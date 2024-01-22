@@ -1,0 +1,39 @@
+# EBNF Grammar for the Geezer DSL
+# Geezer is a domain-specific language used to organize a database of Linux packages
+# Author: Chubak Bidpaa
+
+geezer		::= { pckg | decl | include }
+
+include		::= "@include" text
+
+pckg		::= "pckg" identifer '=' contents ';'
+
+contents	::= content-nam] [ '|' content-auth ] [ '|' content-desc ] '|' content-inst
+
+content-inst    ::= "Install" ':' ( invoke-decl | command ) ','
+content-auth    ::= "Author" ':' text ','
+content-desc    ::= "Description" ':' text ','
+content-name	::= "Name" ':' text ','
+
+invoke-decl	::= '%' identifier arg-list
+
+arg-list	::= text { text }
+
+decl		::= "decl" identifier parameter-list '=' command ';'
+
+
+parameter-list  ::= parameter { parameter }
+parameter	::= "..."
+		| '/' regex '/'
+		| identifier [ '?' ]
+
+
+identifier	::= letter { letter | digit | '_' }
+
+digit		::= '0' | '1' | '2' | ... | '7' | '8' | '9'
+letter 		::= 'A' | 'B' | 'C' | ... | 'X' | 'Y' | 'Z'
+
+regex		::= ? A regular expression ?
+command		::= ? A shell command ?
+text		::= ? Any text ?
+
