@@ -113,7 +113,7 @@ shell_word	[[:alnum:]_./-]+|'[^']*'|"[^"]*
 
 <DEF_CMD_COND>"..."		{ column_name += yyleng; return ELLIPSES; }
 
-<DEF_PKG_COND>[|]		{ column_name += yyleng; return *yytext; }
+<DEF_PKG_COND>[:|]		{ column_name += yyleng; return *yytext; }
 
 
 
