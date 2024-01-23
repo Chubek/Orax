@@ -16,7 +16,7 @@ package-define  ::= "defpkg" identifier '=' info-list ';'
 info-list       ::= info-single { '|' info-single }
 info-single     ::= identifier ':' info-text newline
 
-command-define  ::= "defcmd" identifier [ params-list ] '=' command-text ';'
+command-define  ::= "defcmd" identifier [ params-list | "..." ] '=' command-text ';'
 params-list	::= shell-word { shell-word }
 
 identifier	::= letter { letter | digit | '_' }
