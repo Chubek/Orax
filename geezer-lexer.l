@@ -19,7 +19,7 @@ pascal_case	[A-Z][a-z]*([A-Z][a-z]*)*
 
 
 command_text	[^;$\n]+
-info_text	[^\n]+
+info_text	[^\n:]+
 
 shell_word	[[:alnum:]_./-]+|'[^']*'|"[^"]*
 
