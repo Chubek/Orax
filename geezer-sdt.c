@@ -192,12 +192,3 @@ void walk_and_translate(ASTNode *root, SdtCallbackFn callbackfn)
     RECURSE_TREE_LEAF();
 }
 
-
-/* Below, the various callback functions which translate the text into various languages are defnined */
-
-
-
-void sdt_to_posix_shell(int flag, char *term)
-{
-
-}
