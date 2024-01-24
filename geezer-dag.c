@@ -43,8 +43,9 @@ struct DAGGraph
 };
 
 struct DAGData
-{
-  /* TODO */
+{ 
+  DAGDataType type;
+  char *value;
 };
 
 /* Below are the factory functions for the DAG structures */
@@ -77,3 +78,34 @@ void add_dag_edge(DAGGraph **graph, vert_t src, vert_t dst, DAGData *data)
   new_node->next = (*graph)->adj_list[src];
   (*graph)->adj_list[src] = new_node;
 }
+
+DAGData *create_dag_data(DAGDataType type, char *value)
+{
+  DAGData *data = (DAGData*)calloc(1, sizeof(DAGData));
+  data->type = type;
+  data->value = value;
+  return data;
+}
+
+void free_dag_node(DAGNode *root)
+{
+   DAGNode *node = NULL;
+   while ((node = node->next) != NULL)
+   {
+     if (node->data != NULL)
+       free(node->data);
+     free(node);
+   }
+   if (root->data != NULL)
+     free(root->data);
+   free(root);
+}
+
+void free_dag_graph(DAGGraph *graph)
+{
+   while (--graph->vertices)
+     free_dag_node(graph->adj_list[graph->vertices];
+   free(graph);
+}
+
+
