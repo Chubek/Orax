@@ -44,7 +44,7 @@ ASTNode *new_ast_leaf(ASTType type, char *value)
 {
   ASTNode *node = new_ast_node(type);
   node->is_leaf = true;
-  node->value = valeu;
+  node->value = value;
   return node;
 }
 
@@ -52,7 +52,7 @@ ASTNode *new_ast_leaf(ASTType type, char *value)
 
 ASTNode *ast_add_child(ASTNode **parent, ASTNode *child)
 {
-   (*parent)->child = child;
+   (*parent)->left = child;
    return *parent;
 }
 
@@ -68,6 +68,15 @@ ASTNode *new_ast_info(char *id, char *text)
    return info_node;
 }
 
+ASTNode *new_ast_pkg(char *id, ASTNode *body)
+{
+  ASTNode *id_leaf = new_ast_leaf(AST_NODE_PKGIDENT);
+  ASTNode *pkg_node = new_ast_node(AST_NODE_PKGDEF);
+  pkg_node->left = id_leaf;
+  pkg_node->right = body;
+  return pkg_node;
+}
+
 ASTNode *new_ast_cmd(char *id, ASTNode *params, ASTNode *command)
 {
   ASTNode *id_leaf = new_ast_leaf(AST_LEAF_CMDIDENT, id);
@@ -80,11 +89,20 @@ ASTNode *new_ast_cmd(char *id, ASTNode *params, ASTNode *command)
 
 ASTNode *new_ast_inst(char *id, ASTNode *invoke)
 {
-  ASTNode *id_leaf = new_ast_leaf(AST_LEAF_INSTIDENT);
+  ASTNode *id_leaf = new_ast_leaf(AST_LEAF_INSTIDENT, id);
   ASTNode *inst_node = new_ast_node(AST_NODE_INST);
   inst_node->left = id_leaf;
   inst_node->right = invoke;
   return inst_node;
+}
+
+ASTNode *new_ast_invoke(char *id, ASTNode *args)
+{
+  ASTNode *id_leaf = new_ast_leaf(AST_LEAF_INVOKEIDENT, id);
+  ASTNode *invoke_node = new_ast_node(AST_NODE_INVOKE);
+  invoke_node->left = id_leaf;
+  invoke_node->right = args;
+  return invoke_node;
 }
 
 ASTNode *new_ast_cmdident(char *value)
