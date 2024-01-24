@@ -48,7 +48,7 @@ enum ASTType
   AST_LEAF_PARAM,
 };
 
-/* Declarations for syntax-directed translation types and functions, see `geezer-sdt.c` for definitions */
+/* Declarations and typedefs for the AST walker and symbols table, see `geezer-walker.c` for defintions */
 
 typedef int tflag_t;
 typedef void (*SdtCallbackFn)(tflag_t flag, char *term);
@@ -60,9 +60,7 @@ void symbtable_insert(SymbolsTable **tab, char *key, void *value);
 char *symtable_get(SymbolsTable *tab, char *key);
 void symtable_dump(SymbolsTable *tab);
 
-
 void walk_and_translate(ASTNode *root, SdtCallbackFn callbackfn);
-
 
 /* DAG, and callback functions for SDT, see `geezer-dag.c for more info */
 
