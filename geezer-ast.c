@@ -16,26 +16,6 @@
  */
 
 
-/* The ASTType enumeration stores the types of AST nodes. */
-
-typedef enum ASTType
-{
-  AST_NODE_PKGDEF,
-  AST_NODE_CMDDEf,
-  AST_NODE_INSTDEF,
-  AST_NODE_INFO,
-  AST_LEAF_CMDIDENT,
-  AST_LEAF_ELLIPSE,
-  AST_LEAF_SHWORD,
-  AST_LEAF_CMDTXT,
-  AST_LEAF_REFIDENT,
-  AST_LEAF_INFOIDENT,
-  AST_LEAF_INFOTXT,
-  AST_LEAF_INSTIDENT,
-}
-ASTType;
-
-
 /* The ASTNode structure stores an AST node, or leaf */
 
 typedef struct ASTNode
