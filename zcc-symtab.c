@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include "geezer-decl.h"
+#include "zcc-decl.h"
 
 /* In this DSL, we use a singly-linked list to represent the Symbols Table. The symtable is
  * not only used for symbols, but oft, to represent the state of the program as well.

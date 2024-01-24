@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "geezer-decl.h"
+#include "zcc-decl.h"
 
 /* A DAG (Directed Acyclic Graph) is a type of graph which is loop-less, and each edge has a 
  * specific direction.
@@ -16,15 +16,8 @@
  * and dashed lines represent edges, and the numbers represent the vertext number.
  * This graph, simple as it is, is a textbook definition of a DAG. It is loop-less, and every edge 
  * has a specific direction
- */
-
-/* The AST walker calls a callback function which translates the DSL text into a DAG.
- * A Directed Acylic Graph helps understand the relationship between each part of the target program,
- * unlike the AST which is relationship-agnostic. 
- * Each DAG node contains data which will be used in the final SDT function for each language
- */
-
-/* Below, we define the various data structures we need, the DAG node, the acyclic graph 
+ * -------
+ * Below, we define the various data structures we need, the DAG node, the acyclic graph 
  * using adjacency lists (despite CSLR saying adjacency matrices are a better option, I still want 
  * this to be simple) and the structure for data which DAG nodes hold
  */
@@ -43,9 +36,8 @@ struct DAGGraph
 };
 
 struct DAGData
-{ 
-  DAGDataType type;
-  char *value;
+{
+  /* TODO */
 };
 
 /* Below are the factory functions for the DAG structures */
