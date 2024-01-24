@@ -44,6 +44,7 @@ enum ASTType
   AST_LEAF_INSTIDENT,
   AST_LEAF_TERMINATE,
   AST_LEAF_PKGIDENT,
+  AST_LEAF_INVOKEIDENT,
 };
 
 /* Declarations for syntax-directed translation types and functions, see `geezer-sdt.c` for definitions */
