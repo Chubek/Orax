@@ -57,10 +57,10 @@ void free_dag_graph(DAGGraph *graph);
 
 typedef enum InstructionType InstructionType;	// Defined in `zcc-enums.h`
 typedef enum OperandType OperandType;		// Defined in `zcc-enums.h`
-typedef enum ResultType ResultType;		// Defined in `zcc-enums.h`
+typedef enum OperandType ResultType;		// Defined in `zcc-enums.h`
 typedef struct Instruction Instruction;
 typedef struct Operand Operand;
-typedef struct Result Result;
+typedef struct operand Result;
 typedef int instid_t;
 
 Instruction *create_instruction(InstructionType type, instid_t instruction_id);
