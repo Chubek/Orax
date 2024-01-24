@@ -67,19 +67,39 @@ void walk_and_translate(ASTNode *root, SdtCallbackFn callbackfn);
 typedef struct DAGNode DAGNode;
 typedef struct DAGGraph DAGGraph;
 typedef struct DAGData DAGData;
-typedef int edge_t;
+typedef enum DAGDataType DAGDataType;
 typedef int vert_t;
 
 DAGNode *create_dag_node(DAGData *data, vert_t dest);
 DAGGraph *create_dag_graph(vert_t vertices);
 void add_dag_edge(DAGGraph **graph, vert_t src, vert_t dst);
-DAGData *create_dag_data(/* TODO */);
+DAGData *create_dag_data(DAGDataType type, char *value);
 
+void free_dag_node(DAGNode *root);
+void free_dag_graph(DAGGraph *graph);
 
 void callback_yaf_languages(tflag_t flag, char *term);
 
 
+/* This enumeration contains the types of data which a DAG may contain */
 
+enum DAGDataType
+{
+  DAG_FUNCTION,
+  DAG_VARIABLE,
+  DAG_STRING_LITERAL,
+  DAG_INTEGER_LITERAL,
+  DAG_WHILE_LOOP,
+  DAG_FOR_LOOP,
+  DAG_FOREACH_LOOP,
+  DAG_LIST_LITERAL,
+  DAG_HASHMAP_LITERAL,
+  DAG_IF_COND,
+  DAG_ELSE_COND,
+  DAG_CLASS,
+  DAG_STRUCT,
+  DAG_ENUM,
+};
 
 
 /* Some constant values and macros (both object-like and function-like) */
