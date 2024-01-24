@@ -38,7 +38,7 @@ ASTType;
 typedef struct ASTNode
 {
   ASTType type;				// The type
-  struct ASTNode *left, *right;		// Left and right subtree
+  struct ASTNode *child;		// AST child
   bool is_leaf;				// Is this a leaf? Leaves represent terminals
   char *value;				// This only will be non-NULL if leaf
 } 
@@ -62,4 +62,11 @@ ASTNode *new_ast_leaf(ASTType type, char *value)
   node->is_leaf = true;
   node->value = valeu;
   return node;
+}
+
+/* The following function adds a child to the tree */
+
+ASTNode *ast_add_child(ASTNode **parent, ASTNode *child)
+{
+   (*parent)->child = child;
 }
