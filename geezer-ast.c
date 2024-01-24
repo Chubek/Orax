@@ -69,4 +69,5 @@ ASTNode *new_ast_leaf(ASTType type, char *value)
 ASTNode *ast_add_child(ASTNode **parent, ASTNode *child)
 {
    (*parent)->child = child;
+   return *parent;
 }
