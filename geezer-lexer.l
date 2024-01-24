@@ -122,5 +122,7 @@ qt_shell_word   [^'"\n]+
 ";;".+				{  column_name += yyleng;  }
 [\n]+				{  line_num += yyleng;     }
 
+<<EOF>>				{ yyterminate(); return TERM; }
+
 %%
 
