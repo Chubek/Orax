@@ -116,7 +116,6 @@ void walk_and_translate(ASTNode *root, SdtCallbackFn callbackfn)
 	 walk_and_translate(ident, callbackfn);
 	 walk_and_translate(body, callbackfn);
 	 callbackfn(FLAG_UNSET_MODE | FLAG_MODE_PKG, NULL);
-	 RECURSE_TREE_NODE();
       }
 
       if (root->type == AST_NODE_INSTDEF)
@@ -127,26 +126,63 @@ void walk_and_translate(ASTNode *root, SdtCallbackFn callbackfn)
 	 walk_and_translate(ident, callbackfn);
 	 walk_and_translate(invoke, callbackfn);
 	 callbackfn(FLAG_UNSET_MODE | FLAG_MODE_INST, NULL);
-	 RECURSE_TREE_NODE();
       }
-   }
+
+      if (root->type == AST_NODE_INFO)
+      {
+	callbackfn(FLAG_SET_MODE | FLAT_MODE_INFO, NULL);
+	ASTNode *ident = root->left;
+	ASTNode *text = root-right;
+	walk_and_translate(ident, callbackfn);
+	walk_and_translate(text, callbackfn);
+	callbackfn(FLAG_UNSET_MODE | FLAG_MODE_INFO, NULL);
+      }
+
+      if (root->type AST_NODE_INVOKE)
+      {
+	callbackfn(FLAG_SET_MODE | FLAG_MODE_INVOKE, NULL);
+	ASTNode *ident = root->left;
+	ASTNode *shwords = root->right;
+	walk_and_translate(ident, callbackfn);
+	walk_and_translate(shwords, callbackfn);
+	callbackfn(FLAG_UNSET_MODE | FLAG_MODE_INVOKE, NULL);
+      }
+
+     RECURSE_TREE_NODE();
+    }
 
     switch (root->type)
     {
        case AST_LEAF_CMDIDENT:
-	callbackfn(FLAG_MODE_CMD | FLAG_IDENT, root->value);
+	callbackfn(FLAG_LEAF_MODE | FLAG_MODE_CMD | FLAG_IDENT, root->value);
 	break;
        case AST_LEAF_ELLIPSE:
-	callbackfn(FLAG_MODE_CMD | FLAG_PARAM | FLAG_VARARG, NULL);
+	callbackfn(FLAG_LEAF_MODE | FLAG_MODE_CMD | FLAG_VARPARAM, NULL);
 	break;
        case AST_LEAF_SHOWRD:
-	callbackfn(FLAG_MODE_INST | FLAG_SHELL_WORD, root->value);
+	callbackfn(FLAG_LEAF_MODE | FLAG_MODE_INVOKE | FLAG_SHELLWORD, root->value);
 	break;
        case AST_LEAF_REFIDENT:
-	callbackfn(FLAG_MODE_CMD | FLAG_REFERENCE | FLAG_IDENT, root->value);
+	callbackfn(FLAG_LEAF_MODE | FLAG_MODE_CMD | FLAG_REFIDENT, root->value);
+	break;
        case AST_LEAF_INFOIDENT:
-	callbackfn(FLAG_MODE_PKG | FLAG_IDENT
-
-
+	callbackfn(FLAG_LEAF_MODE | FLAG_MODE_INFO | FLAG_IDENT, root->value);
+	break;
+       case AST_LEAF_PKGIDENT:
+	callbackfn(FLAG_LEAF_MODE | FLAG_MODE_PKG | FLAG_IDENT, root->value);
+	break;
+       case AST_LEAF_INFOTXT:
+	callbackfn(FLAG_LEAF_MODE | FLAG_MODE_INFO | FLAG_TEXT, root->value);
+	break;
+       case AST_LEAF_INSTIDENT:
+	callbackfn(FLAG_LEAF_MODE | FLAG_MODE_INST | FLAG_IDENT, root->value);
+	break;
+       case AST_LEAF_INFOIDENT:
+	callbackfn(FLAG_LEAF_MODE | FLAG_MODE_INFO | FLAG_IDENT, root->value);
+	break;
+       case AST_LEAF_INVOKEIDENT:
+	callbackfn(FLAG_LEAF_MODE | FLAG_MODE_INVOKE | FLAG_IDENT, root->value);
+	break;
     }
+    RECURSE_TREE_LEAF();
 }
