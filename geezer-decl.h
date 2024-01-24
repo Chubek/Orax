@@ -48,19 +48,16 @@ enum ASTType
   AST_LEAF_PARAM,
 };
 
-/* Declarations and typedefs for the AST walker and symbols table, see `geezer-walker.c` for defintions */
 
-typedef int tflag_t;
-typedef void (*SdtCallbackFn)(tflag_t flag, char *term);
+/* Type definitions and function declarations for the symbols table, see `geezer-symtable.c` for definitions */
+
 typedef struct SymbolsTable SymbolsTable;
-
 
 uint32_t djb2_hash(char *message);
 void symbtable_insert(SymbolsTable **tab, char *key, void *value);
 char *symtable_get(SymbolsTable *tab, char *key);
 void symtable_dump(SymbolsTable *tab);
 
-void walk_and_translate(ASTNode *root, SdtCallbackFn callbackfn);
 
 /* DAG, and callback functions for SDT, see `geezer-dag.c for more info */
 
@@ -100,55 +97,6 @@ enum DAGDataType
   DAG_STRUCT,
   DAG_ENUM,
 };
-
-
-/* Some constant values and macros (both object-like and function-like) */
-
-/* Macros for flags used during SDT callbacks */
-
-#define DJB2_MAGIC	 33
-
-#define FLAG_SET_MODE	 (1 << 1)
-#define FLAG_UNSET_MODE	 (1 << 2)
-#define FLAG_MODE_CMD	 (1 << 3)
-#define FLAG_MODE_PKG	 (1 << 4) 
-#define FLAG_MODE_INST	 (1 << 5)
-#define FLAG_MODE_INFO	 (1 << 6)
-#define FLAG_MODE_INVOKE (1 << 7)
-#define FLAG_LEAF_MODE	 (1 << 8)
-#define FLAG_IDENT	 (1 << 9)
-#define FLAG_VARPARAM	 (1 << 10)
-#define	FLAG_PARAM	 (1 << 11)
-#define FLAG_REFIDENT	 (1 << 12)
-#define FLAG_SHELLWORD	 (1 << 13)
-
-#define BITMASK_LEAF_FLAG 0b00000000000000000011111000000000
-#define BITMASK_MODE_FLAG 0b00000000000000000000000011111000
-
-#define IS_FLAG(FLAG, IS)					\
-	((FLAG & IS) == IS)
-
-#define GET_LEAF_FLAG(FLAG)					\
-	(FLAG & BITMASK_LEAF_FLAG)
-
-#define GET_MODE_FLAG(FLAG)					\
-	(FLAG & BITMASK_MODE_FLAG)
-
-
-#define EMIT_YYOUT(FMT, ...)					\
-	fprintf(yyout, FMT, __VA_ARGS__)
-
-
-
-/* General runtime macros */
-
-#define EXIT_CODE_SCAN_ERROR		80
-#define EXIT_CODE_PARSE_ERROR		81
-#define EXIT_CODE_YYPARSE_ERROR		82
-#define EXIT_CODE_SYNTAX_ERROR		83
-
-#define ERROR_OUT(MESSAGE, EXIT_CODE, ...)			\
-	do { fprintf(stderr, MESSAGE, __VA_ARGS__); exit(EXIT_CODE); } while (0)
 
 
 
