@@ -39,15 +39,14 @@ void symtable_dump(SymbolsTable *tab);
 
 /* DAG declarations and typedefs, see `zcc-dag.c for more definitions */
 
+typedef struct Instruction Instruction; // This will be re-declared in the next section
 typedef struct DAGNode DAGNode;
 typedef struct DAGGraph DAGGraph;
-typedef struct DAGData DAGData;
 typedef int vert_t;
 
-DAGNode *create_dag_node(DAGData *data, vert_t dest);
+DAGNode *create_dag_node(Instruction *inst, vert_t dest);
 DAGGraph *create_dag_graph(vert_t vertices);
-void add_dag_edge(DAGGraph **graph, vert_t src, vert_t dst);
-DAGData *create_dag_data(/* TODO */);
+void add_dag_edge(DAGGraph **graph, vert_t src, vert_t dst, Instruction *inst);
 
 void free_dag_node(DAGNode *root);
 void free_dag_graph(DAGGraph *graph);
