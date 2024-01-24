@@ -20,15 +20,18 @@
 
 typedef enum ASTType
 {
-  COMMAND_IDENTIFIER,	// An identifier for "defcmd"
-  PACKAGE_IDENTIFIER,	// An identifier for "defpkg"
-  INSTALL_IDENTIFIER,	// An identifier for "defins"
-  INVOKE_IDENTIFIER,	// A provoked command identifier, prefixed with '%'
-  COMMAND_TEXT,		// The command text, a list of shell words terminated by ';'
-  INFO_TEXT,		// Information singleton for the package (can be many)
-  COMMAND_PARAMETER,	// Parameters defined for the command (prefixe with '$' in COMMAND_TEXT)
-  INVOKE_ARGUMENT,	// The shell word passed as an argument to INVOKE_IDENTIFIER, replaces '$'s1
-  SUBST_PARAM,		// The parameter to be substituted
+  AST_NODE_PKGDEF,
+  AST_NODE_CMDDEf,
+  AST_NODE_INSTDEF,
+  AST_NODE_INFO,
+  AST_LEAF_CMDIDENT,
+  AST_LEAF_ELLIPSE,
+  AST_LEAF_SHWORD,
+  AST_LEAF_CMDTXT,
+  AST_LEAF_REFIDENT,
+  AST_LEAF_INFOIDENT,
+  AST_LEAF_INFOTXT,
+  AST_LEAF_INSTIDENT,
 }
 ASTType;
 
@@ -38,7 +41,7 @@ ASTType;
 typedef struct ASTNode
 {
   ASTType type;				// The type
-  struct ASTNode *child;		// AST child
+  struct ASTNode *left, right;		// AST subtrees
   bool is_leaf;				// Is this a leaf? Leaves represent terminals
   char *value;				// This only will be non-NULL if leaf
 } 
@@ -51,6 +54,8 @@ ASTNode *new_ast_node(ASTType type)
 {
    ASTNode *node = (ASTNode*)calloc(1, sizeof(ASTNode));
    node->type = type;
+   node->left = NULL;
+   node->right = NULL;
    return node;
 }
 
@@ -70,4 +75,74 @@ ASTNode *ast_add_child(ASTNode **parent, ASTNode *child)
 {
    (*parent)->child = child;
    return *parent;
+}
+
+/* The following functions are factories for AST nodes and leaves */
+
+ASTNode *new_ast_info(char *id, char *text)
+{
+   ASTNode *id_leaf = new_ast_leaf(AST_LEAF_INFOIDENT, id);
+   ASTNode *txt_leaf = new_ast_leaf(AST_LEAF_INFOTXT, text);
+   ASTNode *info_node = new_ast_node(AST_NODE_INFO);
+   info_node->left = id_leaf;
+   info_node->right = txt_leaf;
+   return info_node;
+}
+
+ASTNode *new_ast_cmd(char *id, ASTNode *params, ASTNode *command)
+{
+  ASTNode *id_leaf = new_ast_leaf(AST_LEAF_CMDIDENT, id);
+  ASTNode *cmd_node = new_ast_node(AST_NODE_CMDDEF);
+  cmd_node->left = id_leaf;
+  cmd_node->right = params;
+  cmd_node->right->left = command;
+  return cmd_node;
+}
+
+ASTNode *new_ast_inst(char *id, ASTNode *invoke)
+{
+  ASTNode *id_leaf = new_ast_leaf(AST_LEAF_INSTIDENT);
+  ASTNode *inst_node = new_ast_node(AST_NODE_INST);
+  inst_node->left = id_leaf;
+  inst_node->right = invoke;
+  return inst_node;
+}
+
+ASTNode *new_ast_cmdident(char *value)
+{
+  return new_ast_leaf(AST_LEAF_CMDIDENT, value);
+}
+
+
+ASTNode *new_ast_ellipse(void)
+{
+  return new_ast_leaf(AST_LEAF_ELLIPSES, NULL);
+}
+
+ASTNode *new_ast_shword(char *value)
+{
+  return new_ast_leaf(AST_LEAF_SHWORD, value);
+}
+
+
+ASTNode *new_ast_cmdtxt(char *value)
+{
+  return new_ast_leaf(AST_LEAF_CMDTXT, value);
+}
+
+ASTNode *new_ast_refident(char *value)
+{
+  return new_ast_leaf(AST_LEAF_REFIDENT, value);
+}
+
+void free_ast(ASTNode *root)
+{
+  if (root->is_leaf && root->value != NULL)
+    free(root->value);
+  if (root->left != NULL)
+    free(root->left);
+  if (root->right != NULL)
+    free(root->right);
+  if (root != NULL)
+    free(root);
 }
