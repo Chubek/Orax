@@ -34,7 +34,8 @@ BasicBlock *create_basic_block(blockid_t block_id)
 
 BasicBlock *add_cfg_successor(BasicBlock *block, succid_t successor_id)
 {
-  block->successors = (succid_t*)realloc(block->successors, block->num_successors + 1);
+  block->successors = (succid_t*)realloc(block->successors, 
+		  (block->num_successors + 1) * sizeof(succid_t));
   block->successors[block->num_successors++] = successor_id;
   return block;
 }
@@ -42,7 +43,8 @@ BasicBlock *add_cfg_successor(BasicBlock *block, succid_t successor_id)
 
 BasicBlock *add_cfg_instruction(BasicBlock *block, Instruction *inst)
 {
-  block->instructions = (Instruction**)realloc(block->instructions, block->num_instructions + 1);
+  block->instructions = (Instruction**)realloc(block->instructions, 
+		  (block->num_instructions + 1) * sizeof(Instruction*));
   block->instructions[block->num_instructions++] = inst;
   return block;
 }
