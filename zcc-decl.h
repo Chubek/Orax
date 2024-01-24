@@ -10,8 +10,8 @@
 
 /* Declaration of AST structure types and functions, see `zcc-ast.c` for definitions */
 
-typedef enum ASTNodeType ASTNodeType;
-typedef enum ASTLeafType ASTLeafType;
+typedef enum ASTNodeType ASTNodeType;	// Defined in `zcc-enums.h`
+typedef enum ASTLeafType ASTLeafType;	// Defined in `zcc-enums.h`
 typedef struct ASTNode ASTNode;
 typedef struct ASTLeaf ASTLeaf;
 
@@ -52,7 +52,27 @@ DAGData *create_dag_data(/* TODO */);
 void free_dag_node(DAGNode *root);
 void free_dag_graph(DAGGraph *graph);
 
-// + D: The Control Flow Graph +
+// + D: The Instructions +
+
+/* The following functions and typedefs declare the instructions. See `zcc-inst.c` for definitions */
+
+typedef enum InstructionType InstructionType;	// Defined in `zcc-enums.h`
+typedef enum OperandType OperandType;		// Defined in `zcc-enums.h`
+typedef enum ResultType ResultType;		// Defined in `zcc-enums.h`
+typedef struct Instruction Instruction;
+typedef struct Operand Operand;
+typedef struct Result Result;
+typedef int instid_t;
+
+Instruction *create_instruction(InstructionType type, instid_t instruction_id);
+Instruction *add_inst_operand(Instruction *inst, Operand *operand);
+Instruction *add_inst_result(Instruction *inst, Result *result);
+
+Operand *create_operand(OperandType type, void *value);
+Result *create_result(ResultType type, void *value);
+
+
+// + E: The Control Flow Graph +
 
 /* The following functions declares a Basic Block used for Control Flow Analysis. See `zcc-cfg.c` for definitions */
 
@@ -62,10 +82,9 @@ typedef int blockid_t;
 
 BasicBlock *create_basic_block(blockid_t block_id);
 BasicBlock *add_cfg_successor(BasicBlock *block, succid_t successor_id);
+BasicBlock *add_cfg_instruction(BasicBlock *block, Instruction *inst);
 
 
-
- 
 
 
 #endif
