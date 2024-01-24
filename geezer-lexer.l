@@ -21,7 +21,9 @@ pascal_case	[A-Z][a-z]*([A-Z][a-z]*)*
 command_text	[^;$\n]+
 info_text	[^\n:]+
 
-shell_word	[[:alnum:]_./-]+|'[^']*'|"[^"]*
+shell_word	[^ '"\n]+
+qt_shell_word   [^'"\n]+
+
 
 %x DEF_CMD_COND
 %x DEF_INST_COND
@@ -79,7 +81,7 @@ shell_word	[[:alnum:]_./-]+|'[^']*'|"[^"]*
 				   column_num += yyleng;
 				   return SHELL_WORD;
 				}
-<DEF_INST_COND>["']{shell_word}['"] {
+<DEF_INST_COND>["']{qt_shell_word}['"] {
 				      yylval.sval = strndup(&yytext[1], yyleng - 2);
 				      column_num += yyleng;
 				      return QUOTED_SHELL_WORD;
