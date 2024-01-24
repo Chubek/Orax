@@ -21,7 +21,7 @@
 struct ASTNode
 {
   ASTType type;				// The type
-  struct ASTNode *left, right;		// AST subtrees
+  ASTNode *left, right;			// AST subtrees
   bool is_leaf;				// Is this a leaf? Leaves represent terminals
   char *value;				// This only will be non-NULL if leaf
 };
