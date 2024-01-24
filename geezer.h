@@ -1,6 +1,8 @@
 #ifndef GEEZER_H_
 #define GEEZER_H_
 
+#include <stdarg.h>
+
 /* Declaration of AST structure types and functions, see `geezer-ast.c` for definitions */
 
 typedef enum ASTType ASTType;
@@ -16,6 +18,7 @@ ASTNode *new_ast_ellipse(void);
 ASTNode *new_ast_shword(char *value);
 ASTNode *new_ast_cmdtxt(char *value);
 ASTNode *new_ast_refident(char *value);
+ASTNode *new_ast_terminate(void);
 ASTNode *ast_add_child(ASTNode **node, ASTNode *child);
 void free_ast(ASTNode *root);
 
@@ -35,8 +38,13 @@ enum ASTType
   AST_LEAF_INFOIDENT,
   AST_LEAF_INFOTXT,
   AST_LEAF_INSTIDENT,
+  AST_LEAF_TERMINAtE,
 };
 
+/* Declarations for syntax-directed translation types and functions, see `geezer-sdt.c` for definitions */
 
+typedef void (*SdtCallbackFn)(char* fmt, ...);
+
+void walk_and_translate(ASTNode *root, SdtCallbackFn callbackfn);
 
 #endif
