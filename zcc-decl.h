@@ -52,7 +52,16 @@ DAGData *create_dag_data(/* TODO */);
 void free_dag_node(DAGNode *root);
 void free_dag_graph(DAGGraph *graph);
 
+// + D: The Control Flow Graph +
 
+/* The following functions declares a Basic Block used for Control Flow Analysis. See `zcc-cfg.c` for definitions */
+
+typedef struct BasicBlock BasicBlock;
+typedef int succid_t;
+typedef int blockid_t;
+
+BasicBlock *create_basic_block(blockid_t block_id);
+BasicBlock *add_cfg_successor(BasicBlock *block, succid_t successor_id);
 
 
 
