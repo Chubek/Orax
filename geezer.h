@@ -50,7 +50,8 @@ enum ASTType
 
 /* Declarations for syntax-directed translation types and functions, see `geezer-sdt.c` for definitions */
 
-typedef void (*SdtCallbackFn)(int flag, char *term);
+typedef int tflag_t;
+typedef void (*SdtCallbackFn)(tflag_t flag, char *term);
 typedef struct SymbolsTable SymbolsTable;
 
 
@@ -62,7 +63,30 @@ void symtable_dump(SymbolsTable *tab);
 
 void walk_and_translate(ASTNode *root, SdtCallbackFn callbackfn);
 
-void sdt_to_posix_shell(int flag, char *term);
+
+/* DAG, and callback functions for SDT, see `geezer-dag.c for more info */
+
+typedef struct DAGNode DAGNode;
+typedef struct DAGGraph DAGGraph;
+typedef struct DAGData DAGData;
+typedef int edge_t;
+typedef int vert_t;
+
+DAGNode *create_dag_node(DAGData *data, vert_t dest);
+DAGGraph *create_dag_graph(vert_t vertices);
+void add_dag_edge(DAGGraph **graph, vert_t src, vert_t dst);
+DAGData *create_dag_data(/* TODO */);
+
+
+void callback_yaf_languages(tflag_t flag, char *term);
+
+
+
+
+
+/* Some constant values and macros (both object-like and function-like) */
+
+/* Macros for flags used during SDT callbacks */
 
 #define DJB2_MAGIC	 33
 
@@ -79,6 +103,35 @@ void sdt_to_posix_shell(int flag, char *term);
 #define	FLAG_PARAM	 (1 << 11)
 #define FLAG_REFIDENT	 (1 << 12)
 #define FLAG_SHELLWORD	 (1 << 13)
+
+#define BITMASK_LEAF_FLAG 0b00000000000000000011111000000000
+#define BITMASK_MODE_FLAG 0b00000000000000000000000011111000
+
+#define IS_FLAG(FLAG, IS)					\
+	((FLAG & IS) == IS)
+
+#define GET_LEAF_FLAG(FLAG)					\
+	(FLAG & BITMASK_LEAF_FLAG)
+
+#define GET_MODE_FLAG(FLAG)					\
+	(FLAG & BITMASK_MODE_FLAG)
+
+
+#define EMIT_YYOUT(FMT, ...)					\
+	fprintf(yyout, FMT, __VA_ARGS__)
+
+
+
+/* General runtime macros */
+
+#define EXIT_CODE_SCAN_ERROR		80
+#define EXIT_CODE_PARSE_ERROR		81
+#define EXIT_CODE_YYPARSE_ERROR		82
+#define EXIT_CODE_SYNTAX_ERROR		83
+
+#define ERROR_OUT(MESSAGE, EXIT_CODE, ...)			\
+	do { fprintf(stderr, MESSAGE, __VA_ARGS__); exit(EXIT_CODE); } while (0)
+
 
 
 
