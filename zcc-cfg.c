@@ -14,7 +14,7 @@ struct BasicBlock
   blockid_t id;
   succid_t *successors;
   ssize_t num_successors;
-  Instruction *instructions;
+  Instruction **instructions;
   ssize_t num_instructions;
 };
 
@@ -42,7 +42,7 @@ BasicBlock *add_cfg_successor(BasicBlock *block, succid_t successor_id)
 
 BasicBlock *add_cfg_instruction(BasicBlock *block, Instruction *inst)
 {
-  block->instructions = (Instruction*)realloc(block->instructions, block->num_instructions + 1);
+  block->instructions = (Instruction**)realloc(block->instructions, block->num_instructions + 1);
   block->instructions[block->num_instructions++] = inst;
   return block;
 }
