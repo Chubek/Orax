@@ -6,13 +6,19 @@
 
 #include "geezer-decl.h"
 
-/* The following data structues define Abstract Syntax Tree for the Geezer langauge.
- * Geezer is a language used to store data about packages, libraries, and it provides
- * ways to define commands to install them.
- * When the `geezer(1)` command is invoked, the Flex lexer scans the passed document
- * and passes it to the Yacc parser which in turn translates the document into the following AST.
- * This AST, then, is used to construct an executable binary which can be invoked to print data
- * about libraries and packages, or install them
+/* An Abstract Syntax Tree is an assymetic tree which is usually the first method
+ * of an intermediate representation after the text in the language has been parsed,
+ * and there has been no lexical, or parsing errors. AST represents the syntax of the
+ * program in a way that it can be considered a 'pruned' version of the parse tree,
+ * hence the term 'abstract'. However, an AST does not define the relationships between
+ * parts of the syntax. The AST is usually when the text is scanned for syntactic errors, 
+ * and then it is converted to another form of intermediate representation.
+ * In a compiled language, in modern times, that's usually the DAG and then the CFG and
+ * from there, the SSA. However, Geezer is just a tiny DSL so we just translate it to a DAG.
+ * See `geezer-dag.c` for mor info.
+ * A tree data structure usually has a 'node' and a 'leaf'. In an AST, the leaves are used
+ * to represent terminals such as commands and parameters, and nodes are used to encompass
+ * them.
  */
 
 
@@ -21,7 +27,7 @@
 struct ASTNode
 {
   ASTType type;				// The type
-  ASTNode *left, right;			// AST subtrees
+  ASTNode *left, *right;		// AST subtrees
   bool is_leaf;				// Is this a leaf? Leaves represent terminals
   char *value;				// This only will be non-NULL if leaf
 };
