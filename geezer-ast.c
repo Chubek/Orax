@@ -105,9 +105,9 @@ ASTNode *new_ast_invoke(char *id, ASTNode *args)
   return invoke_node;
 }
 
-ASTNode *new_ast_cmdident(char *value)
+ASTNode *new_ast_param(char *value)
 {
-  return new_ast_leaf(AST_LEAF_CMDIDENT, value);
+  return new_ast_leaf(AST_LEAF_PARAM, value);
 }
 
 
