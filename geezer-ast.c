@@ -115,6 +115,11 @@ ASTNode *new_ast_refident(char *value)
   return new_ast_leaf(AST_LEAF_REFIDENT, value);
 }
 
+ASTNode *new_ast_terminate(void)
+{
+  return new_ast_leaf(AST_LEAF_TERMINATE, NULL);
+}
+
 void free_ast(ASTNode *root)
 {
   if (root->is_leaf && root->value != NULL)
