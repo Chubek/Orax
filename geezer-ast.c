@@ -18,14 +18,13 @@
 
 /* The ASTNode structure stores an AST node, or leaf */
 
-typedef struct ASTNode
+struct ASTNode
 {
   ASTType type;				// The type
   struct ASTNode *left, right;		// AST subtrees
   bool is_leaf;				// Is this a leaf? Leaves represent terminals
   char *value;				// This only will be non-NULL if leaf
-} 
-ASTNode;
+};
 
 
 /* The following function creates an AST node */
