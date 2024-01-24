@@ -17,35 +17,30 @@
  * This graph, simple as it is, is a textbook definition of a DAG. It is loop-less, and every edge 
  * has a specific direction
  * -------
- * Below, we define the various data structures we need, the DAG node, the acyclic graph 
+ * Below, we define the various instruction structures we need, the DAG node, the acyclic graph 
  * using adjacency lists (despite CSLR saying adjacency matrices are a better option, I still want 
- * this to be simple) and the structure for data which DAG nodes hold
+ * this to be simple) and the structure for instruction which DAG nodes hold
  */
 
 struct DAGNode
 {
-  DAGData *data;  // The data for the node
-  vert_t dest;	  // The index for the destination to the end of the 'arrow' directed to this node
-  DAGNode *next;  // The next graph in the adjacency list
+  Instruction *instruction;
+  vert_t dest;  
+  DAGNode *next;
 };
 
 struct DAGGraph
 {
-  vert_t vertices;	// Number of vertices this graph holds
-  DAGNode **adj_list;	// The adjacency list that defines this graph
-};
-
-struct DAGData
-{
-  /* TODO */
+  vert_t vertices;
+  DAGNode **adj_list;
 };
 
 /* Below are the factory functions for the DAG structures */
 
-DAGNode *create_dag_node(DAGData *data, vert_t dest)
+DAGNode *create_dag_node(Instruction *instruction, vert_t dest)
 {
   DAGNode *node = (DAGNode*)calloc(1, sizeof(DAGNode));
-  node->data = data;
+  node->instruction = instruction;
   node->dest = dest;
   node->next = NULL;
   return node;
@@ -64,32 +59,19 @@ DAGGraph *create_dag_graph(vert_t vertices)
   return graph;
 }
 
-void add_dag_edge(DAGGraph **graph, vert_t src, vert_t dst, DAGData *data)
+void add_dag_edge(DAGGraph **graph, vert_t src, vert_t dst, Instruction *inst)
 {
-  DAGNode *new_node = create_dag_node(data, dst);
+  DAGNode *new_node = create_dag_node(instruction, dst);
   new_node->next = (*graph)->adj_list[src];
   (*graph)->adj_list[src] = new_node;
 }
 
-DAGData *create_dag_data(DAGDataType type, char *value)
-{
-  DAGData *data = (DAGData*)calloc(1, sizeof(DAGData));
-  data->type = type;
-  data->value = value;
-  return data;
-}
 
 void free_dag_node(DAGNode *root)
 {
-   DAGNode *node = NULL;
-   while ((node = node->next) != NULL)
-   {
-     if (node->data != NULL)
-       free(node->data);
-     free(node);
-   }
-   if (root->data != NULL)
-     free(root->data);
+   if (root == NULL)
+    return;
+   free_dag_node(root->next);
    free(root);
 }
 
