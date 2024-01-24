@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include "geezer.h"
+#include "geezer-decl.h"
 
 /* This macro is used to recurse the tree nodes, and leaves */
 

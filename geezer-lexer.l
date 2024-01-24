@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "geezer.h"
+#include "geezer-decl.h"
 
 size_t line_num = 0;
 size_t column_num = 0;

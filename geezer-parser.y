@@ -6,7 +6,7 @@
 #include <string.h>
 
 
-#include "geezer.h"
+#include "geezer-decl.h"
 
 
 %}
@@ -56,7 +56,7 @@ params   : /* empty */
 	 | params param				{ $$ = ast_add_child(&$1, $2);		 }
 	 ;
 
-param    : CMD_IDENT				{ $$ = new_ast_cmdident($1);  		 }
+param    : CMD_IDENT				{ $$ = new_ast_param($1);  		 }
 	 | ELLIPSES				{ $$ = new_ast_ellipse();		 }
 	 ;
 

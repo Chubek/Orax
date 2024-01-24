@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "geezer.h"
+#include "geezer-decl.h"
 
 /* The following data structues define Abstract Syntax Tree for the Geezer langauge.
  * Geezer is a language used to store data about packages, libraries, and it provides
