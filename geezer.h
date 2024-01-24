@@ -45,11 +45,12 @@ enum ASTType
   AST_LEAF_TERMINATE,
   AST_LEAF_PKGIDENT,
   AST_LEAF_INVOKEIDENT,
+  AST_LEAF_PARAM,
 };
 
 /* Declarations for syntax-directed translation types and functions, see `geezer-sdt.c` for definitions */
 
-typedef void (*SdtCallbackFn)(int info, char *term);
+typedef void (*SdtCallbackFn)(int flag, char *term);
 typedef struct SymbolsTable SymbolsTable;
 
 
@@ -61,7 +62,24 @@ void symtable_dump(SymbolsTable *tab);
 
 void walk_and_translate(ASTNode *root, SdtCallbackFn callbackfn);
 
+void sdt_to_posix_shell(int flag, char *term);
 
 #define DJB2_MAGIC	 33
+
+#define FLAG_SET_MODE	 (1 << 1)
+#define FLAG_UNSET_MODE	 (1 << 2)
+#define FLAG_MODE_CMD	 (1 << 3)
+#define FLAG_MODE_PKG	 (1 << 4) 
+#define FLAG_MODE_INST	 (1 << 5)
+#define FLAG_MODE_INFO	 (1 << 6)
+#define FLAG_MODE_INVOKE (1 << 7)
+#define FLAG_LEAF_MODE	 (1 << 8)
+#define FLAG_IDENT	 (1 << 9)
+#define FLAG_VARPARAM	 (1 << 10)
+#define	FLAG_PARAM	 (1 << 11)
+#define FLAG_REFIDENT	 (1 << 12)
+#define FLAG_SHELLWORD	 (1 << 13)
+
+
 
 #endif
