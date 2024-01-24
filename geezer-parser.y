@@ -67,7 +67,7 @@ infotxts : infotxt				{ $$ = $1; 				 }
 infotxt  : PASCAL_CASE ':' INFO_TEXT NEWLINE    { $$ = new_ast_info($1, $3);		 }
          ;
 
-invoke   : INVOKE_IDENT shwords
+invoke   : INVOKE_IDENT shwords			{ $$ = new_ast_invoke($1, $2);		 }
 	 ;
 
 shwords  : shword				{ $$ = $1;				 }
