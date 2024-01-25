@@ -83,7 +83,35 @@ BasicBlock *create_basic_block(blockid_t block_id);
 BasicBlock *add_cfg_successor(BasicBlock *block, succid_t successor_id);
 BasicBlock *add_cfg_instruction(BasicBlock *block, Instruction *inst);
 
+// + F: The Interferrence Graph +
 
+/* The following functions and typedefs declare the interferrence graph, used for Register Allocation. See `zcc-ifg.c` for definitions */
 
+typedef struct RegisterNode RegisterNode;
+typedef int regid_t;
+typedef int color_t;
+typedef int degree_t;
+
+RegisterNode *create_register(regid_t id, char *name);
+void update_node_degree(RegisterNode *node);
+void remove_neighbor(RegisterNode *node, degree_t neighbor_degree);
+void remove_all_neighbors(RegisterNode *node);
+void add_register_edge(RegisterNode *node1, RegisterNode *node2);
+RegisterNode *get_node_with_least_degree(RegisterNode *nodes[], size_t num_nodes);
+void simplify_registers(RegisterNode *nodes[], size_t num_nodes);
+inline void spill_to_memory(RegisterNode *node);
+void select_registers(Node *nodes[], size_t num_nodes);
+void coalesce_registers(RegisterNode *node1, RegisterNode *node2);
+void color_registers_graph(RegisterNode *nodes[], size_t num_nodes);
+
+#define DEGREE_INIT -1
+
+#define COLOR_INIT -1
+#define COLOR_REMOVED -2
+#define COLOR_SPILLED -3
+
+#ifndef MAX_NEIGHBORS
+#define MAX_NEIGHBORS 128
+#endif
 
 #endif
