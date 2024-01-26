@@ -1,0 +1,106 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
+#include <stdbool.h>
+
+
+#include "orax-decl.h"
+
+struct MachineInstruction
+{
+   MachineOpcode opcode;		// enum MachineOpcode
+   MachineRegister dest_register;	// enum MachineRegister;
+   char *label;				// Assembler label
+   size_t line_number;			// Line number in Assembly code
+};
+
+struct InstructionTile
+{
+   tileid_t id;
+   Instruction *left, *right;
+};
+
+struct MaxMunchState
+{
+   InstructionTile **tiles;
+   size_t num_tiles;
+   MachineInstruction **gen_inst;	// Generated instructions
+   size_t num_gen_inst;
+};
+
+
+MachineInstruction *create_machine_instruction(MachineOpcode opcode, 
+				MachineRegister dest_register, char *label, size_t line_number) {
+   MachineInstruction *minst = 
+	   (MachineInstruction*)calloc(1, sizeof(MachineInstruction));
+   minst->opcode = opcode;
+   minst->dest_register = dest_register;
+   minst->label = label;
+   minst->line_number = line_number;
+   return minst;
+}
+
+
+InstructionTile *create_instruction_tile(tileid_t id)
+{
+   InstructionTile *tile = (InstructionTile*)calloc(1, sizeof(InstructionTile));
+   tile->id = id;
+   tile->left = NULL;
+   tile->right = NULL;
+   return tile;
+}
+
+MaxMunchState *create_max_munch_state(void)
+{
+   MaxMunchState *state = (MaxMunchState*)calloc(1, sizeof(MaxMunchState));
+   state->tiles = NULL;
+   state->gen_inst = NULL;
+   return state;
+}
+
+
+InstructionTile *add_tile_left_subtree(InstructionTile *tile, InstructionTile *subtree)
+{
+  tile->left = subtree;
+  return tile;
+}
+
+InstructionTile *add_tile_right_subtree(InstructionTile *tile, InstructionTile *subtree)
+{
+  tile->right = subtree;
+  return tile;
+}
+
+MaxMunchState *add_munch_state_tile(MaxMunchState *state, InstructionTile *tile)
+{
+  state->tiles =
+    (InstructionTile**)realloc(state->tiles, (state->num_tiles + 1) * sizeof(InstructionTile*));
+  state->tiles[state->num_tiles++] = tile;
+  return state;
+}
+
+MaxMunchState *add_munch_state_inst(MaxMunchState *state, MachineInstruction *minst)
+{
+  state->gen_inst =
+    (MachineInstruction**)realloc(state->gen_inst,
+		    (state->num_gen_inst + 1) * sizeof(MachineInstruction*));
+  state->gen_inst[state->num_gen_inst++] = minst;
+  return state;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
