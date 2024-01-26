@@ -64,7 +64,8 @@ typedef struct operand Result;
 typedef int instid_t;
 
 Instruction *create_instruction(InstructionType type, instid_t instruction_id);
-Instruction *add_inst_operand(Instruction *inst, Operand *operand);
+Instruction *add_inst_operand_defined(Instruction *inst, Operand *operand, bool used);
+Instruction *add_inst_operand_used(Instruction *inst, Operand *operand, bool used);
 Instruction *add_inst_result(Instruction *inst, Result *result);
 
 Operand *create_operand(OperandType type, void *value);
@@ -76,12 +77,13 @@ Result *create_result(ResultType type, void *value);
 /* The following functions declares a Basic Block used for Control Flow Analysis. See `zcc-cfg.c` for definitions */
 
 typedef struct BasicBlock BasicBlock;
-typedef int succid_t;
 typedef int blockid_t;
 
 BasicBlock *create_basic_block(blockid_t block_id);
-BasicBlock *add_cfg_successor(BasicBlock *block, succid_t successor_id);
+BasicBlock *add_cfg_successor(BasicBlock *block, BasicBlock *succ);
 BasicBlock *add_cfg_instruction(BasicBlock *block, Instruction *inst);
+BasicBlock *get_successor_by_id(BasicBlock *block, blockid_t succ_bid);
+Instruction *get_instruction_by_id(BasicBlock *block, instid_t instid);
 
 // + F: The Interferrence Graph +
 
@@ -123,4 +125,10 @@ void remove_node_from_graph(RegisterNode *nodes[], size_t num_nodes, RegisterNod
 #define MAX_SPILLABLE 8
 #endif
 
+
 #endif
+
+
+
+
+
