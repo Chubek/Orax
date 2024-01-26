@@ -138,7 +138,8 @@ LifeSet *add_life_set_object(LifeSet *set, LifeObject *object);
 LifeSet *union_life_set(LifeSet *set1, LifeSet *set2);
 LifeSet *difference_life_set(LifeSet *set1, LifeSet *set2);
 LifeSet *interset_life_set(LifeSet *set1, LifeSet *set2);
-
+void free_life_object(LifeObject *object);
+void free_life_set(LifeSet *set);
 
 
 
