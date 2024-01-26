@@ -21,7 +21,6 @@ struct Instruction
 struct Operand
 {
   OperandType type;
-  bool is_live;
   union
   {
     uint64_t u64;
