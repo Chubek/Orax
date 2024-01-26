@@ -12,8 +12,12 @@
 struct TraceBlock
 {
   blockid_t id;
+  const char *label;
+  TraceBlockType type;
   TraceBlock **successors;
   size_t num_successors;
+  TraceBlock **predecessors;
+  size_t num_predecessors;
   Instruction **instructions;
   size_t num_instructions;
   LifeSet *live_in;
@@ -28,14 +32,17 @@ struct ControlFlowGraph
   size_t num_blocks;
 };
 
-TraceBlock *create_trace_block(blockid_t block_id)
+TraceBlock *create_trace_block(TraceBlockType type,
+			 	blockid_t block_id,
+				const char *label)
 {
    TraceBlock *block = (TraceBlock*)calloc(1, sizeof(TraceBlock));
    block->id = block_id;
+   block->type = type;
+   block->label = label;
    block->successors = NULL;
-   block->num_successors = 0;
+   block->predecessors = NULL;
    block->instructions = NULL;
-   block->num_instructions = 0;
    block->live_in = create_life_set();
    block->live_out = create_life_set();
    block->use_set = create_life_set();
@@ -67,6 +74,13 @@ TraceBlock *add_trace_successor(TraceBlock *block, TraceBlock *succ)
    return block;
 }
 
+TraceBlock *add_trace_predecessor(TraceBlock *block, TraceBlock *pred)
+{
+   block->predecessors = 
+	(TraceBlock**)realloc(block->predecessors, (block->num_predecessors + 1) * sizeof(TraceBlock*));
+   block->predecessors[block->num_predecessors++] = pred;
+   return block;
+}
 
 TraceBlock *add_trace_instruction(TraceBlock *block, Instruction *inst)
 {
