@@ -63,6 +63,11 @@ LifeSet *create_life_set(void)
   return set;
 }
 
+void set_life_set_field_at(LifeField *field, size_t field_index, size_t field_at, bool value)
+{
+  set_life_field_index(set->fields[field_index], field_at, value);
+}
+
 LifeSet *add_life_set_empty_field(LifeSet *set)
 {
   set->fields = 
@@ -108,9 +113,9 @@ LifeSet *union_life_set(LifeSet *set1, LifeSet *set2)
 }
 
 
-LifeSet *subtract_life_set(LifeSet *set1, LifeSet *set2)
+LifeSet *difference_life_set(LifeSet *set1, LifeSet *set2)
 {
-   LifeSet *set_sub = create_life_set();
+   LifeSet *set_diff = create_life_set();
 
    for (size_t i = 0; i < set1->num_fields; i++)
    {
@@ -126,13 +131,34 @@ LifeSet *subtract_life_set(LifeSet *set1, LifeSet *set2)
 	}
 
 	if (!is_present)
-	  set_union = add_life_set(set1->fields[i]);
+	  set_diff = add_life_set(set1->fields[i]);
    }
+   return set_diff;
 }
 
 
 LifeSet *interset_life_set(LifeSet *set1, LifeSet *set2)
+{
+  LifeSet *set_inter = create_life_set();
 
+  for (size_t i = 0; i < set1->num_fields; i++)
+   {
+	bool is_present = false;
+
+	for (size_t j = 0; j < set2->num_fields; j++)
+	{
+	   if (fields_are_equal(set1->fields[i], set2->fields[j]))
+	   {
+	      is_preset = true;
+	      break;
+	   }
+	}
+
+	if (is_present)
+	  set_inter = add_life_set(set1->fields[i]);
+   }
+   return set_inter;
+}
 
 
 
