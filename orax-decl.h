@@ -64,8 +64,7 @@ typedef struct operand Result;
 typedef int instid_t;
 
 Instruction *create_instruction(InstructionType type, instid_t instruction_id);
-Instruction *add_inst_operand_defined(Instruction *inst, Operand *operand, bool used);
-Instruction *add_inst_operand_used(Instruction *inst, Operand *operand, bool used);
+Instruction *add_inst_operand(Instruction *inst, Operand *operand);
 Instruction *add_inst_result(Instruction *inst, Result *result);
 
 Operand *create_operand(OperandType type, void *value);
