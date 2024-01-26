@@ -36,7 +36,7 @@ void update_node_degree(RegisterNode *node)
   node->degree = 0;
   for (size_t i = 0; i < MAX_NEIGHBORS; i++)
   {
-     if (node->neighbors[i] != NULL && node->neighbors[i] == COLOR_INIT)
+     if (node->neighbors[i] != NULL)
        node->degree++;
   }
 }
@@ -58,6 +58,8 @@ void add_register_edge(RegisterNode *node1, RegisterNode *node2)
 {
    node1->neighbors[node1->id - 1] = node2;
    node2->neighbors[node2->id - 1] = node1;
+   update_node_degree(node1);
+   update_node_degree(node2);
 }
 
 
@@ -68,7 +70,7 @@ RegisterNode *get_node_with_least_degree(RegisterNode *nodes[], size_t num_nodes
    
    for (size_t i = 0; i < num_nodes; i++)
    {
-       if (nodes[i]->color == COLOR_INIT || nodes[i]->color == COLOR_REMOVED)
+       if (NODE_IS_COLORED(nodes[i]))
 	continue;
        update_node_degree(nodes[i]);
        if (nodes[i]->degree < minimum_degree)
@@ -102,11 +104,49 @@ void simplify_registers(RegisterNode *nodes[], size_t num_nodes)
 }
 
 
-inline void spill_to_memory(RegisterNode *node)
+void spill_eligible_to_memory(RegisterNode *nodes[], size_t num_nodes)
 {
-   if (node->color != COLOR_REMOVED || node->color != COLOR_SPILLED)
-    node->color = COLOR_SPILLED;
+  for (size_t i = 0; i < num_nodes; i++)
+  {
+     update_node_degree(nodes[i]);
+
+     if (nodes[i]->degree >= MAX_SPILLABLE)
+       node[i]->color = COLOR_SPILLED;
+  }
 }
 
+
+void color_graphs(RegisterNode *nodes[], size_t num_nodes)
+{
+  for (size_t i = 0; i < num_nodes; i++)
+  {
+     update_node_degree(nodes[i]);
+
+     if (NODE_IS_COLORED(nodes[i]))
+      continue;
+
+     color_t used_colors[MAX_NEIGHBORS] = {false};
+
+     for (size_t j = 0; j < MAX_NEIGHBORS; j++)
+        if (nodes[i]->neighbors[j] != NULL)
+	  used_colors[nodes[i]->neighbors[j]->color] = true;
+    
+     for (nodes[i]->color = 0; nodes[i]->color < MAX_NEIGHBORS; nodes[i]->color++)
+	if (!used_colors[nodes[i]->color])
+	 break; 
+  }
+}
+
+
+void select_registers(RegisterNode *nodes[], size_t num_nodes)
+{
+  for (size_t i = 0; i < num_nodes; i++)
+  {
+    if (NODE_IS_COLOR(nodes[i]))
+      continue;
+
+           
+  }
+}
 
 

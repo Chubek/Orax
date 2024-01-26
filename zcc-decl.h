@@ -99,10 +99,10 @@ void remove_all_neighbors(RegisterNode *node);
 void add_register_edge(RegisterNode *node1, RegisterNode *node2);
 RegisterNode *get_node_with_least_degree(RegisterNode *nodes[], size_t num_nodes);
 void simplify_registers(RegisterNode *nodes[], size_t num_nodes);
-inline void spill_to_memory(RegisterNode *node);
+void spill_eligible_to_memory(RegisterNode *nodes[], size_t num_nodes);
 void select_registers(Node *nodes[], size_t num_nodes);
 void coalesce_registers(RegisterNode *node1, RegisterNode *node2);
-void color_registers_graph(RegisterNode *nodes[], size_t num_nodes);
+void color_registers(RegisterNode *nodes[], size_t num_nodes);
 
 #define DEGREE_INIT -1
 
@@ -110,8 +110,15 @@ void color_registers_graph(RegisterNode *nodes[], size_t num_nodes);
 #define COLOR_REMOVED -2
 #define COLOR_SPILLED -3
 
+#define NODE_IS_COLORED(NODE)				\
+	(NODE->color > 0)
+
 #ifndef MAX_NEIGHBORS
 #define MAX_NEIGHBORS 128
+#endif
+
+#ifndef MAX_SPILLABLE
+#define MAX_SPILLABLE 8
 #endif
 
 #endif
