@@ -128,16 +128,13 @@ void remove_node_from_graph(RegisterNode *nodes[], size_t num_nodes, RegisterNod
 
 /* These are declarations for the lifeset, see `orax-lifeset.c` for definitions */
 
-typedef struct LifeField LifeField;
+typedef struct LifeObject LifeObject;
 typedef struct LifeSet LifeSet;
 
-LifeField *new_life_field(void);
-void set_life_field_index(LifeField *field, size_t index, uint8_t value);
-bool fields_are_equal(LifeField *field1, LifeField *field2);
+LifeObject *create_life_object(void *obj, size_t size);
 LifeSet *create_life_set(void);
-inline void set_life_set_field_at(LifeField *field, size_t field_index, size_t field_at, bool value);
-LifeSet *add_life_set_empty_field(LifeSet *set);
-LifeSet *add_life_set_field(LifeSet *set, LifeField *field);
+bool objects_are_equal(LifeObject *object1, LifeObject *object2);
+LifeSet *add_life_set_object(LifeSet *set, LifeObject *object);
 LifeSet *union_life_set(LifeSet *set1, LifeSet *set2);
 LifeSet *difference_life_set(LifeSet *set1, LifeSet *set2);
 LifeSet *interset_life_set(LifeSet *set1, LifeSet *set2);
