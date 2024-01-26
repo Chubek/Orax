@@ -50,3 +50,20 @@ BasicBlock *add_cfg_instruction(BasicBlock *block, Instruction *inst)
   return block;
 }
 
+BasicBlock *get_successor_by_id(BasicBlock *block, blockid_t succ_bid)
+{
+   for (size_t i = 0; i < block->num_successors; i++)
+    if (block->successors[i]->id == succ_bid)
+      return block->successors[i];
+
+   return NULL:
+}
+
+Instruction *get_instruction_by_id(BasicBlock *block, instid_t instid)
+{
+  for (size_t i = 0; i < block->num_instructions; i++)
+   if (block->instructions[i]->id == instid)
+     return block->instructions[i];
+
+  return NULL;
+}
