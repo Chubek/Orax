@@ -11,7 +11,8 @@ struct Instruction
 {
   instid_t id;
   InstructionType type;
-  Operand **operands;
+  Operand **operands_defined;
+  Operand **opernds_used;
   ssize_t num_operands;
   Result *result;
 };
@@ -19,6 +20,7 @@ struct Instruction
 struct Operand
 {
   OperandType type;
+  bool is_live;
   union
   {
     uint64_t u64;
@@ -48,10 +50,13 @@ Instruction *create_instruction(InstructionType type, instid_t id)
   return inst;
 }
 
-Instruction *add_inst_operand(Instrution *inst, Operand *operand)
+Instruction *add_inst_operand(Instrution *inst, Operand *operand, bool used)
 {
   inst->operands = (Operand**)realloc(inst->operands, (inst-num_operand + 1) * sizeof(Operand*));
-  inst->operands[inst->num_operands++] = operand;
+  if (used)
+     inst->operands_used[inst->num_operands++] = operand;
+  else
+     inst->operands_defined[inst->num_operands++] = operandi;
   return inst;
 }
 
