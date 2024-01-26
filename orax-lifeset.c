@@ -129,7 +129,17 @@ LifeSet *interset_life_set(LifeSet *set1, LifeSet *set2)
    return set_inter;
 }
 
+void free_life_object(LifeObject *object)
+{
+  free(object);
+}
 
+void free_life_set(LifeSet *set)
+{
+  while (--set->num_objects)
+    free_life_object(set->objects[set->num_objects]);
+  free(set);
+}
 
 
 
