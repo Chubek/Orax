@@ -62,11 +62,12 @@ typedef struct Instruction Instruction;
 typedef struct Operand Operand;
 typedef struct operand Result;
 typedef int instid_t;
+typedef int opid_t;
 
 Instruction *create_instruction(InstructionType type, instid_t instruction_id);
 Instruction *add_inst_operand(Instruction *inst, Operand *operand);
 Instruction *add_inst_result(Instruction *inst, Result *result);
-Operand *create_operand(OperandType type, void *value);
+Operand *create_operand(opid_t id, OperandType type, void *value);
 Result *create_result(ResultType type, void *value);
 
 
@@ -165,6 +166,22 @@ InstructionTile *add_tile_left_subtree(InstructionTile *tile, InstructionTile *s
 InstructionTile *add_tile_right_subtree(InstructionTile *tile, InstructionTile *subtree);
 MaxMunchState *add_munch_state_tile(MaxMunchState *state, InstructionTile *tile);
 MaxMunchState *add_munch_state_inst(MaxMunchState *state, MachineInstruction *minst);
+
+// + I: Static Single-Assignment Graph +
+
+typedef struct SSAVariable SSAVariable;
+typedef struct SSAUseDef SSAUseDef;
+typedef struct SSADefUse SSADefUse;
+typedef int version_t;
+
+SSAVariable *create_ssa_variable(Operand *operand);
+SSADefUse *create_ssa_def_use(SSAVariable *var);
+SSAUseDef *create_ssa_use_def(SSAVariable *var);
+SSAGraph *create_ssa_graph(void);
+SSAGraphNode *create_ssa_graph_node(void);
+
+
+#define VERSION_INIT -1
 
 #endif
 
