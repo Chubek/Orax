@@ -2,16 +2,17 @@
 #define ORAX_DECL_H_
 
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdbool.h>
 
 // + A: The Abstract Syntax Tree +
 
-/* Declaration of AST structure types and functions, see `orax-ast.c` for definitions */
+/* Declaration of AST structure types and functions, see `orax-ast.c` for
+ * definitions */
 
-typedef enum ASTNodeType ASTNodeType;	// Defined in `orax-enums.h`
-typedef enum ASTLeafType ASTLeafType;	// Defined in `orax-enums.h`
+typedef enum ASTNodeType ASTNodeType; // Defined in `orax-enums.h`
+typedef enum ASTLeafType ASTLeafType; // Defined in `orax-enums.h`
 typedef struct ASTNode ASTNode;
 typedef struct ASTLeaf ASTLeaf;
 
@@ -23,10 +24,10 @@ ASTNode *add_ast_leaf(ASTNode *node, ASTLeaf *leaf);
 void free_ast_node(ASTNode *root);
 void free_ast_leaf(ASTLeaf *leaf);
 
-
 // + B: The Symbols Table +
 
-/* Type definitions and function declarations for the symbols table, see `orax-symtable.c` for definitions */
+/* Type definitions and function declarations for the symbols table, see
+ * `orax-symtable.c` for definitions */
 
 typedef struct SymbolsTable SymbolsTable;
 
@@ -39,7 +40,8 @@ void symtable_dump(SymbolsTable *tab);
 
 /* DAG declarations and typedefs, see `orax-dag.c for more definitions */
 
-typedef struct Instruction Instruction; // This will be re-declared in the next section
+typedef struct Instruction
+    Instruction; // This will be re-declared in the next section
 typedef struct DAGNode DAGNode;
 typedef struct DAGGraph DAGGraph;
 typedef int vert_t;
@@ -53,11 +55,12 @@ void free_dag_graph(DAGGraph *graph);
 
 // + D: The Instructions +
 
-/* The following functions and typedefs declare the instructions. See `orax-inst.c` for definitions */
+/* The following functions and typedefs declare the instructions. See
+ * `orax-inst.c` for definitions */
 
-typedef enum InstructionType InstructionType;	// Defined in `orax-enums.h`
-typedef enum OperandType OperandType;		// Defined in `orax-enums.h`
-typedef enum OperandType ResultType;		// Defined in `orax-enums.h`
+typedef enum InstructionType InstructionType; // Defined in `orax-enums.h`
+typedef enum OperandType OperandType;         // Defined in `orax-enums.h`
+typedef enum OperandType ResultType;          // Defined in `orax-enums.h`
 typedef struct Instruction Instruction;
 typedef struct Operand Operand;
 typedef struct operand Result;
@@ -70,19 +73,18 @@ Instruction *add_inst_result(Instruction *inst, Result *result);
 Operand *create_operand(opid_t id, OperandType type, void *value);
 Result *create_result(ResultType type, void *value);
 
-
 // + E: The Control Flow Graph +
 
-/* The following functions declares a Basic Block used for Control Flow Analysis. See `orax-cfg.c` for definitions */
+/* The following functions declares a Basic Block used for Control Flow
+ * Analysis. See `orax-cfg.c` for definitions */
 
-typedef enum TraceBlockType TraceBlockType;		// Defined in `orax-enums.h`
+typedef enum TraceBlockType TraceBlockType; // Defined in `orax-enums.h`
 typedef struct TraceBlock TraceBlock;
 typedef struct ControlFlowGraph ControlFlowGraph;
 typedef int blockid_t;
 
-TraceBlock *create_trace_block(TraceBlockType type,
-				blockid_t block_id,
-				const char *label);
+TraceBlock *create_trace_block(TraceBlockType type, blockid_t block_id,
+                               const char *label);
 ControlFlowGraph *create_cfg(void);
 ControlFLowGraph *add_cfg_trace(ControlFlowGraph *cfg, TraceBlock *block);
 TraceBlock *add_trace_successor(TraceBlock *block, TraceBlock *succ);
@@ -98,7 +100,8 @@ void free_cfg(TraceBlock *block);
 
 // + F: The Interferrence Graph +
 
-/* The following functions and typedefs declare the interferrence graph, used for Register Allocation. See `orax-ifg.c` for definitions */
+/* The following functions and typedefs declare the interferrence graph, used
+ * for Register Allocation. See `orax-ifg.c` for definitions */
 
 typedef struct RegisterNode RegisterNode;
 typedef int regid_t;
@@ -110,14 +113,16 @@ void update_node_degree(RegisterNode *node);
 void remove_neighbor(RegisterNode *node, degree_t neighbor_degree);
 void remove_all_neighbors(RegisterNode *node);
 void add_register_edge(RegisterNode *node1, RegisterNode *node2);
-RegisterNode *get_node_with_least_degree(RegisterNode *nodes[], size_t num_nodes);
+RegisterNode *get_node_with_least_degree(RegisterNode *nodes[],
+                                         size_t num_nodes);
 void simplify_registers(RegisterNode *nodes[], size_t num_nodes);
 void spill_eligible_to_memory(RegisterNode *nodes[], size_t num_nodes);
 void select_registers(Node *nodes[], size_t num_nodes);
 void coalesce_register_pair(RegisterNode *node1, RegisterNode *node2);
 void color_registers(RegisterNode *nodes[], size_t num_nodes);
 bool nodes_interfere(RegisterNode *node1, RegisterNode *node2);
-void remove_node_from_graph(RegisterNode *nodes[], size_t num_nodes, RegisterNode *to_remove);
+void remove_node_from_graph(RegisterNode *nodes[], size_t num_nodes,
+                            RegisterNode *to_remove);
 
 #define DEGREE_INIT -1
 
@@ -125,7 +130,7 @@ void remove_node_from_graph(RegisterNode *nodes[], size_t num_nodes, RegisterNod
 #define COLOR_REMOVED -2
 #define COLOR_SPILLED -3
 
-#define NODE_IS_COLORED(NODE)		 (NODE->color > 0)
+#define NODE_IS_COLORED(NODE) (NODE->color > 0)
 
 #ifndef MAX_NEIGHBORS
 #define MAX_NEIGHBORS 128
@@ -137,7 +142,8 @@ void remove_node_from_graph(RegisterNode *nodes[], size_t num_nodes, RegisterNod
 
 // + G: The Lifeset +
 
-/* These are declarations for the lifeset, see `orax-lifeset.c` for definitions */
+/* These are declarations for the lifeset, see `orax-lifeset.c` for definitions
+ */
 
 typedef struct LifeObject LifeObject;
 typedef struct LifeSet LifeSet;
@@ -155,29 +161,28 @@ void free_life_set(LifeSet *set);
 
 // + H: Instruction Selection +
 
-/* These are declarations for functions and types used during instruction selection, see `orax-sel.c.` for definitions */
+/* These are declarations for functions and types used during instruction
+ * selection, see `orax-sel.c.` for definitions */
 
-typedef enum MachineOpcode MachineOpcode; 		// Generated from file
-typedef enum MachineRegister MachineRegister;		// Generated from file
+typedef enum MachineOpcode MachineOpcode;     // Generated from file
+typedef enum MachineRegister MachineRegister; // Generated from file
 typedef struct MachineInstruction MachineInstrction;
 typedef struct InstructionTile InstructionTile;
 typedef struct MaxMunchState MaxMunchState;
 typedef int tileid_t;
 
-
-MachineInstruction *create_machine_instruction(MachineOpcode opcode, 
-                                MachineRegister dest_register, char *label, size_t line_number);
+MachineInstruction *create_machine_instruction(MachineOpcode opcode,
+                                               MachineRegister dest_register,
+                                               char *label, size_t line_number);
 InstructionTile *create_instruction_tile(tileid_t id);
 MaxMunchState *create_max_munch_state(void);
-InstructionTile *add_tile_left_subtree(InstructionTile *tile, InstructionTile *subtree);
-InstructionTile *add_tile_right_subtree(InstructionTile *tile, InstructionTile *subtree);
-MaxMunchState *add_munch_state_tile(MaxMunchState *state, InstructionTile *tile);
-MaxMunchState *add_munch_state_inst(MaxMunchState *state, MachineInstruction *minst);
-
+InstructionTile *add_tile_left_subtree(InstructionTile *tile,
+                                       InstructionTile *subtree);
+InstructionTile *add_tile_right_subtree(InstructionTile *tile,
+                                        InstructionTile *subtree);
+MaxMunchState *add_munch_state_tile(MaxMunchState *state,
+                                    InstructionTile *tile);
+MaxMunchState *add_munch_state_inst(MaxMunchState *state,
+                                    MachineInstruction *minst);
 
 #endif
-
-
-
-
-

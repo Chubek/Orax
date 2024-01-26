@@ -1,15 +1,12 @@
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <string.h>
-
 
 #include "orax-decl.h"
 
-
-struct  RegisterNode
-{
+struct RegisterNode {
   regid_t id;
   char *name;
   color_t color;
@@ -17,11 +14,8 @@ struct  RegisterNode
   RegisterNode *neighbors[MAX_NEIGHBORS];
 };
 
-
-
-RegisterNode *create_register(regid_t id, char *name)
-{
-  RegisterNode *node = (Node*)calloc(1, sizeof(RegisterNode));
+RegisterNode *create_register(regid_t id, char *name) {
+  RegisterNode *node = (Node *)calloc(1, sizeof(RegisterNode));
   node->id = id;
   node->name = name;
   node->color = COLOR_INIT;
@@ -30,162 +24,134 @@ RegisterNode *create_register(regid_t id, char *name)
   return node;
 }
 
-
-void update_node_degree(RegisterNode *node)
-{
+void update_node_degree(RegisterNode *node) {
   node->degree = 0;
-  for (size_t i = 0; i < MAX_NEIGHBORS; i++)
-  {
-     if (node->neighbors[i] != NULL)
-       node->degree++;
+  for (size_t i = 0; i < MAX_NEIGHBORS; i++) {
+    if (node->neighbors[i] != NULL)
+      node->degree++;
   }
 }
 
-void remove_neighbor(RegisterNode *node, degree_t neighbor_degree)
-{
+void remove_neighbor(RegisterNode *node, degree_t neighbor_degree) {
   node->neighbors[neighbor_degree] = NULL;
   update_node_degree(node);
 }
 
-void remove_all_neighbors(RegisterNode *node)
-{
+void remove_all_neighbors(RegisterNode *node) {
   for (size_t i = 0; i < MAX_NEIGHBORS; i++)
     remove_neighbors(node, i);
   node->color = COLOR_REMOVED;
 }
 
-void add_register_edge(RegisterNode *node1, RegisterNode *node2)
-{
-   node1->neighbors[node1->id - 1] = node2;
-   node2->neighbors[node2->id - 1] = node1;
-   update_node_degree(node1);
-   update_node_degree(node2);
+void add_register_edge(RegisterNode *node1, RegisterNode *node2) {
+  node1->neighbors[node1->id - 1] = node2;
+  node2->neighbors[node2->id - 1] = node1;
+  update_node_degree(node1);
+  update_node_degree(node2);
 }
 
+RegisterNode *get_node_with_least_degree(RegisterNode *nodes[],
+                                         size_t num_nodes) {
+  degree_t minimum_degree = 0;
+  RegisterNode *minumum_degree_node = NULL;
 
-RegisterNode *get_node_with_least_degree(RegisterNode *nodes[], size_t num_nodes)
-{
-   degree_t minimum_degree = 0;
-   RegisterNode *minumum_degree_node = NULL;
-   
-   for (size_t i = 0; i < num_nodes; i++)
-   {
-       if (NODE_IS_COLORED(nodes[i]))
-	continue;
-       update_node_degree(nodes[i]);
-       if (nodes[i]->degree < minimum_degree)
-       {
-	  minimum_degree = nodes[i]->degree;
-	  minimum_degree_node = nodes[i];
-       }	
-   }
-   
-   return minimum_degree_node;
+  for (size_t i = 0; i < num_nodes; i++) {
+    if (NODE_IS_COLORED(nodes[i]))
+      continue;
+    update_node_degree(nodes[i]);
+    if (nodes[i]->degree < minimum_degree) {
+      minimum_degree = nodes[i]->degree;
+      minimum_degree_node = nodes[i];
+    }
+  }
+
+  return minimum_degree_node;
 }
 
-void simplify_registers(RegisterNode *nodes[], size_t num_nodes)
-{
+void simplify_registers(RegisterNode *nodes[], size_t num_nodes) {
   size_t removed_nodes = 0;
 
-  while (removed_nodes < num_nodes)
-  {
-    RegisterNode *minimum_degree_node = 
-	get_node_with_least_degree(&nodes[removed_nodes], num_nodes - removed_nodes);
+  while (removed_nodes < num_nodes) {
+    RegisterNode *minimum_degree_node = get_node_with_least_degree(
+        &nodes[removed_nodes], num_nodes - removed_nodes);
 
-     if (minimum_degree_node == NULL)
+    if (minimum_degree_node == NULL)
       return;
-     else
-     {
-	remove_all_neighbors(minimum_degree_node);
-	removed_nodes++;
-     }
-  }
-
-}
-
-
-void spill_eligible_to_memory(RegisterNode *nodes[], size_t num_nodes)
-{
-  for (size_t i = 0; i < num_nodes; i++)
-  {
-     update_node_degree(nodes[i]);
-
-     if (nodes[i]->degree >= MAX_SPILLABLE)
-       node[i]->color = COLOR_SPILLED;
+    else {
+      remove_all_neighbors(minimum_degree_node);
+      removed_nodes++;
+    }
   }
 }
 
+void spill_eligible_to_memory(RegisterNode *nodes[], size_t num_nodes) {
+  for (size_t i = 0; i < num_nodes; i++) {
+    update_node_degree(nodes[i]);
 
-void color_graphs(RegisterNode *nodes[], size_t num_nodes)
-{
-  for (size_t i = 0; i < num_nodes; i++)
-  {
-     update_node_degree(nodes[i]);
+    if (nodes[i]->degree >= MAX_SPILLABLE)
+      node[i]->color = COLOR_SPILLED;
+  }
+}
 
-     if (NODE_IS_COLORED(nodes[i]))
+void color_graphs(RegisterNode *nodes[], size_t num_nodes) {
+  for (size_t i = 0; i < num_nodes; i++) {
+    update_node_degree(nodes[i]);
+
+    if (NODE_IS_COLORED(nodes[i]))
       continue;
 
-     color_t used_colors[MAX_NEIGHBORS] = {false};
+    color_t used_colors[MAX_NEIGHBORS] = {false};
 
-     for (size_t j = 0; j < MAX_NEIGHBORS; j++)
-        if (nodes[i]->neighbors[j] != NULL)
-	  used_colors[nodes[i]->neighbors[j]->color] = true;
-    
-     for (nodes[i]->color = 0; nodes[i]->color < MAX_NEIGHBORS; nodes[i]->color++)
-	if (!used_colors[nodes[i]->color])
-	 break; 
+    for (size_t j = 0; j < MAX_NEIGHBORS; j++)
+      if (nodes[i]->neighbors[j] != NULL)
+        used_colors[nodes[i]->neighbors[j]->color] = true;
+
+    for (nodes[i]->color = 0; nodes[i]->color < MAX_NEIGHBORS;
+         nodes[i]->color++)
+      if (!used_colors[nodes[i]->color])
+        break;
   }
 }
 
-bool nodes_interfere(RegisterNode *node1, RegisterNode *node2)
-{
-   for (size_t i = 0; i < MAX_NEIGHBORS; i++)
+bool nodes_interfere(RegisterNode *node1, RegisterNode *node2) {
+  for (size_t i = 0; i < MAX_NEIGHBORS; i++)
     if (node1->neighbors[i] == node2 || node2->neighbors[i] == node1)
       return true;
 
-   return false;
+  return false;
 }
 
-void coalesce_register_pair(RegisterNode *node1, RegisterNode *node2)
-{
-   if (NODE_IS_COLORED(node1) || NODE_IS_COLORED(node2))
+void coalesce_register_pair(RegisterNode *node1, RegisterNode *node2) {
+  if (NODE_IS_COLORED(node1) || NODE_IS_COLORED(node2))
     return;
 
-   if (nodes_interfere(node1, node2))
+  if (nodes_interfere(node1, node2))
     return;
 
-   for (size_t i = 0; i < MAX_NEIGHBORS; i++)
-   {
-      if (node2->neighbors[i] != NULL)
-      {
-  	node1->neighbors[i] = node2->neighbors[i];
-	node2->neighbors[i] = NULL;
-      }
-   }
+  for (size_t i = 0; i < MAX_NEIGHBORS; i++) {
+    if (node2->neighbors[i] != NULL) {
+      node1->neighbors[i] = node2->neighbors[i];
+      node2->neighbors[i] = NULL;
+    }
+  }
 
-   update_node_degree(node1);
-   update_node_degree(node2);
+  update_node_degree(node1);
+  update_node_degree(node2);
 }
 
-void remove_node_from_graph(RegisterNode *nodes[], size_t num_nodes, RegisterNode *to_remove)
-{
-   for (size_t i = 0; i < num_nodes; i++)
-   {
-      for (size_t j = 0; j < MAX_NEIGHBORS; j++)
-      {
-	 if (nodes[i]->neighbors[j] == to_remove)
-	   nodes[i]->neighbors[j] = NULL;
-      }
+void remove_node_from_graph(RegisterNode *nodes[], size_t num_nodes,
+                            RegisterNode *to_remove) {
+  for (size_t i = 0; i < num_nodes; i++) {
+    for (size_t j = 0; j < MAX_NEIGHBORS; j++) {
+      if (nodes[i]->neighbors[j] == to_remove)
+        nodes[i]->neighbors[j] = NULL;
+    }
 
-      update_node_degree(nodes[i]);
-
-   }
+    update_node_degree(nodes[i]);
+  }
 }
 
-void select_registers(RegisterNode *nodes[], size_t num_nodes)
-{
-   simplify_registers(nodes, num_nodes);
-   // TODO
+void select_registers(RegisterNode *nodes[], size_t num_nodes) {
+  simplify_registers(nodes, num_nodes);
+  // TODO
 }
-
-

@@ -1,14 +1,12 @@
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "orax-decl.h"
 
-
-struct Instruction
-{
+struct Instruction {
   instid_t id;
   InstructionType type;
   Operand **operands;
@@ -16,11 +14,10 @@ struct Instruction
   Result *result;
 };
 
-struct Operand
-{
+struct Operand {
+  opid_t id;
   OperandType type;
-  union
-  {
+  union {
     uint64_t u64;
     int64_t i64;
     uint32_t u32;
@@ -37,9 +34,8 @@ struct Operand
   };
 };
 
-Instruction *create_instruction(InstructionType type, instid_t id)
-{
-  Instruction *inst = (Instruction*)calloc(1, sizeof(Instruction));
+Instruction *create_instruction(InstructionType type, instid_t id) {
+  Instruction *inst = (Instruction *)calloc(1, sizeof(Instruction));
   inst->id = id;
   inst->type = type;
   inst->operands = NULL;
@@ -48,35 +44,25 @@ Instruction *create_instruction(InstructionType type, instid_t id)
   return inst;
 }
 
-Instruction *add_inst_operand(Instrution *inst, Operand *operand)
-{
-  inst->operands = 
-     (Operand**)realloc(inst->operands, (inst->num_operand + 1) * sizeof(Operand*));
+Instruction *add_inst_operand(Instrution *inst, Operand *operand) {
+  inst->operands = (Operand **)realloc(inst->operands, (inst->num_operand + 1) *
+                                                           sizeof(Operand *));
   inst->operands[inst->num_operands++] = operand;
   return inst;
 }
 
-
-Instruction *add_inst_result(Instruction *inst, Result *result)
-{
+Instruction *add_inst_result(Instruction *inst, Result *result) {
   inst->result = result;
   return inst;
 }
 
-Operand *create_operand(OperandType type, void *value)
-{
-   Operand *operand = (Operand*)calloc(1, sizeof(Operand));
-   operand->ptr = value;
-   return operand;
+Operand *create_operand(opid_t id, OperandType type, void *value) {
+  Operand *operand = (Operand *)calloc(1, sizeof(Operand));
+  operand->id = id;
+  operand->ptr = value;
+  return operand;
 }
 
-Result *create_result(ResultType type, void *value)
-{
-  return (Result*)create_operand(type, value);
+Result *create_result(ResultType type, void *value) {
+  return (Result *)create_operand(type, value);
 }
-
-
-
-
-
-
