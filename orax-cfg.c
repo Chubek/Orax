@@ -18,6 +18,9 @@ struct TraceBlock
   size_t num_successors;
   TraceBlock **predecessors;
   size_t num_predecessors;
+  TraceBlock *immediate_dominator;
+  TraceBlock **dominance_frontiers;
+  size_t num_dominance_frontiers;
   Instruction **instructions;
   size_t num_instructions;
   LifeSet *live_in;
@@ -43,11 +46,17 @@ TraceBlock *create_trace_block(TraceBlockType type,
    block->successors = NULL;
    block->predecessors = NULL;
    block->instructions = NULL;
+   block->immediate_dominator = NULL;
    block->live_in = create_life_set();
    block->live_out = create_life_set();
    block->use_set = create_life_set();
    block->def_set = create_life_set();
    return block;
+}
+
+bool trace_blocks_are_equal(TraceBlock *block1, TraceBlock *block2)
+{
+   return memcmp(block1, block2, sizeof(*block1));
 }
 
 ControlFlowGraph *create_cfg(void)
@@ -57,12 +66,12 @@ ControlFlowGraph *create_cfg(void)
 }
 
 
-ControlFlowGraph *add_cfg_trace(ControlFlowGraph *graph, TraceBlock *block)
+ControlFlowGraph *add_cfg_trace(ControlFlowGraph *cfg, TraceBlock *block)
 {
-  graph->blocks =
-      (TraceBlock**)realloc(graph->blocks, (graph->num_blocks + 1) * sizeof(TraceBlock*));
-  graph->blocks[graph->num_blocks++] = block;
-  return graph;
+  cfg->blocks =
+      (TraceBlock**)realloc(cfg->blocks, (cfg->num_blocks + 1) * sizeof(TraceBlock*));
+  cfg->blocks[cfg->num_blocks++] = block;
+  return cfg;
 }
 
 
@@ -91,15 +100,16 @@ TraceBlock *add_trace_instruction(TraceBlock *block, Instruction *inst)
   return block;
 }
 
-void analyze_liveness(ControlFlowGraph *graph)
+
+void analyze_liveness(ControlFlowGraph *cfg)
 {
   bool changed = true;
 
   while (changed)
   {
-     for (size_t i = graph->num_blocks - 1; i >= 0; i--)
+     for (size_t i = cfg->num_blocks - 1; i >= 0; i--)
      {
-        TraceBlock *block = graph->blocks[i];
+        TraceBlock *block = cfg->blocks[i];
 	LifeSet *new_live_out = copy_life_set(block->live_out);
 
 	for (size_t j = 0; j < block->num_successors; j++)
@@ -121,6 +131,124 @@ void analyze_liveness(ControlFlowGraph *graph)
         }
      }
   }
+}
+
+
+void calculate_immediate_dominator(ControlFlowGraph *cfg, size_t entry_index)
+{
+    
+    cfg->blocks[entry_index]->immediate_dominator = cfg->blocks[entry_index];
+
+    
+    for (size_t i = 0; i < cfg->num_blocks; i++)
+    {
+        if (i != entry_index)
+            cfg->blocks[i]->immediate_dominator = NULL;
+    }
+
+    bool changed = true;
+    while (changed)
+    {
+        changed = false;
+
+        for (size_t i = 0; i < cfg->num_blocks; i++)
+        {
+            if (i == entry_index)
+                continue;
+
+            TraceBlock *block = cfg->blocks[i];
+
+            
+            TraceBlock *new_idom = NULL;
+
+            for (size_t j = 0; j < block->num_predecessors; j++)
+            {
+                TraceBlock *pred = block->predecessors[j];
+
+                if (pred->immediate_dominator != NULL)
+                {
+                    if (new_idom == NULL)
+                        new_idom = pred->immediate_dominator;
+                    else
+                    {
+                        
+                        TraceBlock *runner1 = new_idom;
+                        TraceBlock *runner2 = pred->immediate_dominator;
+
+                        while (runner1 != runner2)
+                        {
+                            while (runner1->id > runner2->id)
+                                runner1 = runner1->immediate_dominator;
+
+                            while (runner1->id < runner2->id)
+                                runner2 = runner2->immediate_dominator;
+                        }
+
+                        new_idom = runner1;
+                    }
+                }
+            }
+
+            if (!trace_blocks_are_equal(block->immediate_dominator, new_idom))
+            {
+                block->immediate_dominator = new_idom;
+                changed = true;
+            }
+        }
+    }
+}
+
+void calculate_dominance_frontiers(ControlFlowGraph *cfg)
+{
+    
+    for (size_t i = 0; i < cfg->num_blocks; i++)
+    {
+        cfg->blocks[i]->dominance_frontiers = NULL;
+        cfg->blocks[i]->num_dominance_frontiers = 0;
+    }
+
+    
+    for (size_t i = cfg->num_blocks - 1; i > 0; i--)
+    {
+        TraceBlock *block = cfg->blocks[i];
+
+        
+        for (size_t j = 0; j < block->num_successors; j++)
+        {
+            TraceBlock *succ = block->successors[j];
+
+            if (succ->immediate_dominator != block)
+            {
+                
+                size_t num_frontiers = succ->num_dominance_frontiers;
+                succ->dominance_frontiers =
+                    (TraceBlock **)realloc(succ->dominance_frontiers, (num_frontiers + 1) * sizeof(TraceBlock *));
+                succ->dominance_frontiers[num_frontiers] = block;
+                succ->num_dominance_frontiers++;
+            }
+        }
+
+        
+        for (size_t j = 0; j < block->num_dominance_frontiers; j++)
+        {
+            TraceBlock *frontier_block = block->dominance_frontiers[j];
+
+            for (size_t k = 0; k < block->num_successors; k++)
+            {
+                TraceBlock *succ = block->successors[k];
+
+                if (succ->immediate_dominator != block)
+                {
+                    
+                    size_t num_frontiers = succ->num_dominance_frontiers;
+                    succ->dominance_frontiers =
+                        (TraceBlock **)realloc(succ->dominance_frontiers, (num_frontiers + 1) * sizeof(TraceBlock *));
+                    succ->dominance_frontiers[num_frontiers] = frontier_block;
+                    succ->num_dominance_frontiers++;
+                }
+            }
+        }
+    }
 }
 
 TraceBlock *get_successor_by_id(TraceBlock *block, blockid_t succ_bid)
