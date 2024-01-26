@@ -75,14 +75,18 @@ Result *create_result(ResultType type, void *value);
 
 /* The following functions declares a Basic Block used for Control Flow Analysis. See `orax-cfg.c` for definitions */
 
+typedef enum TraceBlockType TraceBlockType;		// Defined in `orax-enums.h`
 typedef struct TraceBlock TraceBlock;
 typedef struct ControlFlowGraph ControlFlowGraph;
 typedef int blockid_t;
 
-TraceBlock *create_trace_block(blockid_t block_id);
+TraceBlock *create_trace_block(TraceBlockType type,
+				blockid_t block_id,
+				const char *label);
 ControlFlowGraph *create_cfg(void);
 ControlFLowGraph *add_cfg_trace(ControlFlowGraph *cfg, TraceBlock *block);
 TraceBlock *add_trace_successor(TraceBlock *block, TraceBlock *succ);
+TraceBlock *add_trace_predecessor(TraceBlock *block, TraceBlock *pred);
 TraceBlock *add_trace_instruction(TraceBlock *block, Instruction *inst);
 TraceBlock *get_successor_by_id(TraceBlock *block, blockid_t succ_bid);
 Instruction *get_instruction_by_id(TraceBlock *block, instid_t instid);
@@ -167,21 +171,6 @@ InstructionTile *add_tile_right_subtree(InstructionTile *tile, InstructionTile *
 MaxMunchState *add_munch_state_tile(MaxMunchState *state, InstructionTile *tile);
 MaxMunchState *add_munch_state_inst(MaxMunchState *state, MachineInstruction *minst);
 
-// + I: Static Single-Assignment Graph +
-
-typedef struct SSAVariable SSAVariable;
-typedef struct SSAUseDef SSAUseDef;
-typedef struct SSADefUse SSADefUse;
-typedef int version_t;
-
-SSAVariable *create_ssa_variable(Operand *operand);
-SSADefUse *create_ssa_def_use(SSAVariable *var);
-SSAUseDef *create_ssa_use_def(SSAVariable *var);
-SSAGraph *create_ssa_graph(void);
-SSAGraphNode *create_ssa_graph_node(void);
-
-
-#define VERSION_INIT -1
 
 #endif
 
