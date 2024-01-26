@@ -76,14 +76,14 @@ Result *create_result(ResultType type, void *value);
 
 /* The following functions declares a Basic Block used for Control Flow Analysis. See `orax-cfg.c` for definitions */
 
-typedef struct BasicBlock BasicBlock;
+typedef struct TraceBlock TraceBlock;
 typedef int blockid_t;
 
-BasicBlock *create_basic_block(blockid_t block_id);
-BasicBlock *add_cfg_successor(BasicBlock *block, BasicBlock *succ);
-BasicBlock *add_cfg_instruction(BasicBlock *block, Instruction *inst);
-BasicBlock *get_successor_by_id(BasicBlock *block, blockid_t succ_bid);
-Instruction *get_instruction_by_id(BasicBlock *block, instid_t instid);
+TraceBlock *create_basic_block(blockid_t block_id);
+TraceBlock *add_cfg_successor(TraceBlock *block, TraceBlock *succ);
+TraceBlock *add_cfg_instruction(TraceBlock *block, Instruction *inst);
+TraceBlock *get_successor_by_id(TraceBlock *block, blockid_t succ_bid);
+Instruction *get_instruction_by_id(TraceBlock *block, instid_t instid);
 
 // + F: The Interferrence Graph +
 
