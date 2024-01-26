@@ -145,7 +145,26 @@ LifeSet *copy_life_set(LifeSet *set);
 void free_life_object(LifeObject *object);
 void free_life_set(LifeSet *set);
 
+// + H: Instruction Selection +
 
+/* These are declarations for functions and types used during instruction selection, see `orax-sel.c.` for definitions */
+
+typedef enum MachineOpcode MachineOpcode; 		// Generated from file
+typedef enum MachineRegister MachineRegister;		// Generated from file
+typedef struct MachineInstruction MachineInstrction;
+typedef struct InstructionTile InstructionTile;
+typedef struct MaxMunchState MaxMunchState;
+typedef int tileid_t;
+
+
+MachineInstruction *create_machine_instruction(MachineOpcode opcode, 
+                                MachineRegister dest_register, char *label, size_t line_number);
+InstructionTile *create_instruction_tile(tileid_t id);
+MaxMunchState *create_max_munch_state(void);
+InstructionTile *add_tile_left_subtree(InstructionTile *tile, InstructionTile *subtree);
+InstructionTile *add_tile_right_subtree(InstructionTile *tile, InstructionTile *subtree);
+MaxMunchState *add_munch_state_tile(MaxMunchState *state, InstructionTile *tile);
+MaxMunchState *add_munch_state_inst(MaxMunchState *state, MachineInstruction *minst);
 
 #endif
 
