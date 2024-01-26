@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 
-#include "zcc-decl.h"
+#include "orax-decl.h"
 
 
 

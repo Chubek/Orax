@@ -8,10 +8,10 @@
 
 // + A: The Abstract Syntax Tree +
 
-/* Declaration of AST structure types and functions, see `zcc-ast.c` for definitions */
+/* Declaration of AST structure types and functions, see `orax-ast.c` for definitions */
 
-typedef enum ASTNodeType ASTNodeType;	// Defined in `zcc-enums.h`
-typedef enum ASTLeafType ASTLeafType;	// Defined in `zcc-enums.h`
+typedef enum ASTNodeType ASTNodeType;	// Defined in `orax-enums.h`
+typedef enum ASTLeafType ASTLeafType;	// Defined in `orax-enums.h`
 typedef struct ASTNode ASTNode;
 typedef struct ASTLeaf ASTLeaf;
 
@@ -26,7 +26,7 @@ void free_ast_leaf(ASTLeaf *leaf);
 
 // + B: The Symbols Table +
 
-/* Type definitions and function declarations for the symbols table, see `zcc-symtable.c` for definitions */
+/* Type definitions and function declarations for the symbols table, see `orax-symtable.c` for definitions */
 
 typedef struct SymbolsTable SymbolsTable;
 
@@ -37,7 +37,7 @@ void symtable_dump(SymbolsTable *tab);
 
 // + C: The Directed Acyclic Graph +
 
-/* DAG declarations and typedefs, see `zcc-dag.c for more definitions */
+/* DAG declarations and typedefs, see `orax-dag.c for more definitions */
 
 typedef struct Instruction Instruction; // This will be re-declared in the next section
 typedef struct DAGNode DAGNode;
@@ -53,11 +53,11 @@ void free_dag_graph(DAGGraph *graph);
 
 // + D: The Instructions +
 
-/* The following functions and typedefs declare the instructions. See `zcc-inst.c` for definitions */
+/* The following functions and typedefs declare the instructions. See `orax-inst.c` for definitions */
 
-typedef enum InstructionType InstructionType;	// Defined in `zcc-enums.h`
-typedef enum OperandType OperandType;		// Defined in `zcc-enums.h`
-typedef enum OperandType ResultType;		// Defined in `zcc-enums.h`
+typedef enum InstructionType InstructionType;	// Defined in `orax-enums.h`
+typedef enum OperandType OperandType;		// Defined in `orax-enums.h`
+typedef enum OperandType ResultType;		// Defined in `orax-enums.h`
 typedef struct Instruction Instruction;
 typedef struct Operand Operand;
 typedef struct operand Result;
@@ -74,7 +74,7 @@ Result *create_result(ResultType type, void *value);
 
 // + E: The Control Flow Graph +
 
-/* The following functions declares a Basic Block used for Control Flow Analysis. See `zcc-cfg.c` for definitions */
+/* The following functions declares a Basic Block used for Control Flow Analysis. See `orax-cfg.c` for definitions */
 
 typedef struct BasicBlock BasicBlock;
 typedef int blockid_t;
@@ -87,7 +87,7 @@ Instruction *get_instruction_by_id(BasicBlock *block, instid_t instid);
 
 // + F: The Interferrence Graph +
 
-/* The following functions and typedefs declare the interferrence graph, used for Register Allocation. See `zcc-ifg.c` for definitions */
+/* The following functions and typedefs declare the interferrence graph, used for Register Allocation. See `orax-ifg.c` for definitions */
 
 typedef struct RegisterNode RegisterNode;
 typedef int regid_t;

@@ -5,7 +5,7 @@
 #include <string.h>
 
 
-#include "zcc-decl.h"
+#include "orax-decl.h"
 
 
 struct  RegisterNode

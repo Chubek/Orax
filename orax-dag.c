@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "zcc-decl.h"
+#include "orax-decl.h"
 
 /* A DAG (Directed Acyclic Graph) is a type of graph which is loop-less, and each edge has a 
  * specific direction.

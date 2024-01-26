@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "zcc-decl.h"
+#include "orax-decl.h"
 
 
 /* The ASTNode structure stores an AST node */
