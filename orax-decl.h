@@ -66,7 +66,6 @@ typedef int instid_t;
 Instruction *create_instruction(InstructionType type, instid_t instruction_id);
 Instruction *add_inst_operand(Instruction *inst, Operand *operand);
 Instruction *add_inst_result(Instruction *inst, Result *result);
-
 Operand *create_operand(OperandType type, void *value);
 Result *create_result(ResultType type, void *value);
 
@@ -76,13 +75,18 @@ Result *create_result(ResultType type, void *value);
 /* The following functions declares a Basic Block used for Control Flow Analysis. See `orax-cfg.c` for definitions */
 
 typedef struct TraceBlock TraceBlock;
+typedef struct ControlFlowGraph ControlFlowGraph;
 typedef int blockid_t;
 
-TraceBlock *create_basic_block(blockid_t block_id);
-TraceBlock *add_cfg_successor(TraceBlock *block, TraceBlock *succ);
-TraceBlock *add_cfg_instruction(TraceBlock *block, Instruction *inst);
+TraceBlock *create_trace_block(blockid_t block_id);
+ControlFlowGraph *create_cfg(void);
+ControlFLowGraph *add_cfg_trace(ControlFlowGraph *cfg, TraceBlock *block);
+TraceBlock *add_trace_successor(TraceBlock *block, TraceBlock *succ);
+TraceBlock *add_trace_instruction(TraceBlock *block, Instruction *inst);
 TraceBlock *get_successor_by_id(TraceBlock *block, blockid_t succ_bid);
 Instruction *get_instruction_by_id(TraceBlock *block, instid_t instid);
+void analyze_liveness(ControlFlowGraph *graph);
+void free_cfg(TraceBlock *block);
 
 // + F: The Interferrence Graph +
 
@@ -137,6 +141,7 @@ LifeSet *add_life_set_object(LifeSet *set, LifeObject *object);
 LifeSet *union_life_set(LifeSet *set1, LifeSet *set2);
 LifeSet *difference_life_set(LifeSet *set1, LifeSet *set2);
 LifeSet *interset_life_set(LifeSet *set1, LifeSet *set2);
+LifeSet *copy_life_set(LifeSet *set);
 void free_life_object(LifeObject *object);
 void free_life_set(LifeSet *set);
 
