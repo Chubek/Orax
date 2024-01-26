@@ -13,7 +13,8 @@ struct Instruction
   InstructionType type;
   Operand **operands_defined;
   Operand **opernds_used;
-  ssize_t num_operands;
+  size_t num_operands_defined;
+  size_t num_operands_used;
   Result *result;
 };
 
@@ -50,13 +51,19 @@ Instruction *create_instruction(InstructionType type, instid_t id)
   return inst;
 }
 
-Instruction *add_inst_operand(Instrution *inst, Operand *operand, bool used)
+Instruction *add_inst_operand_defined(Instrution *inst, Operand *operand)
 {
-  inst->operands = (Operand**)realloc(inst->operands, (inst-num_operand + 1) * sizeof(Operand*));
-  if (used)
-     inst->operands_used[inst->num_operands++] = operand;
-  else
-     inst->operands_defined[inst->num_operands++] = operandi;
+  inst->operands_defined = 
+     (Operand**)realloc(inst->operands_defined, (inst->num_operand_defined + 1) * sizeof(Operand*));
+  inst->operands_defined[inst->num_operands_defined++] = operand;
+  return inst;
+}
+
+Instruction *add_inst_operand_used(Instrution *inst, Operand *operand)   
+{
+  inst->operands_used = 
+     (Operand**)realloc(inst->operands_used, (inst->num_operand_used + 1) * sizeof(Operand*));
+  inst->operands_used[inst->num_operands_used++] = operand;
   return inst;
 }
 
