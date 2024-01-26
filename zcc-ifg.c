@@ -137,16 +137,55 @@ void color_graphs(RegisterNode *nodes[], size_t num_nodes)
   }
 }
 
+bool nodes_interfere(RegisterNode *node1, RegisterNode *node2)
+{
+   for (size_t i = 0; i < MAX_NEIGHBORS; i++)
+    if (node1->neighbors[i] == node2 || node2->neighbors[i] == node1)
+      return true;
+
+   return false;
+}
+
+void coalesce_register_pair(RegisterNode *node1, RegisterNode *node2)
+{
+   if (NODE_IS_COLORED(node1) || NODE_IS_COLORED(node2))
+    return;
+
+   if (nodes_interfere(node1, node2))
+    return;
+
+   for (size_t i = 0; i < MAX_NEIGHBORS; i++)
+   {
+      if (node2->neighbors[i] != NULL)
+      {
+  	node1->neighbors[i] = node2->neighbors[i];
+	node2->neighbors[i] = NULL;
+      }
+   }
+
+   update_node_degree(node1);
+   update_node_degree(node2);
+}
+
+void remove_node_from_graph(RegisterNode *nodes[], size_t num_nodes, RegisterNode *to_remove)
+{
+   for (size_t i = 0; i < num_nodes; i++)
+   {
+      for (size_t j = 0; j < MAX_NEIGHBORS; j++)
+      {
+	 if (nodes[i]->neighbors[j] == to_remove)
+	   nodes[i]->neighbors[j] = NULL;
+      }
+
+      update_node_degree(nodes[i]);
+
+   }
+}
 
 void select_registers(RegisterNode *nodes[], size_t num_nodes)
 {
-  for (size_t i = 0; i < num_nodes; i++)
-  {
-    if (NODE_IS_COLOR(nodes[i]))
-      continue;
-
-           
-  }
+   simplify_registers(nodes, num_nodes);
+   // TODO
 }
 
 
