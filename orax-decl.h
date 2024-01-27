@@ -184,5 +184,8 @@ MaxMunchState *add_munch_state_tile(MaxMunchState *state,
                                     InstructionTile *tile);
 MaxMunchState *add_munch_state_inst(MaxMunchState *state,
                                     MachineInstruction *minst);
+void free_instruction_tile(InstructionTile *tile);
+void free_machine_register(MachineRegister *reg);
+void free_maximal_munch_state(MaxMunchState *state);
 
 #endif
