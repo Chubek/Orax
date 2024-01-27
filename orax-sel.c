@@ -81,3 +81,25 @@ MaxMunchState *add_munch_state_inst(MaxMunchState *state,
   state->gen_inst[state->num_gen_inst++] = minst;
   return state;
 }
+
+void free_instruction_tile(InstructionTile *tile) {
+  if (tile == NULL)
+    return;
+  free_instruction_tile(tile->left);
+  free_instruction_tile(tile->right);
+  free(tile);
+}
+
+void free_machine_register(MachineRegister *reg) { free(reg->label); }
+
+void free_maximal_munch_state(MaxMunchState *state) {
+  if (state == NULL)
+    return;
+
+  while (--state->num_tiles)
+    free_instruction_tile(state->times[state->num_tiles]);
+
+  while (--state->num_gen_inst)
+    free_machine_instruction(state->gen_inst[state->num_gen_inst]);
+  q
+}
