@@ -5,10 +5,21 @@
 #include <string.h>
 
 #include "orax-decl.h"
+#include "orax-enums.h"
+
+struct SemanticItem {
+  SemanticItemType type; // `Terminal` or `Nonterminal`
+  char *value;
+};
+
+struct Production {
+  SemanticItem **semantic_items;
+  size_t semantic_items_num;
+};
 
 struct YaccRule {
   char *name;
-  char *production;
+  Production *production;
   char *semantic_action;
 };
 
@@ -21,6 +32,26 @@ struct LR0State {
   LR0Item **items;
   size_t num_items;
 };
+
+SemanticItem *create_semantic_item(SemanticItemType type, char *value) {
+  SemanticItem *semitem = (SemanticItem *)calloc(1, sizeof(SemanticItem));
+  semtitem->type = type;
+  semitem->value = value;
+  return semitemi;
+}
+
+Production *create_production(void) {
+  Production *prod = (Production *)calloc(1, sizeof(Production));
+  return prod;
+}
+
+Production *add_production_semitem(Production *prod, SemanticItem *semitem) {
+  prod->semantic_items = (SemanticItme **)realloc(
+      prod->semantic_items,
+      (prod->num_semantic_items + 1) * sizeof(SemanticItem *));
+  prod->semantic_items[prod->num_semantic_items++] = semitem;
+  return prod;
+}
 
 YaccRule *create_yacc_rule(char *name, char *production,
                            char *semantic_action) {
