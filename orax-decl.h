@@ -194,7 +194,28 @@ SExpressionList *parse_sexp_list(FILE *input_file);
 void walk_sexp_list(SExpressionList *sexpls);
 void print_sexp(SExpression *sexp);
 
+// + K: IEEE-745 Interface +
 
+typedef struct Float32 Float32;
+typedef struct Float64 Float64;
 
+Float32 newFloat32(uint32_t fraction, uint8_t exponent, uint8_t sign);
+Float64 newFloat64(uint64_t fraction, uint16_t exponent, uint8_t sign);
+Float32 f32Addition(Float32 a, Float32 b);
+Float32 f32Subtraction(Float32 a, Float32 b);
+Float32 f32Multiplication(Float32 a, Float32 b);
+Float32 f32Division(Float32 a, Float32 b);
+Float32 f32Exponentiation(Float32 a, Float32 b);
+Float64 f64Addition(Float64 a, Float64 b);
+Float64 f64Subtraction(Float64 a, Float64 b);
+Float64 f64Multiplication(Float64 a, Float64 b);
+Float64 f64Division(Float64 a, Float64 b);
+Float64 f64Exponentiation(Float64 a, Float64 b);
+
+#define FLOAT32_FRACTION_MASK 0x800000
+#define FLOAT32_BIAS 127
+
+#define FLOAT64_FRACTION_MASK 0x10000000000000
+#define FLOAT64_BIAS 1023
 
 #endif
