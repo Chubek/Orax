@@ -61,7 +61,7 @@ typedef struct Instruction Instruction;
 typedef struct Operand Operand;
 typedef struct operand Result;
 typedef int instid_t;
-typedef int opid_t;
+typedef int ophash_t;
 typedef int ssaversion_t;
 
 Instruction *create_instruction(InstructionName type, instid_t instruction_id);
@@ -96,10 +96,19 @@ TraceBlock *add_trace_instruction(TraceBlock *block, Instruction *inst);
 TraceBlock *get_successor_by_id(TraceBlock *block, blockid_t succ_bid);
 Instruction *get_instruction_by_id(TraceBlock *block, instid_t instid);
 bool trace_blocks_are_equal(TraceBlock *block1, TraceBlock *block2);
-void calculate_immediate_dominator(ControlFlowGraph *cfg, size_t entry_index);
-void calculate_dominance_frontiers(ControlFlowGraph *cfg);
-void insert_phi_instructions(ControlFlowGraph *cfg);
+void ssa_calculate_immediate_dominator(ControlFlowGraph *cfg,
+                                       size_t entry_index);
+void ssa_calculate_dominance_frontiers(ControlFlowGraph *cfg);
+void ssa_insert_phi_instructions(ControlFlowGraph *cfg);
+void ssa_reversion_operands(ControlFlowGraph *cfg);
 void analyze_liveness(ControlFlowGraph *graph);
+bool dominates(TraceBlock *dominator, TraceBlock *block);
+bool operand_defined_in_block(Operand *operand, TraceBlock *block);
+bool is_phi_present_for_operand(TraceBlock *block, Operand *operand);
+Instruction *create_instruction(TraceBlock *block, Operand *operand);
+Operand *get_operand_from_block(Operand *operand, TraceBlock *block);
+void insert_phi_instruction_at_head(TraceBlock *block, Instruction *inst);
+void ssa_insert_phi_instructions(ControlFlowGraph *cfg);
 void free_trace_block(TraceBlock *block);
 void free_cfg(ControlFlowGraph *cfg);
 
