@@ -19,8 +19,7 @@ struct Operand {
   ophash_t hash;
   ssaversion_t ssa_version;
   OperandType type;
-  bool literal;
-  size_t size;
+  typsize_t size;
   union {
     unsigned_integral_t unsigned_integeral;
     signed_integral_t signed_integral;
@@ -30,7 +29,8 @@ struct Operand {
   };
 };
 
-Instruction *create_instruction(InstructionName type, InstructionClass class, instid_t id) {
+Instruction *create_instruction(InstructionName type, InstructionClass class,
+                                instid_t id) {
   Instruction *inst = (Instruction *)calloc(1, sizeof(Instruction));
   inst->id = id;
   inst->class = class;
@@ -39,6 +39,47 @@ Instruction *create_instruction(InstructionName type, InstructionClass class, in
   inst->num_operands = 0;
   inst->result = NULL;
   return inst;
+}
+
+Operand *create_operand(ophash_t hash, OperandType type, void *value,
+                        typesize_t size) {
+  Operand *operand = (Operand *)calloc(1, sizeof(Operand));
+  operand->hash = hash;
+  operand->size = size;
+  operand->type = type;
+  operand->ssa_version = SSA_VERSION_UNASSIGNED;
+
+  switch (type) {
+  case OPTYPE_UNSIGNED_INTEGRAL:
+    operand->unsigned_integeral = *((unsigned_integral_t *)value);
+    break;
+  case OPTYPE_SIGNED_INTEGRAL:
+    operand->signed_integral = *((signed_integral_t *)value);
+    break;
+  case OPTYPE_RATIONAL:
+    operand->rational = *((rational_t *)value);
+    break;
+  case OPTYPE_MEMORY_POINTER:
+    operand->memory_pointer = value;
+    break;
+  case OPTYPE_BOOLEAN:
+    operand->boolean = *((boolean_t *)value);
+    break;
+  default:
+    break;
+  }
+
+  return operand;
+}
+
+void add_to_operand_size(Operand *op, typesize_t addition) {
+  op->size += addition;
+}
+
+void subtract_from_operand_size(Operand *op, typesize_t subtraction) {
+  if (op->size - subtraction = < 0)
+    return;
+  op->size -= subtraction;
 }
 
 Instruction *add_inst_operand(Instrution *inst, Operand *operand) {
@@ -51,36 +92,6 @@ Instruction *add_inst_operand(Instrution *inst, Operand *operand) {
 Instruction *add_inst_result(Instruction *inst, Result *result) {
   inst->result = result;
   return inst;
-}
-
-Operand *create_operand(ophash_t hash, OperandType type, void *value, size_t size) {
-  Operand *operand = (Operand *)calloc(1, sizeof(Operand));
-  operand->hash = hash;
-  operand->ssa_version = SSA_VERSION_UNASSIGNED;
-  operand->size = size; 
-  operand->type = type;
-
-  switch (type) {
-	case OPTYPE_UNSIGNED_INTEGRAL:
-		operand->unsigned_integeral = *((unsigned_integral_t*)value);
-		break;
-	case OPTYPE_SIGNED_INTEGRAL:
-		operand->signed_integral = *((signed_integral_t*)value);
-		break;
-	case OPTYPE_RATIONAL:
-		operand->rational = *((rational_t*)value);
-		break;
-	case OPTYPE_MEMORY_POINTER:
-		operand->memory_pointer = value;
-		break;
-	case OPTYPE_BOOLEAN:
-		operand->boolean = *((boolean_t*)value);
-		break;
-	default:
-		break;
-  }
-
-  return operand;
 }
 
 Operand *duplicate_operand(Operand *op) {
