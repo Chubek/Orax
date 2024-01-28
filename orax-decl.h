@@ -238,4 +238,23 @@ Float64 f64Exponentiation(Float64 a, Float64 b);
 typedef struct SSAVariable SSAVariable;
 typedef int version_t;
 
+
+// + M: Yacc Implementation +
+
+typedef struct YaccRule YaccRule;
+typedef struct SymbtabNode YaccSymtab;
+typedef struct LR0Item LR0Item;
+typedef struct LR0State LR0State;
+
+
+YaccRule *create_yacc_rule(char *name, char *production, char *semantic_action);
+LR0Item *create_lr0_item(YaccRule *rule);
+LR0State *create_lr0_state(void);
+LR0State *lr0_state_add_item(LR0State *state, LR0Item *item);
+
+#define DOT_INDEX_INIT -1
+
+
+
+
 #endif
