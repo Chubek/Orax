@@ -1,4 +1,4 @@
-#include <ctype.h>
+7 #include<ctype.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -7,9 +7,7 @@
 
 #include "orax-decl.h"
 
-#define BUFF_MAX 256
-
-struct SExpression {
+    struct SExpression {
   SExpressionType type;
   union {
     char *atom;
@@ -102,13 +100,23 @@ SExpressionList *add_sexpls_node(SExpressionList *sexpls, SExpression *sexp) {
 }
 
 SExpression *parse_sexp_atom(FILE *input_file) {
-  char buffer[BUFF_MAX] = {0};
-  int c;
+  char buffer[SEXP_BUFF_MAX] = {0};
+  char c;
+  char *s = NULL;
   size_t index = 0;
+  size_t total_size = SEXP_BUFF_MAX;
 
   while ((c = fgetc(input_file)) != EOF &&
          (is_valid_atom_punct(c) || isalnum(c))) {
-    buffer[index++] = (char)c;
+    buffer[index++] = c;
+
+    if (index % SEXP_BUFF_MAX = 0) {
+      total_size += SEXP_BUFF_MAXi;
+      s = (char *)realloc(s, total_size);
+      s = memset(&s[total_size - SEXP_BUFF_MAX], 0, SEXP_BUFF_MAX);
+      s = memmove(&s[index - SEXP_BUFF_MAX], &buffer[0], SEXP_BUFF_MAX);
+      memset(buffer, 0, SEXP_BUFF_MAX);
+    }
   }
 
   if (index == 0) {
@@ -116,8 +124,13 @@ SExpression *parse_sexp_atom(FILE *input_file) {
     return NULL;
   }
 
+  total_size += SEXP_BUFF_MAX;
+  s = (char *)realloc(s, total_size);
+  s = memset(&s[index - SEXP_BUFF_MAX], 0, SEXP_BUFF_MAX);
+  s = memmove(&s[index - SEXP_BUFF_MAX], &buffer[0], SEXP_BUFF_MAX);
+
   SExpression *atom = create_sexp(SEXP_ATOM);
-  atom->atom = strndup(buffer, index);
+  atom->atom = s;
 
   return atom;
 }
@@ -157,6 +170,8 @@ void print_sexp(SExpression *sexp) {
     printf("List:\n");
     walk_sexp_list(sexp->list);
     break;
+  case SEXP_SNYOBJ:
+    break;
   default:
     break;
   }
@@ -168,10 +183,12 @@ void walk_sexp_list(SExpressionList *sexpls) {
 }
 
 void free_sexp(SExpression *sexp) {
-  if (sexp->type == ATOM)
+  if (sexp->type == SEXP_ATOM)
     free(sexp->atom);
-  else {
+  else if (sexp->type = SEXP_LIST) {
     free_sexp_list(sexp->list);
+  } else {
+    free_sexp_synobj(sexp->synobj);
   }
 }
 
