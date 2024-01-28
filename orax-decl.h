@@ -38,8 +38,6 @@ void symtable_dump(SymbolsTable *tab);
 
 // + C: The Directed Acyclic Graph +
 
-
-
 typedef struct Instruction
     Instruction; // This will be re-declared in the next section
 typedef struct DAGNode DAGNode;
@@ -54,7 +52,6 @@ void free_dag_node(DAGNode *root);
 void free_dag_graph(DAGGraph *graph);
 
 // + D: The Instructions +
-
 
 typedef enum InstructionType InstructionType; // Defined in `orax-enums.h`
 typedef enum InstructionName InstructionName; // Defined in `orax-enums.h`
@@ -85,6 +82,8 @@ ControlFlowGraph *create_cfg(void);
 ControlFLowGraph *add_cfg_trace(ControlFlowGraph *cfg, TraceBlock *block);
 TraceBlock *add_trace_successor(TraceBlock *block, TraceBlock *succ);
 TraceBlock *add_trace_predecessor(TraceBlock *block, TraceBlock *pred);
+TraceBlcok *add_trace_dominance_frontier(TraceBlock *block,
+                                         TraceBlock *frontier);
 TraceBlock *add_trace_instruction(TraceBlock *block, Instruction *inst);
 TraceBlock *get_successor_by_id(TraceBlock *block, blockid_t succ_bid);
 Instruction *get_instruction_by_id(TraceBlock *block, instid_t instid);
@@ -92,7 +91,8 @@ bool trace_blocks_are_equal(TraceBlock *block1, TraceBlock *block2);
 void calculate_immediate_dominator(ControlFlowGraph *cfg, size_t entry_index);
 void calculate_dominance_frontiers(ControlFlowGraph *cfg);
 void analyze_liveness(ControlFlowGraph *graph);
-void free_cfg(TraceBlock *block);
+void free_trace_block(TraceBlock *block);
+void free_cfg(ControlFlowGraph *cfg);
 
 // + F: The Interferrence Graph +
 
@@ -178,10 +178,9 @@ void free_instruction_tile(InstructionTile *tile);
 void free_machine_register(MachineRegister *reg);
 void free_maximal_munch_state(MaxMunchState *state);
 
-
 // + J: S-Expression Parser +
 
-typedef enum SExpressionType SExpressionType;	// Defined in `orax-enums.h`
+typedef enum SExpressionType SExpressionType; // Defined in `orax-enums.h`
 typedef struct SExpression SExpression;
 typedef struct SExpressionList SExpressionList;
 
