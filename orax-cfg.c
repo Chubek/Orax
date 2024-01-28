@@ -22,8 +22,8 @@ struct TraceBlock {
   size_t num_instructions;
   LifeSet *live_in;
   LifeSet *live_out;
-  LifeSet *use_set;
-  LifeSet *def_set;
+  LifeSet *use_chain;
+  LifeSet *def_chain;
 };
 
 struct ControlFlowGraph {
@@ -43,8 +43,8 @@ TraceBlock *create_trace_block(TraceBlockType type, blockid_t block_id,
   block->immediate_dominator = NULL;
   block->live_in = create_life_set();
   block->live_out = create_life_set();
-  block->use_set = create_life_set();
-  block->def_set = create_life_set();
+  block->use_chain = create_life_set();
+  block->def_chain = create_life_set();
   return block;
 }
 
@@ -123,8 +123,8 @@ void analyze_liveness(ControlFlowGraph *cfg) {
         new_live_out =
             union_life_set(new_live_out, block->successors[j]->live_in);
 
-      LifeSet *diff = difference_life_set(new_live_out, block->def_set);
-      LifeSet *new_live_in = union_life_set(block->use_set, diff);
+      LifeSet *diff = difference_life_set(new_live_out, block->def_chain);
+      LifeSet *new_live_in = union_life_set(block->use_chain, diff);
 
       if (!objects_are_equal(new_live_in, block->live_in) ||
           !objects_are_equal(new_live_out, block->live_out)) {
@@ -141,7 +141,8 @@ void analyze_liveness(ControlFlowGraph *cfg) {
   }
 }
 
-void calculate_immediate_dominator(ControlFlowGraph *cfg, size_t entry_index) {
+void ssa_calculate_immediate_dominator(ControlFlowGraph *cfg,
+                                       size_t entry_index) {
 
   cfg->blocks[entry_index]->immediate_dominator = cfg->blocks[entry_index];
 
@@ -194,7 +195,7 @@ void calculate_immediate_dominator(ControlFlowGraph *cfg, size_t entry_index) {
   }
 }
 
-void calculate_dominance_frontiers(ControlFlowGraph *cfg) {
+void ssa_calculate_dominance_frontiers(ControlFlowGraph *cfg) {
 
   for (size_t i = 0; i < cfg->num_blocks; i++) {
     cfg->blocks[i]->dominance_frontiers = NULL;
@@ -226,41 +227,55 @@ void calculate_dominance_frontiers(ControlFlowGraph *cfg) {
   }
 }
 
-void insert_phi_instructions(ControlFlowGraph *cfg) {
+void ssa_reversion_operands(ControlFlowGraph *cfg) {
+  ophash_t hash_lut[MAX_OP_HASH] = {0};
+
   for (size_t i = 0; i < cfg->num_blocks; i++) {
     TraceBlock *block = cfg->blocks[i];
 
-    for (size_t var_index = 0; var_index < block->def_set->num_objects;
-         var_index++) {
-      LifeObject *variable = block->def_set->objects[var_index];
+    for (size_t j = 0; j < block->num_instructions; j++) {
+      Instruction *inst = block->instructions[j];
 
-      if (variable->size > 1) {
+      for (size_t k = 0; k < inst->num_operands; k++) {
+        Operand *operand = inst->operands[k];
 
-        Operand *phi_result = duplicate_operand(variable);
-        Instruction *phi_instruction =
-            create_instruction(INST_PHI, GEN_UNIQUE_ID());
-        phi_instruction = add_inst_result(
-            phi_instruction, create_result(variable->type, phi_result));
+        if (operand->ssa_version == SSA_VERSION_UNASSIGNED) {
+          hash_lut[operand->hash] = hash_lut[operand->hash] == 0
+                                        ? GEN_UNIQUE_ID()
+                                        : hash_lut[operand->hash]++;
+          new_operand->ssa_version = hash_lut[operand->hash];
+        }
+      }
+    }
+  }
+}
 
-        block = insert_trace_instruction_at_head(block, phi_instruction);
+void ssa_insert_phi_instructions(ControlFlowGraph *cfg) {
 
-        block->use_set = add_life_set_object(
-            block->use_set,
-            create_life_object(variable->type, phi_result, variable->size));
+  for (size_t i = 0; i < cfg->num_blocks; i++) {
+    TraceBlock *block = cfg->blocks[i];
 
-        for (size_t df_index = 0; df_index < block->num_dominance_frontiers;
-             df_index++) {
-          TraceBlock *frontier_block = block->dominance_frontiers[df_index];
+    for (size_t j = 0; j < block->num_dominance_frontiers; j++) {
+      TraceBlock *dominance_frontier = block->dominance_frontiers[j];
 
-          if (frontier_block->def_set != NULL) {
-            for (size_t def_index = 0;
-                 def_index < frontier_block->def_set->num_objects;
-                 def_index++) {
-              if (objects_are_equal(frontier_block->def_set->objects[def_index],
-                                    variable)) {
-                frontier_block =
-                    add_trace_dominance_frontir(frontier_block, block);
-                break;
+      for (size_t k = 0; k < dominance_frontier->num_instructions; k++) {
+        Instruction *inst = dominance_frontier->instructions[k];
+
+        for (size_t m = 0; m < inst->num_operands; m++) {
+          Operand *operand = inst->operands[m];
+
+          for (size_t x = 0; x < dominance_frontier->num_predecessors; x++) {
+            TraceBlock *pred = dominance_frontier->predecessors[x];
+
+            if (dominates(pred, block)) {
+
+              if (operand_defined_in_block(operand, pred)) {
+
+                if (!is_phi_present_for_operand(block, operand)) {
+                  Instruction *phi_inst =
+                      create_phi_instruction(block, operand);
+                  insert_instruction_at_head(block, phi_inst);
+                }
               }
             }
           }
@@ -268,6 +283,77 @@ void insert_phi_instructions(ControlFlowGraph *cfg) {
       }
     }
   }
+}
+
+bool dominates(TraceBlock *dominator, TraceBlock *block) {
+
+  while (block != NULL && block->immediate_dominator != dominator) {
+    block = block->immediate_dominator;
+  }
+  return (block == dominator);
+}
+
+bool operand_defined_in_block(Operand *operand, TraceBlock *block) {
+  for (size_t i = 0; i < block->num_instructions; i++) {
+    Instruction *inst = block->instructions[i];
+    for (size_t j = 0; j < inst->num_operands; j++) {
+      if (inst->operands[j] == operand) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+bool is_phi_present_for_operand(TraceBlock *block, Operand *operand) {
+  for (size_t i = 0; i < block->num_instructions; i++) {
+    Instruction *inst = block->instructions[i];
+    if (inst->type == INST_PHI) {
+      for (size_t j = 0; j < inst->num_operands; j++) {
+        if (inst->operands[j] == operand) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+Instruction *create_phi_instruction(TraceBlock *block, Operand *operand) {
+  Instruction *phi_inst = create_instruction(INST_PHI, GEN_UNIQUE_ID());
+  Operand *phi_result = create_operand(operand->hash, operand->type, NULL);
+  phi_result->ssa_version = GEN_UNIQUE_ID();
+  phi_inst = add_inst_result(phi_inst, phi_result);
+
+  for (size_t i = 0; i < block->num_predecessors; i++) {
+    TraceBlock *pred = block->predecessors[i];
+    Operand *pred_operand = get_operand_from_block(operand, pred);
+    phi_inst = add_inst_operand(phi_inst, pred_operand);
+  }
+
+  return phi_inst;
+}
+
+Operand *get_operand_from_block(Operand *operand, TraceBlock *block) {
+  for (size_t i = 0; i < block->num_instructions; i++) {
+    Instruction *inst = block->instructions[i];
+    for (size_t j = 0; j < inst->num_operands; j++) {
+      if (inst->operands[j] == operand) {
+        return inst->operands[j];
+      }
+    }
+  }
+  return NULL;
+}
+
+void insert_instruction_at_head(TraceBlock *block, Instruction *inst) {
+  block->instructions = (Instruction **)realloc(block->instructions,
+                                                (block->num_instructions + 1) *
+                                                    sizeof(Instruction *));
+  memmove(&block->instructions[1], &block->instructions[0],
+          block->num_instructions * sizeof(Instruction *));
+  block->instructions[0] = inst;
+  block->num_instructions++;
 }
 
 TraceBlock *get_successor_by_id(TraceBlock *block, blockid_t succ_bid) {
@@ -305,8 +391,8 @@ void free_trace_block(TraceBlock *block) {
 
   free_life_set(block->live_in);
   free_life_set(block->live_out);
-  free_life_set(block->used_set);
-  free_life_set(block->def_set);
+  free_life_set(block->use_chain);
+  free_life_set(block->def_chain);
 
   free_trace_block(block->immediate_dominator);
   free(block);
