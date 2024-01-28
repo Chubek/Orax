@@ -53,7 +53,6 @@ void free_dag_graph(DAGGraph *graph);
 
 // + D: The Instructions +
 
-typedef enum InstructionType InstructionType; // Defined in `orax-enums.h`
 typedef enum InstructionName InstructionName; // Defined in `orax-enums.h`
 typedef enum OperandType OperandType;         // Defined in `orax-enums.h`
 typedef enum OperandType ResultType;          // Defined in `orax-enums.h`
@@ -84,12 +83,15 @@ TraceBlock *add_trace_successor(TraceBlock *block, TraceBlock *succ);
 TraceBlock *add_trace_predecessor(TraceBlock *block, TraceBlock *pred);
 TraceBlcok *add_trace_dominance_frontier(TraceBlock *block,
                                          TraceBlock *frontier);
+TraceBlock *insert_trace_instruction_at_head(TraceBlock *block,
+                                             Instruction *inst);
 TraceBlock *add_trace_instruction(TraceBlock *block, Instruction *inst);
 TraceBlock *get_successor_by_id(TraceBlock *block, blockid_t succ_bid);
 Instruction *get_instruction_by_id(TraceBlock *block, instid_t instid);
 bool trace_blocks_are_equal(TraceBlock *block1, TraceBlock *block2);
 void calculate_immediate_dominator(ControlFlowGraph *cfg, size_t entry_index);
 void calculate_dominance_frontiers(ControlFlowGraph *cfg);
+void insert_phi_instructions(ControlFlowGraph *cfg);
 void analyze_liveness(ControlFlowGraph *graph);
 void free_trace_block(TraceBlock *block);
 void free_cfg(ControlFlowGraph *cfg);
@@ -216,5 +218,10 @@ Float64 f64Exponentiation(Float64 a, Float64 b);
 
 #define FLOAT64_FRACTION_MASK 0x10000000000000
 #define FLOAT64_BIAS 1023
+
+// + L: SSA Form +
+
+typedef struct SSAVariable SSAVariable;
+typedef int version_t;
 
 #endif
