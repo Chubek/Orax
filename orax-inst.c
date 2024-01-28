@@ -15,7 +15,7 @@ struct Instruction {
 };
 
 struct Operand {
-  opid_t id;
+  ophash_t hash;
   ssaversion_t ssa_version;
   OperandType type;
   size_t size;
@@ -58,9 +58,9 @@ Instruction *add_inst_result(Instruction *inst, Result *result) {
   return inst;
 }
 
-Operand *create_operand(opid_t id, OperandType type, void *value) {
+Operand *create_operand(ophash_t hash, OperandType type, void *value) {
   Operand *operand = (Operand *)calloc(1, sizeof(Operand));
-  operand->id = id;
+  operand->hash = hash;
   operand->ssa_version = SSA_VERSION_UNASSIGNED;
   operand->ptr = value;
   operand->size = operand->type = type;

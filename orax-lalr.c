@@ -17,14 +17,14 @@ struct Production {
   size_t semantic_items_num;
 };
 
-struct YaccRule {
+struct LALRRule {
   char *name;
   Production *production;
   char *semantic_action;
 };
 
 struct LR0Item {
-  YaccRule *rule;
+  LALRRule *rule;
   ssize_t dot_index;
 };
 
@@ -53,16 +53,16 @@ Production *add_production_semitem(Production *prod, SemanticItem *semitem) {
   return prod;
 }
 
-YaccRule *create_yacc_rule(char *name, char *production,
+LALRRule *create_yacc_rule(char *name, char *production,
                            char *semantic_action) {
-  YaccRule *rule = (YaccRule *)calloc(1, sizeof(YaccRule));
+  LALRRule *rule = (LALRRule *)calloc(1, sizeof(LALRRule));
   rule->name = name;
   rule->production = production;
   rule->semantic_action = semantic_action;
   return rule;
 }
 
-LR0Item *create_lr0_item(YaccRule *rule) {
+LR0Item *create_lr0_item(LALRRule *rule) {
   LR0Item *item = (LR0Item *)calloc(1, sizeof(LR0Item));
   item->rule = rule;
   item->dot_index = DOT_INDEX_INIT;

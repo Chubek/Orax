@@ -292,20 +292,7 @@ StackAutomaton *parse_regular_expression(const char *regex);
 #define MAX_TRANSITIONS 65536
 #define EPSILON 65537
 
-// + N: The LL Parser Generator +
-
-typedef enum PEGSymbol PEGSymbol	// Defined in `orax-enums.h`
-typedef struct PEGExpression PEGExpression;
-typedef union PEGMetaExpression PEGMetaExpression;
-
-
-#define PEG_CHAR_UNASSIGNED 65537
-#define MAX_PEG_SUBEXPRESSION 2
-#define PEG_SUBEXP_INDEX_SEQUENCE 0
-#define PEG_SUBEXP_INDEX_CHOICE 1
-#define PEG_SUBEXP_INDEX_GROUP 2
-
-// + O: The Typing System +
+// + L: The Typing System +
 
 typedef enum TypeKind TypeKind;
 typedef enum TypeStaticity TypeStaticity;
