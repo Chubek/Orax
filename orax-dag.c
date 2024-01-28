@@ -16,7 +16,6 @@ struct DAGGraph {
   DAGNode **adj_list;
 };
 
-
 DAGNode *create_dag_node(Instruction *instruction, vert_t dest) {
   DAGNode *node = (DAGNode *)calloc(1, sizeof(DAGNode));
   node->instruction = instruction;

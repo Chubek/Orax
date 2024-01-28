@@ -236,7 +236,7 @@ void insert_phi_instructions(ControlFlowGraph *cfg) {
 
       if (variable->size > 1) {
 
-        Operand *phi_result = create_operand(GEN_UNIQUE_ID(), OPTYPE_PHI, NULL);
+        Operand *phi_result = duplicate_operand(variable);
         Instruction *phi_instruction =
             create_instruction(INST_PHI, GEN_UNIQUE_ID());
         phi_instruction = add_inst_result(

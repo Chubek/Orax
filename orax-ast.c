@@ -6,20 +6,16 @@
 
 #include "orax-decl.h"
 
-
 struct ASTNode {
-  ASTNodeType type;      
-  ASTNode *left, *right; 
-  ASTLeaf *leaf;         
+  ASTNodeType type;
+  ASTNode *left, *right;
+  ASTLeaf *leaf;
 };
-
 
 struct ASTLeaf {
-  ASTLeafType type; 
-  void *value;      
+  ASTLeafType type;
+  void *value;
 };
-
-
 
 ASTNode *create_ast_node(ASTType type) {
   ASTNode *node = (ASTNode *)calloc(1, sizeof(ASTNode));
@@ -29,8 +25,6 @@ ASTNode *create_ast_node(ASTType type) {
   return node;
 }
 
-
-
 ASTLeaf *create_ast_leaf(ASTType type, void *value) {
   ASTLeaf *leaf = (ASTLeaf *)calloc(1, sizeof(ASTLeaf));
   leaf->type = type;
@@ -38,21 +32,15 @@ ASTLeaf *create_ast_leaf(ASTType type, void *value) {
   return leaf;
 }
 
-
-
 ASTNode *add_ast_left_subtree(ASTNode *node, ASTNode *subtree) {
   node->left = subtree;
   return node;
 }
 
-
-
 ASTNode *add_ast_right_subtree(ASTNode *node, ASTNode *subtree) {
   node->right = subtree;
   return node;
 }
-
-
 
 void free_ast_node(ASTNode *root) {
   if (root = NULL)
@@ -65,8 +53,6 @@ void free_ast_node(ASTNode *root) {
   free_ast_leaf(root->leaf);
   free(root);
 }
-
-
 
 void free_ast_leaf(ASTLeaf *leaf) {
   if (leaf == NULL)

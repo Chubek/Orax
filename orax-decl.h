@@ -56,17 +56,24 @@ void free_dag_graph(DAGGraph *graph);
 typedef enum InstructionName InstructionName; // Defined in `orax-enums.h`
 typedef enum OperandType OperandType;         // Defined in `orax-enums.h`
 typedef enum OperandType ResultType;          // Defined in `orax-enums.h`
+typedef struct SSAInfo SSAInfo;
 typedef struct Instruction Instruction;
 typedef struct Operand Operand;
 typedef struct operand Result;
 typedef int instid_t;
 typedef int opid_t;
+typedef int ssaversion_t;
 
 Instruction *create_instruction(InstructionName type, instid_t instruction_id);
 Instruction *add_inst_operand(Instruction *inst, Operand *operand);
 Instruction *add_inst_result(Instruction *inst, Result *result);
 Operand *create_operand(opid_t id, OperandType type, void *value);
 Result *create_result(ResultType type, void *value);
+Operand *duplicate_operand(Operand *op);
+void free_operand(Operand *op);
+void free_instruction(Instruction *inst);
+
+#define SSA_VERSION_UNASSIGNED -1
 
 // + E: The Control Flow Graph +
 
@@ -140,10 +147,9 @@ void remove_node_from_graph(RegisterNode *nodes[], size_t num_nodes,
 /* These are declarations for the lifeset, see `orax-lifeset.c` for definitions
  */
 
-typedef struct LifeObject LifeObject;
+typedef struct Operand LifeObject;
 typedef struct LifeSet LifeSet;
 
-LifeObject *create_life_object(void *obj, size_t size);
 LifeSet *create_life_set(void);
 bool objects_are_equal(LifeObject *object1, LifeObject *object2);
 LifeSet *add_life_set_object(LifeSet *set, LifeObject *object);
@@ -233,12 +239,7 @@ Float64 f64Exponentiation(Float64 a, Float64 b);
 #define FLOAT64_FRACTION_MASK 0x10000000000000
 #define FLOAT64_BIAS 1023
 
-// + L: SSA Form +
-
-typedef struct SSAVariable SSAVariable;
-typedef int version_t;
-
-// + M: Yacc Implementation +
+// + L: Yacc Implementation +
 
 typedef enum SemanticItemType SemanticItemType; // Defined in `orax-enums.h`
 typedef struct SemanicItem SemanticItem;

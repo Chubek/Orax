@@ -16,7 +16,9 @@ struct Instruction {
 
 struct Operand {
   opid_t id;
+  ssaversion_t ssa_version;
   OperandType type;
+  size_t size;
   union {
     uint64_t u64;
     int64_t i64;
@@ -59,15 +61,40 @@ Instruction *add_inst_result(Instruction *inst, Result *result) {
 Operand *create_operand(opid_t id, OperandType type, void *value) {
   Operand *operand = (Operand *)calloc(1, sizeof(Operand));
   operand->id = id;
+  operand->ssa_version = SSA_VERSION_UNASSIGNED;
   operand->ptr = value;
+  operand->size = operand->type = type;
   return operand;
 }
 
-Operand *copy_operand(Operand *op) {
-  Operand *operand_copy = (Operand*)calloc(1, sizeof(Operand));
-  return memmove(operand_copy, op, sizeof(Operand));
+Operand *duplicate_operand(Operand *op) {
+  Operand *operand_copy = (Operand *)calloc(1, sizeof(Operand));
+  operand_copy = memmove(operand_copy, op, sizeof(Operand));
+  operand_copy->id = GEN_UNIQUE_ID();
+  return operand_copy;
 }
 
 Result *create_result(ResultType type, void *value) {
   return (Result *)create_operand(type, value);
+}
+
+void free_operand(Operand *op) {
+  if (op == NULL)
+    return;
+
+  if (op->type == OPTYPE_PTR && op->ptr != NULL)
+    free(op->ptr);
+  else if (op->type == OPTYPE_STR && op->str != NULL)
+    free(op->str);
+
+  free(op);
+}
+
+void free_instruction(Instruction *inst) {
+  while (--inst->num_operands)
+    free_operand(inst->operands[inst->num_operands]);
+
+  free_operand(inst->result);
+
+  free(inst);
 }

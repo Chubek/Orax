@@ -1,22 +1,22 @@
-i#ifndef ORAX_ENUMS_H
+i #ifndef ORAX_ENUMS_H
 #define ORAX_ENUMS_H
 
-enum OperandType {
-  OPTYPE_BYTE,
-  OPTYPE_UBYTE,
-  OPTYPE_HALF,
-  OPTYPE_UHALF,
-  OPTYPE_DOUBLE,
-  OPTYPE_UDOUBLE,
-  OPTYPE_QUAD,
-  OPTYPE_UQUAD,
-  OPTYPE_FLOAT,
-  OPTYPE_DOUBLE_FLOAT,
-  OPTYPE_TRIPLE_FLOAT,
-  OPTYPE_POINTER,
-  OPTYPE_STRING,
-  OPTYPE_PHI,
-};
+    enum OperandType {
+      OPTYPE_BYTE,
+      OPTYPE_UBYTE,
+      OPTYPE_HALF,
+      OPTYPE_UHALF,
+      OPTYPE_DOUBLE,
+      OPTYPE_UDOUBLE,
+      OPTYPE_QUAD,
+      OPTYPE_UQUAD,
+      OPTYPE_FLOAT,
+      OPTYPE_DOUBLE_FLOAT,
+      OPTYPE_TRIPLE_FLOAT,
+      OPTYPE_POINTER,
+      OPTYPE_STRING,
+      OPTYPE_PHI,
+    };
 
 enum InstructionName {
   // Arithmetic
@@ -113,15 +113,13 @@ enum InstructionName {
 
 };
 
-enum SExpressionType
-{
+enum SExpressionType {
   SEXP_ATOM,
   SEXP_LIST,
   SEXP_SYNOBJ,
 };
 
-enum SemanticItemType
-{
+enum SemanticItemType {
   SEMITEM_TERMINAL,
   SEMITEM_NONTERMINAL,
 };
