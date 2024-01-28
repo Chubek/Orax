@@ -248,24 +248,42 @@ Float64 f64Exponentiation(Float64 a, Float64 b);
 #define FLOAT64_FRACTION_MASK 0x10000000000000
 #define FLOAT64_BIAS 1023
 
-// + L: Yacc Implementation +
+// + L: LALR Parser Generator +
 
 typedef enum SemanticItemType SemanticItemType; // Defined in `orax-enums.h`
 typedef struct SemanicItem SemanticItem;
 typedef struct Production Production;
-typedef struct YaccRule YaccRule;
-typedef struct SymbtabNode YaccSymtab;
+typedef struct LALRRule LALRRule;
+typedef struct SymbtabNode LALRSymtab;
 typedef struct LR0Item LR0Item;
 typedef struct LR0State LR0State;
 
 SemanticItem *create_semantic_item(SemanticItemType type, char *value);
 Production *create_production(void);
 Production *add_production_semitem(Production *prod, SemanticItem *semitem);
-YaccRule *create_yacc_rule(char *name, char *production, char *semantic_action);
-LR0Item *create_lr0_item(YaccRule *rule);
+LALRRule *create_yacc_rule(char *name, char *production, char *semantic_action);
+LR0Item *create_lr0_item(LALRRule *rule);
 LR0State *create_lr0_state(void);
 LR0State *lr0_state_add_item(LR0State *state, LR0Item *item);
 
 #define DOT_INDEX_INIT -1
+
+// + M: The Lexican Scanner Generator +
+
+typedef struct NFAState NFAState;
+typedef struct DFAState DFAState;
+typedef int nfaid_t;
+typedef int dfaid_t;
+
+NFAState *create_nfa_state(nfaid_t id, bool is_accepting);
+DFAState *create_dfa_state(dfaid_t id, bool is_accepting);
+NFAState *add_nfa_epstrans(NFAState *state, NFAState *eps);
+void add_nfa_trans(NFAState *state, uint32_t from, uint32_t to);
+void add_dfa_trans(DFAState *state, uint32_t from, uint16_t to);
+bool state_in_set(NFAState **set, size_t size, NFAState *state);
+DFAState *convert_nfa_to_dfa(NFAState *nfa);
+
+#define MAX_TRANSITIONS 65536
+#define EPSILON 65537
 
 #endif
