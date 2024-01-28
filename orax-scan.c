@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <ctype.h>
 
 #include "orax-decl.h"
 #include "orax-enums.h"
@@ -142,7 +143,7 @@ DFAState *convert_nfa_to_dfa(NFAState *nfa) {
           NFAState *epsilon_transition_state =
               nfa_state->epsilon_transitions[j];
 
-          if (!state_in_set(nfa_state_set, nfa_state_set_size,
+4          if (!state_in_set(nfa_state_set, nfa_state_set_size,
                             epsilon_transition_state)) {
             nfa_state_set[nfa_state_set_size++] = epsilon_transition_state;
           }
@@ -187,11 +188,32 @@ bool state_in_set(NFAState **set, size_t size, NFAState *state) {
 
 const bool const legal_operators[SCHAR_MAX] = {
    ['*'] = true, ['|'] = true, ['('] = true, [')'] = true,
+   ['?'] = true, ['+'] = true, ['.'] = true, ['['] = true,
+   [']'] = true,
 };
 
 
 const precedence_t const precedence_map[SCHAR_MAX] = {
-   ['|'] = 1, ['*'] = 2,
+   ['|'] = 1, ['*'] = 2, ['?'] = 2, ['+'] = 2,
+};
+
+const char const escape_map[SCHAR_MAX] = {
+   [']'] = ']',
+   ['n'] = '\n',
+   ['\\'] = '\\',
+   ['a'] = '\a',
+   ['b'] = '\b',
+   ['"'] = '"',
+   ['\''] = '\'',
+   ['r'] = '\r',
+   ['t'] = '\t',
+   ['s'] = ' ',
+   ['v'] = '\v',
+   ['?'] = '?',
+   ['+'] = '+',
+   ['*'] = '*',
+   ['('] = '(',
+   [')'] = ')',
 };
 
 
@@ -240,15 +262,17 @@ StackAutomaton *parse_regular_expression(const char *regex) {
             add_nfa_trans(state, current, i + 1);
             push_stack_state(stack, state);
         } else if (current == '|') {
-            NFAState *right = stack_tos_recede(stack);
-            NFAState *left = stack_tos_recede(stack);
+            // ... (previous code)
+        } else if (current == '*') {
+            // ... (previous code)
+        } else if (current == '?') {
+            NFAState *top = stack_tos_recede(stack);
 
             NFAState *state = create_nfa_state(i, false);
-            add_nfa_epstrans(state, left);
-            add_nfa_epstrans(state, right);
+            add_nfa_epstrans(state, top);
 
             push_stack_state(stack, state);
-        } else if (current == '*') {
+        } else if (current == '+') {
             NFAState *top = stack_tos_recede(stack);
 
             NFAState *state = create_nfa_state(i, false);
@@ -256,12 +280,36 @@ StackAutomaton *parse_regular_expression(const char *regex) {
             add_nfa_epstrans(top, state);
 
             push_stack_state(stack, state);
+        } else if (current == '.') {
+            NFAState *state = create_nfa_state(i, false);
+            add_nfa_trans(state, ANY_CHAR, i + 1);
+
+            push_stack_state(stack, state);
+        } else if (current == '[') {
+            NFAState *state = create_nfa_state(i, false);
+            int j = i + 1;
+
+            while (postfix[j] != ']') {
+                add_nfa_trans(state, postfix[j], i + 1);
+                j++;
+            }
+
+            push_stack_state(stack, state);
+            i = j;
+        } else if (current == ']') {
+            fprintf(stderr, 
+		"Error: Close character class ']' without open '[' at position %d\n", i);
+            exit(EXIT_FAILURE);
+        } else if (current == '\\') {
+            char next_char = postfix[++i];
+            NFAState *state = create_nfa_state(i, false);
+            add_nfa_trans(state, escape_map[next_char], i + 1);
+            push_stack_state(stack, state);
         }
 
         i++;
     }
 
     stack->top_of_stack->is_accepting = true;
-
     return stack;
 }
