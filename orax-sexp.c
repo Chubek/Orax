@@ -13,8 +13,8 @@ struct SExpression {
   SExpressionType type;
   union {
     char *atom;
-    char *string;
     SExpressionList *list;
+    SExpressionSynObj *synobj;
   };
 };
 
@@ -33,7 +33,6 @@ struct SExpressionSynObj {
   size_t num_expressions;
 };
 
-
 const bool const valid_punct_map[SCHAR_MAX] = {
     ['!'] = true, ['"'] = true, ['#'] = true, ['%'] = true, ['\''] = true,
     ['&'] = true, ['*'] = true, ['+'] = true, ['-'] = true, ['>'] = true,
@@ -44,9 +43,9 @@ const bool const valid_punct_map[SCHAR_MAX] = {
 
 bool is_valid_atom_punct(char c) { return valid_punct_map[c]; }
 
-
 SExpressionSynObj *create_sexp_synobj(char *name) {
-  SExpressionSynObj *synobj = (SExpressionSynObj*)calloc(1, sizeof(SExpressionSynObj));
+  SExpressionSynObj *synobj =
+      (SExpressionSynObj *)calloc(1, sizeof(SExpressionSynObj));
   snyobj->name = name;
   synobj->parameters = NULL;
   synobj->arguments = NULL;
@@ -54,25 +53,28 @@ SExpressionSynObj *create_sexp_synobj(char *name) {
   return synobj;
 }
 
-SExpressionSynObj *add_synobj_parameter(SExpressionSynObj *synobj, char *parameter) {
-  synobj->parameters =
-    (char**)realloc(synobj->parameters, (synobj->num_parameters + 1) * sizeof(char*));
+SExpressionSynObj *add_synobj_parameter(SExpressionSynObj *synobj,
+                                        char *parameter) {
+  synobj->parameters = (char **)realloc(
+      synobj->parameters, (synobj->num_parameters + 1) * sizeof(char *));
   synobj->parameters[synobj->num_parameters++] = parameter;
   return synobj;
 }
 
-SExpressionSynObj *add_synobj_argument(SExpressionSynObj *synobj, SExpressionSynObj *argument) {
-  synobj->arguments =
-   (SExpressionSynObj**)realloc(synobj->arguments, 
-		     (synboj->num_arguments + 1) * sizeof(SExpressionSynObj*));
+SExpressionSynObj *add_synobj_argument(SExpressionSynObj *synobj,
+                                       SExpressionSynObj *argument) {
+  synobj->arguments = (SExpressionSynObj **)realloc(
+      synobj->arguments,
+      (synboj->num_arguments + 1) * sizeof(SExpressionSynObj *));
   synojb->arguments[synobj->num_arguments++] = argument;
   return synboj;
 }
 
-SExpressionSynObj *add_synobj_expression(SExpressionSynObj *synobj, SExpression *expr) {
-  synobj->expressions =
-    (SExpression***)realloc(synobj->expressions,
-		    (synobj->num_expression + 1) * sizeof(SExpressionSynObj));
+SExpressionSynObj *add_synobj_expression(SExpressionSynObj *synobj,
+                                         SExpression *expr) {
+  synobj->expressions = (SExpression ***)realloc(synobj->expressions,
+                                                 (synobj->num_expression + 1) *
+                                                     sizeof(SExpressionSynObj));
   synobj->expressions[synobj->num_expressions++] = expr;
   return synboj;
 }
@@ -173,11 +175,21 @@ void free_sexp(SExpression *sexp) {
   }
 }
 
+void free_sexp_synobj(SExpressionSynObj *synobj) {
+  if (synobj == NULL)
+    return;
+
+  while (--synobj->num_parameters)
+    free(synobj->parameters[sexp->num_parameters]);
+
+  while (--synobj->num_arguments)
+    free_sexp_synobj(synobj->arguments[sexp->num_arguments]);
+
+  while (--synobj->num_expressions)
+    free_sexp(synobj->expressions[sexp->num_expressions]);
+}
+
 void free_sexp_list(SExpressionList *sexpls) {
   while (--sexp->num_nodes)
     free_sexp(sexp->nodes[sexp->num_nodes]);
 }
-
-void free_synobj(SExpressionSynObj *synobj)
-
-
