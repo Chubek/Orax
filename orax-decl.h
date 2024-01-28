@@ -38,7 +38,7 @@ void symtable_dump(SymbolsTable *tab);
 
 // + C: The Directed Acyclic Graph +
 
-/* DAG declarations and typedefs, see `orax-dag.c for more definitions */
+
 
 typedef struct Instruction
     Instruction; // This will be re-declared in the next section
@@ -55,8 +55,6 @@ void free_dag_graph(DAGGraph *graph);
 
 // + D: The Instructions +
 
-/* The following functions and typedefs declare the instructions. See
- * `orax-inst.c` for definitions */
 
 typedef enum InstructionType InstructionType; // Defined in `orax-enums.h`
 typedef enum InstructionName InstructionName; // Defined in `orax-enums.h`
@@ -75,9 +73,6 @@ Operand *create_operand(opid_t id, OperandType type, void *value);
 Result *create_result(ResultType type, void *value);
 
 // + E: The Control Flow Graph +
-
-/* The following functions declares a Basic Block used for Control Flow
- * Analysis. See `orax-cfg.c` for definitions */
 
 typedef enum TraceBlockType TraceBlockType; // Defined in `orax-enums.h`
 typedef struct TraceBlock TraceBlock;
@@ -100,9 +95,6 @@ void analyze_liveness(ControlFlowGraph *graph);
 void free_cfg(TraceBlock *block);
 
 // + F: The Interferrence Graph +
-
-/* The following functions and typedefs declare the interferrence graph, used
- * for Register Allocation. See `orax-ifg.c` for definitions */
 
 typedef struct RegisterNode RegisterNode;
 typedef int regid_t;
@@ -162,9 +154,6 @@ void free_life_set(LifeSet *set);
 
 // + H: Instruction Selection +
 
-/* These are declarations for functions and types used during instruction
- * selection, see `orax-sel.c.` for definitions */
-
 typedef enum MachineOpcode MachineOpcode;     // Generated from file
 typedef enum MachineRegister MachineRegister; // Generated from file
 typedef struct MachineInstruction MachineInstrction;
@@ -191,7 +180,6 @@ void free_maximal_munch_state(MaxMunchState *state);
 
 
 // + J: S-Expression Parser +
-
 
 typedef enum SExpressionType SExpressionType;	// Defined in `orax-enums.h`
 typedef struct SExpression SExpression;
