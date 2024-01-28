@@ -262,9 +262,20 @@ StackAutomaton *parse_regular_expression(const char *regex) {
       add_nfa_trans(state, current, i + 1);
       push_stack_state(stack, state);
     } else if (current == '|') {
-      // ... (previous code)
+      NFAState *right = stack_tos_recede(stack);
+      NFAState *left = stack_tos_recede(stack);
+
+      NFAState *state = create_nfa_state(i, false);
+      add_nfa_epstrans(state, left);
+      add_nfa_epstrans(state, right);
     } else if (current == '*') {
-      // ... (previous code)
+      NFAState *top = stack_tos_recede(stack);
+
+      NFAState *state = create_nfa_state(i, false);
+      add_nfa_epstrans(state, top);
+      add_nfa_epstrans(top, state);
+
+      push_stack_state(stack, state);
     } else if (current == '?') {
       NFAState *top = stack_tos_recede(stack);
 
