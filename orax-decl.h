@@ -29,12 +29,12 @@ void free_ast_leaf(ASTLeaf *leaf);
 /* Type definitions and function declarations for the symbols table, see
  * `orax-symtable.c` for definitions */
 
-typedef struct SymbolsTable SymbolsTable;
+typedef struct SymtabNode SymtabNode;
 
 uint32_t djb2_hash(char *message);
-void symbtable_insert(SymbolsTable **tab, char *key, void *value);
-char *symtable_get(SymbolsTable *tab, char *key);
-void symtable_dump(SymbolsTable *tab);
+void symbtable_insert(SymtabNode **tab, char *key, void *value);
+void *symtable_get(SymtabNode *tab, char *key);
+void free_symtable(SymtabNode *tab);
 
 // + C: The Directed Acyclic Graph +
 
@@ -186,6 +186,7 @@ typedef enum SExpressionType SExpressionType; // Defined in `orax-enums.h`
 typedef struct SExpression SExpression;
 typedef struct SExpressionList SExpressionList;
 typedef struct SExpressionSynObj SExpressionSynObj;
+typedef struct SExpressionMacro SExpressionMacro;
 
 bool is_valid_atom_punct(char c);
 SExpression *create_sexp(SExpressionType type);
@@ -205,6 +206,8 @@ void print_sexp(SExpression *sexp);
 void free_sexp_list(SExpressionList *sexpls);
 void free_sexp(SExpression *sexp);
 void free_sexp_synobj(SExpressionSynObj *synobj);
+
+#define SEXP_BUFF_MAX	2048
 
 // + K: IEEE-745 Interface +
 
