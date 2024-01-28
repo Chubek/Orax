@@ -113,4 +113,10 @@ enum InstructionName {
 
 };
 
+enum SExpressionType
+{
+  SEXP_ATOM,
+  SEXP_LIST,
+};
+
 #endif
