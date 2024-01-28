@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 #include "orax-decl.h"
 #include "orax-enums.h"
@@ -21,6 +22,13 @@ struct DFAState {
   uint32_t transitions[MAX_TRANSITIONS];
 };
 
+struct StackAutomaton {
+   NFAState **states;
+   NFAState *top_of_stack;
+   size_t num_states;
+};
+
+
 NFAState *create_nfa_state(nfaid_t id, bool is_accepting) {
   NFAState *state = (NFAState *)calloc(1, sizeof(NFAState));
   state->id = id;
@@ -34,6 +42,13 @@ DFAState *create_dfa_state(dfaid_t id, bool is_accepting) {
   return state;
 }
 
+StackAutomaton *create_stack_automaton(void) {
+  StackAutomaton *automaton = (StackAutomaton*)calloc(1, sizeof(StackAutomaton));
+  automaton->states = NULL;
+  return automaton;
+}
+
+
 NFAState *add_nfa_epstrans(NFAState *state, NFAState *eps) {
   state->epsilon_transitions = (NFAState **)realloc(
       state->epsilon_transitions,
@@ -41,6 +56,18 @@ NFAState *add_nfa_epstrans(NFAState *state, NFAState *eps) {
   state->epsilon_transitions[state->num_epsilon_transitions++] = eps;
   return state;
 }
+
+
+StackAutomaton *push_stack_state(StackAutomaton *stack, NFAState *state) {
+  stack->states = 
+	  (NFAState**)realloc(stack->states, 
+			  (stack->num_states + 1) * sizeof(NFAState*));
+  stack->states[stack->num_states++] = state;
+  return stack;
+}
+
+NFAState *stack_tos_proceed(StackAutomaton *stack) { return ++stack->top_of_stack; }
+NFAState *stack_tos_recede(StackAutomaton *stack) { return --stack->top_of_stack; }
 
 void add_nfa_trans(NFAState *state, uint32_t from, uint32_t to) {
   state->transitions[from] = to;
@@ -155,4 +182,86 @@ bool state_in_set(NFAState **set, size_t size, NFAState *state) {
     }
   }
   return false;
+}
+
+
+const bool const legal_operators[SCHAR_MAX] = {
+   ['*'] = true, ['|'] = true, ['('] = true, [')'] = true,
+};
+
+
+const precedence_t const precedence_map[SCHAR_MAX] = {
+   ['|'] = 1, ['*'] = 2,
+};
+
+
+bool is_operator(char c) { return legal_operators[c]; }
+precedence_t precedence(char c) { return precedence_map[c]; }
+
+void infix_to_postfix(const char *regex, char *postfix) {
+    int i = 0, j = 0;
+    char stack[strlen(regex)];
+    int top = -1;
+
+    while (regex[i] != '\0') {
+        char current = regex[i];
+
+        if (!is_operator(current)) {
+            postfix[j++] = current;
+        } else {
+            while (top >= 0 && precedence(stack[top]) >= precedence(current)) {
+                postfix[j++] = stack[top--];
+            }
+            stack[++top] = current;
+        }
+
+        i++;
+    }
+
+    while (top >= 0) {
+        postfix[j++] = stack[top--];
+    }
+
+    postfix[j] = '\0';
+}
+
+StackAutomaton *parse_regular_expression(const char *regex) {
+    char postfix[strlen(regex) + 1];
+    infix_to_postfix(regex, postfix);
+
+    StackAutomaton *stack = create_stack_automaton();
+
+    int i = 0;
+    while (postfix[i] != '\0') {
+        char current = postfix[i];
+
+        if (!is_operator(current)) {
+            NFAState *state = create_nfa_state(i, false);
+            add_nfa_trans(state, current, i + 1);
+            push_stack_state(stack, state);
+        } else if (current == '|') {
+            NFAState *right = stack_tos_recede(stack);
+            NFAState *left = stack_tos_recede(stack);
+
+            NFAState *state = create_nfa_state(i, false);
+            add_nfa_epstrans(state, left);
+            add_nfa_epstrans(state, right);
+
+            push_stack_state(stack, state);
+        } else if (current == '*') {
+            NFAState *top = stack_tos_recede(stack);
+
+            NFAState *state = create_nfa_state(i, false);
+            add_nfa_epstrans(state, top);
+            add_nfa_epstrans(top, state);
+
+            push_stack_state(stack, state);
+        }
+
+        i++;
+    }
+
+    stack->top_of_stack->is_accepting = true;
+
+    return stack;
 }
