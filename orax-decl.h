@@ -272,8 +272,10 @@ LR0State *lr0_state_add_item(LR0State *state, LR0Item *item);
 
 typedef struct NFAState NFAState;
 typedef struct DFAState DFAState;
+typedef struct StackAutomaton StackAutomaton;
 typedef int nfaid_t;
 typedef int dfaid_t;
+typedef int precedence_t;
 
 NFAState *create_nfa_state(nfaid_t id, bool is_accepting);
 DFAState *create_dfa_state(dfaid_t id, bool is_accepting);
@@ -282,6 +284,10 @@ void add_nfa_trans(NFAState *state, uint32_t from, uint32_t to);
 void add_dfa_trans(DFAState *state, uint32_t from, uint16_t to);
 bool state_in_set(NFAState **set, size_t size, NFAState *state);
 DFAState *convert_nfa_to_dfa(NFAState *nfa);
+precedence_t precedence(char c);
+bool is_operator(char c);
+void infix_to_postfix(const char *regex, char *postfix);
+StackAutomaton *parse_regular_expression(const char *regex);
 
 #define MAX_TRANSITIONS 65536
 #define EPSILON 65537
