@@ -297,7 +297,7 @@ bool operand_defined_in_block(Operand *operand, TraceBlock *block) {
   for (size_t i = 0; i < block->num_instructions; i++) {
     Instruction *inst = block->instructions[i];
     for (size_t j = 0; j < inst->num_operands; j++) {
-      if (inst->operands[j] == operand) {
+      if (inst->operands[j]->hash == operand->hash) {
         return true;
       }
     }
@@ -310,7 +310,7 @@ bool is_phi_present_for_operand(TraceBlock *block, Operand *operand) {
     Instruction *inst = block->instructions[i];
     if (inst->type == INST_PHI) {
       for (size_t j = 0; j < inst->num_operands; j++) {
-        if (inst->operands[j] == operand) {
+        if (inst->operands[j]->hash == operand->hash) {
           return true;
         }
       }
@@ -321,7 +321,7 @@ bool is_phi_present_for_operand(TraceBlock *block, Operand *operand) {
 
 Instruction *create_phi_instruction(TraceBlock *block, Operand *operand) {
   Instruction *phi_inst = create_instruction(INST_PHI, INSTCLASS_SSA, GEN_UNIQUE_ID());
-  Operand *phi_result = create_operand(operand->hash, operand->type, NULL);
+  Operand *phi_result = duplicate_operand(operand);
   phi_result->ssa_version = GEN_UNIQUE_ID();
   phi_inst = add_inst_result(phi_inst, phi_result);
 
