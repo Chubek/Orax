@@ -51,12 +51,12 @@ void free_ast_node(ASTNode *root) {
   }
 
   free_ast_leaf(root->leaf);
-  FREE_AND_NULLIFY(free(root);
+  FREE_AND_NULLIFY(&root);
 }
 
 void free_ast_leaf(ASTLeaf *leaf) {
   if (leaf == NULL)
     return;
 
-  FREE_AND_NULLIFY(free(leaf->value);
+  FREE_AND_NULLIFY(&leaf->value);
 }

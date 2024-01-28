@@ -395,7 +395,7 @@ void free_trace_block(TraceBlock *block) {
   free_life_set(block->def_chain);
 
   free_trace_block(block->immediate_dominator);
-  FREE_AND_NULLIFY(free(block);
+  FREE_AND_NULLIFY(&block);
 }
 
 void free_cfg(ControlFlowGraph *cfg) {
@@ -403,5 +403,5 @@ void free_cfg(ControlFlowGraph *cfg) {
     return;
   while (--cfg->num_blocks)
     free_trace_block(cfg->blocks[cfg->num_blocks]);
-  FREE_AND_NULLIFY(free(cfg);
+  FREE_AND_NULLIFY(&cfg);
 }
