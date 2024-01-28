@@ -296,7 +296,6 @@ void free_dfa_state(DFAState *dfa);
 void free_stack_automaton(StackAutomaton *stack);
 void free_lexical_rule(LexicalRule *lrule);
 
-
 #define MAX_TRANSITIONS 65536
 #define EPSILON 65537
 
@@ -323,12 +322,15 @@ TypeEnumerationFields *create_type_enumeration_fields(void);
 TypeVirtualTable *create_type_vtable(void);
 SingletonType *add_singleton_field(SingletonType *singleton,
                                    SingletonType *field);
-SingletonType *add_singleton_enumeration_field(SingletonType *singleton,                                               TypeEnumeration *enumeration);
-SingletonType *add_singleton_vtable_method(SingletonType *singleton, TypeMethod *meth);
+SingletonType *add_singleton_enumeration_field(SingletonType *singleton,
+                                               TypeEnumeration *enumeration);
+SingletonType *add_singleton_vtable_method(SingletonType *singleton,
+                                           TypeMethod *meth);
 
-
-
-#define FREE_AND_NULLIFY(MEM) do { free(*MEM); *MEM = NULL; } while (0)
-
+#define FREE_AND_NULLIFY(MEM)                                                  \
+  do {                                                                         \
+    free(*MEM);                                                                \
+    *MEM = NULL;                                                               \
+  } while (0)
 
 #endif

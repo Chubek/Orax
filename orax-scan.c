@@ -1,10 +1,10 @@
+#include <ctype.h>
+#include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <limits.h>
-#include <ctype.h>
 
 #include "orax-decl.h"
 #include "orax-enums.h"
@@ -24,14 +24,14 @@ struct DFAState {
 };
 
 struct StackAutomaton {
-   NFAState **states;
-   NFAState *top_of_stack;
-   size_t num_states;
+  NFAState **states;
+  NFAState *top_of_stack;
+  size_t num_states;
 };
 
-struct LexicalRule { 
-   StackAutomaton *automaton;
-   char *semantic_action;
+struct LexicalRule {
+  StackAutomaton *automaton;
+  char *semantic_action;
 };
 
 NFAState *create_nfa_state(nfaid_t id, bool is_accepting) {
@@ -48,18 +48,18 @@ DFAState *create_dfa_state(dfaid_t id, bool is_accepting) {
 }
 
 StackAutomaton *create_stack_automaton(void) {
-  StackAutomaton *automaton = (StackAutomaton*)calloc(1, sizeof(StackAutomaton));
+  StackAutomaton *automaton =
+      (StackAutomaton *)calloc(1, sizeof(StackAutomaton));
   automaton->states = NULL;
   return automaton;
 }
 
 LexicalRule *create_lexical_rule(char *semantic_action) {
-   LexicalRule *lrule = (LexicalRule*)calloc(1, sizeof(LexicalRule));
-   lrule->automaton = NULL;
-   lrule->semantic_action = strdup(semantic_action);
-   return lrule;
+  LexicalRule *lrule = (LexicalRule *)calloc(1, sizeof(LexicalRule));
+  lrule->automaton = NULL;
+  lrule->semantic_action = strdup(semantic_action);
+  return lrule;
 }
-
 
 NFAState *add_nfa_epstrans(NFAState *state, NFAState *eps) {
   state->epsilon_transitions = (NFAState **)realloc(
@@ -69,17 +69,19 @@ NFAState *add_nfa_epstrans(NFAState *state, NFAState *eps) {
   return state;
 }
 
-
 StackAutomaton *push_stack_state(StackAutomaton *stack, NFAState *state) {
-  stack->states = 
-	  (NFAState**)realloc(stack->states, 
-			  (stack->num_states + 1) * sizeof(NFAState*));
+  stack->states = (NFAState **)realloc(stack->states, (stack->num_states + 1) *
+                                                          sizeof(NFAState *));
   stack->states[stack->num_states++] = state;
   return stack;
 }
 
-NFAState *stack_tos_proceed(StackAutomaton *stack) { return ++stack->top_of_stack; }
-NFAState *stack_tos_recede(StackAutomaton *stack) { return --stack->top_of_stack; }
+NFAState *stack_tos_proceed(StackAutomaton *stack) {
+  return ++stack->top_of_stack;
+}
+NFAState *stack_tos_recede(StackAutomaton *stack) {
+  return --stack->top_of_stack;
+}
 
 void add_nfa_trans(NFAState *state, uint32_t from, uint32_t to) {
   state->transitions[from] = to;
@@ -154,8 +156,8 @@ DFAState *convert_nfa_to_dfa(NFAState *nfa) {
           NFAState *epsilon_transition_state =
               nfa_state->epsilon_transitions[j];
 
-4          if (!state_in_set(nfa_state_set, nfa_state_set_size,
-                            epsilon_transition_state)) {
+          4 if (!state_in_set(nfa_state_set, nfa_state_set_size,
+                              epsilon_transition_state)) {
             nfa_state_set[nfa_state_set_size++] = epsilon_transition_state;
           }
         }
@@ -196,161 +198,150 @@ bool state_in_set(NFAState **set, size_t size, NFAState *state) {
   return false;
 }
 
-
 const bool const legal_operators[SCHAR_MAX] = {
-   ['*'] = true, ['|'] = true, ['('] = true, [')'] = true,
-   ['?'] = true, ['+'] = true, ['.'] = true, ['['] = true,
-   [']'] = true,
+    ['*'] = true, ['|'] = true, ['('] = true, [')'] = true, ['?'] = true,
+    ['+'] = true, ['.'] = true, ['['] = true, [']'] = true,
 };
 
-
 const precedence_t const precedence_map[SCHAR_MAX] = {
-   ['|'] = 1, ['*'] = 2, ['?'] = 2, ['+'] = 2,
+    ['|'] = 1,
+    ['*'] = 2,
+    ['?'] = 2,
+    ['+'] = 2,
 };
 
 const char const escape_map[SCHAR_MAX] = {
-   [']'] = ']',
-   ['n'] = '\n',
-   ['\\'] = '\\',
-   ['a'] = '\a',
-   ['b'] = '\b',
-   ['"'] = '"',
-   ['\''] = '\'',
-   ['r'] = '\r',
-   ['t'] = '\t',
-   ['s'] = ' ',
-   ['v'] = '\v',
-   ['?'] = '?',
-   ['+'] = '+',
-   ['*'] = '*',
-   ['('] = '(',
-   [')'] = ')',
+    [']'] = ']',  ['n'] = '\n', ['\\'] = '\\', ['a'] = '\a',
+    ['b'] = '\b', ['"'] = '"',  ['\''] = '\'', ['r'] = '\r',
+    ['t'] = '\t', ['s'] = ' ',  ['v'] = '\v',  ['?'] = '?',
+    ['+'] = '+',  ['*'] = '*',  ['('] = '(',   [')'] = ')',
 };
-
 
 bool is_operator(char c) { return legal_operators[c]; }
 precedence_t precedence(char c) { return precedence_map[c]; }
 
 void infix_to_postfix(const char *regex, char *postfix) {
-    int i = 0, j = 0;
-    char stack[strlen(regex)];
-    int top = -1;
+  int i = 0, j = 0;
+  char stack[strlen(regex)];
+  int top = -1;
 
-    while (regex[i] != '\0') {
-        char current = regex[i];
+  while (regex[i] != '\0') {
+    char current = regex[i];
 
-        if (!is_operator(current)) {
-            postfix[j++] = current;
-        } else {
-            while (top >= 0 && precedence(stack[top]) >= precedence(current)) {
-                postfix[j++] = stack[top--];
-            }
-            stack[++top] = current;
-        }
-
-        i++;
-    }
-
-    while (top >= 0) {
+    if (!is_operator(current)) {
+      postfix[j++] = current;
+    } else {
+      while (top >= 0 && precedence(stack[top]) >= precedence(current)) {
         postfix[j++] = stack[top--];
+      }
+      stack[++top] = current;
     }
 
-    postfix[j] = '\0';
+    i++;
+  }
+
+  while (top >= 0) {
+    postfix[j++] = stack[top--];
+  }
+
+  postfix[j] = '\0';
 }
 
 StackAutomaton *parse_regular_expression(const char *regex) {
-    char postfix[strlen(regex) + 1];
-    infix_to_postfix(regex, postfix);
+  char postfix[strlen(regex) + 1];
+  infix_to_postfix(regex, postfix);
 
-    StackAutomaton *stack = create_stack_automaton();
+  StackAutomaton *stack = create_stack_automaton();
 
-    int i = 0;
-    while (postfix[i] != '\0') {
-        char current = postfix[i];
+  int i = 0;
+  while (postfix[i] != '\0') {
+    char current = postfix[i];
 
-        if (!is_operator(current)) {
-            NFAState *state = create_nfa_state(i, false);
-            add_nfa_trans(state, current, i + 1);
-            push_stack_state(stack, state);
-        } else if (current == '|') {
-            // ... (previous code)
-        } else if (current == '*') {
-            // ... (previous code)
-        } else if (current == '?') {
-            NFAState *top = stack_tos_recede(stack);
+    if (!is_operator(current)) {
+      NFAState *state = create_nfa_state(i, false);
+      add_nfa_trans(state, current, i + 1);
+      push_stack_state(stack, state);
+    } else if (current == '|') {
+      // ... (previous code)
+    } else if (current == '*') {
+      // ... (previous code)
+    } else if (current == '?') {
+      NFAState *top = stack_tos_recede(stack);
 
-            NFAState *state = create_nfa_state(i, false);
-            add_nfa_epstrans(state, top);
+      NFAState *state = create_nfa_state(i, false);
+      add_nfa_epstrans(state, top);
 
-            push_stack_state(stack, state);
-        } else if (current == '+') {
-            NFAState *top = stack_tos_recede(stack);
+      push_stack_state(stack, state);
+    } else if (current == '+') {
+      NFAState *top = stack_tos_recede(stack);
 
-            NFAState *state = create_nfa_state(i, false);
-            add_nfa_epstrans(state, top);
-            add_nfa_epstrans(top, state);
+      NFAState *state = create_nfa_state(i, false);
+      add_nfa_epstrans(state, top);
+      add_nfa_epstrans(top, state);
 
-            push_stack_state(stack, state);
-        } else if (current == '.') {
-            NFAState *state = create_nfa_state(i, false);
-            add_nfa_trans(state, ANY_CHAR, i + 1);
+      push_stack_state(stack, state);
+    } else if (current == '.') {
+      NFAState *state = create_nfa_state(i, false);
+      add_nfa_trans(state, ANY_CHAR, i + 1);
 
-            push_stack_state(stack, state);
-        } else if (current == '[') {
-            NFAState *state = create_nfa_state(i, false);
-            int j = i + 1;
+      push_stack_state(stack, state);
+    } else if (current == '[') {
+      NFAState *state = create_nfa_state(i, false);
+      int j = i + 1;
 
-            while (postfix[j] != ']') {
-                add_nfa_trans(state, postfix[j], i + 1);
-                j++;
-            }
+      while (postfix[j] != ']') {
+        add_nfa_trans(state, postfix[j], i + 1);
+        j++;
+      }
 
-            push_stack_state(stack, state);
-            i = j;
-        } else if (current == ']') {
-            fprintf(stderr, 
-		"Error: Close character class ']' without open '[' at position %d\n", i);
-            exit(EXIT_FAILURE);
-        } else if (current == '\\') {
-            char next_char = postfix[++i];
-            NFAState *state = create_nfa_state(i, false);
-            add_nfa_trans(state, escape_map[next_char], i + 1);
-            push_stack_state(stack, state);
-        }
-
-        i++;
+      push_stack_state(stack, state);
+      i = j;
+    } else if (current == ']') {
+      fprintf(
+          stderr,
+          "Error: Close character class ']' without open '[' at position %d\n",
+          i);
+      exit(EXIT_FAILURE);
+    } else if (current == '\\') {
+      char next_char = postfix[++i];
+      NFAState *state = create_nfa_state(i, false);
+      add_nfa_trans(state, escape_map[next_char], i + 1);
+      push_stack_state(stack, state);
     }
 
-    stack->top_of_stack->is_accepting = true;
-    return stack;
+    i++;
+  }
+
+  stack->top_of_stack->is_accepting = true;
+  return stack;
 }
 
-
 void free_nfa_state(NFAState *nfa) {
-   if (nfa == NULL)
-	   return;
+  if (nfa == NULL)
+    return;
 
-   while (--nfa->num_epsilon_transitions)
-	free_nfa_state(nfa->epsilon_transitions[nfa->num_epsilon_transitions]);
-   FREE_AND_NULLIFY(&nfa);
+  while (--nfa->num_epsilon_transitions)
+    free_nfa_state(nfa->epsilon_transitions[nfa->num_epsilon_transitions]);
+
+  FREE_AND_NULLIFY(&nfa);
 }
 
 void free_dfa_state(DFAState *dfa) {
-   if (dfa == NULL)
-     return;
+  if (dfa == NULL)
+    return;
 
-   FREE_AND_NULLIFY(&dfa);
+  FREE_AND_NULLIFY(&dfa);
 }
 
 void free_stack_automaton(StackAutomaton *stack) {
-   while (--stack->num_states)
-	free_nfa_state(stack->states[stack->num_states]);
+  while (--stack->num_states)
+    free_nfa_state(stack->states[stack->num_states]);
 
-   FREE_AND_NULLIFY(&stack);
+  FREE_AND_NULLIFY(&stack);
 }
 
 void free_lexical_rule(LexicalRule *lrule) {
-    free_stack_automaton(lrule->automaton);
-    FREE_AND_NULLIFY(&lrule->semantic_action);
-    FREE_AND_NULLIFY(&lrule);
+  free_stack_automaton(lrule->automaton);
+  FREE_AND_NULLIFY(&lrule->semantic_action);
+  FREE_AND_NULLIFY(&lrule);
 }

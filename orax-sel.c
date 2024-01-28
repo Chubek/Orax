@@ -90,7 +90,9 @@ void free_instruction_tile(InstructionTile *tile) {
   FREE_AND_NULLIFY(&tile);
 }
 
-void free_machine_register(MachineRegister *reg) { FREE_AND_NULLIFY(&reg->label); }
+void free_machine_register(MachineRegister *reg) {
+  FREE_AND_NULLIFY(&reg->label);
+}
 
 void free_maximal_munch_state(MaxMunchState *state) {
   if (state == NULL)
