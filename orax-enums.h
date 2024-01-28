@@ -15,7 +15,7 @@ enum OperandType {
   OPTYPE_TRIPLE_FLOAT,
   OPTYPE_POINTER,
   OPTYPE_STRING,
-  OPTYPE_PHI,
+  OPTYPE_BOOLEAN,
 };
 
 enum InstructionName {

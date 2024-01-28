@@ -33,6 +33,7 @@ struct Operand {
     long double f80;
     void *ptr;
     char *str;
+    bool boolean;
   };
 };
 
