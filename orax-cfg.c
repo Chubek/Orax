@@ -79,6 +79,15 @@ TraceBlock *add_trace_predecessor(TraceBlock *block, TraceBlock *pred) {
   return block;
 }
 
+TraceBlcok *add_trace_dominance_frontier(TraceBlock *block,
+                                         TraceBlock *frontier) {
+  block->dominance_frontiers = (TraceBlock **)realloc(
+      block->dominance_frontiers,
+      (block->num_dominance_frontiers + 1) * sizeof(TraceBlock *));
+  block->dominance_frontiers[block->num_dominance_frontiers++] = frontier;
+  return block;
+}
+
 TraceBlock *add_trace_instruction(TraceBlock *block, Instruction *inst) {
   block->instructions = (Instruction **)realloc(block->instructions,
                                                 (block->num_instructions + 1) *
@@ -184,13 +193,7 @@ void calculate_dominance_frontiers(ControlFlowGraph *cfg) {
       TraceBlock *succ = block->successors[j];
 
       if (succ->immediate_dominator != block) {
-
-        size_t num_frontiers = succ->num_dominance_frontiers;
-        succ->dominance_frontiers =
-            (TraceBlock **)realloc(succ->dominance_frontiers,
-                                   (num_frontiers + 1) * sizeof(TraceBlock *));
-        succ->dominance_frontiers[num_frontiers] = block;
-        succ->num_dominance_frontiers++;
+        succ = add_trace_dominance_frontier(succ, block);
       }
     }
 
@@ -201,13 +204,7 @@ void calculate_dominance_frontiers(ControlFlowGraph *cfg) {
         TraceBlock *succ = block->successors[k];
 
         if (succ->immediate_dominator != block) {
-
-          size_t num_frontiers = succ->num_dominance_frontiers;
-          succ->dominance_frontiers = (TraceBlock **)realloc(
-              succ->dominance_frontiers,
-              (num_frontiers + 1) * sizeof(TraceBlock *));
-          succ->dominance_frontiers[num_frontiers] = frontier_block;
-          succ->num_dominance_frontiers++;
+          succ = add_trace_dominance_frontier(succ, frontier_block);
         }
       }
     }
@@ -230,10 +227,36 @@ Instruction *get_instruction_by_id(TraceBlock *block, instid_t instid) {
   return NULL;
 }
 
-void free_cfg(TraceBlock *block) {
+void free_trace_block(TraceBlock *block) {
+  if (block == NULL)
+    return;
+
+  while (--block->num_successors) {
+    free_trace_block(block->successors[block->num_successors]);
+  }
+
+  while (--block->num_predecessors) {
+    free_trace_block(block->prececessors[block->num_predecessors]);
+  }
+
+  while (--block->num_dominance_frontiers) {
+    free_trace_block(
+        block->dominance_frontiers[block->num_dominance_frontiers]);
+  }
+
   free_life_set(block->live_in);
   free_life_set(block->live_out);
   free_life_set(block->used_set);
   free_life_set(block->def_set);
+
+  free_trace_block(block->immediate_dominator);
   free(block);
+}
+
+void free_cfg(ControlFlowGraph *cfg) {
+  if (cfg == NULL)
+    return;
+  while (--cfg->num_blocks)
+    free_trace_block(cfg->blocks[cfg->num_blocks]);
+  free(cfg);
 }
