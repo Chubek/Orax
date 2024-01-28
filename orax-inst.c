@@ -19,22 +19,14 @@ struct Operand {
   ophash_t hash;
   ssaversion_t ssa_version;
   OperandType type;
+  bool literal;
   size_t size;
   union {
-    uint64_t u64;
-    int64_t i64;
-    uint32_t u32;
-    int32_t i32;
-    uint16_t u16;
-    int64_t i16;
-    uint8_t u8;
-    int8_t i8;
-    float f32;
-    double f64;
-    long double f80;
-    void *ptr;
-    char *str;
-    bool boolean;
+    unsigned_integral_t unsigned_integeral;
+    signed_integral_t signed_integral;
+    rational_t rational;
+    memory_pointer_t memory_pointer;
+    boolean_t boolean;
   };
 };
 
@@ -61,12 +53,33 @@ Instruction *add_inst_result(Instruction *inst, Result *result) {
   return inst;
 }
 
-Operand *create_operand(ophash_t hash, OperandType type, void *value) {
+Operand *create_operand(ophash_t hash, OperandType type, void *value, size_t size) {
   Operand *operand = (Operand *)calloc(1, sizeof(Operand));
   operand->hash = hash;
   operand->ssa_version = SSA_VERSION_UNASSIGNED;
-  operand->ptr = value;
-  operand->size = operand->type = type;
+  operand->size = size; 
+  operand->type = type;
+
+  switch (type) {
+	case OPTYPE_UNSIGNED_INTEGRAL:
+		operand->unsigned_integeral = *((unsigned_integral_t*)value);
+		break;
+	case OPTYPE_SIGNED_INTEGRAL:
+		operand->signed_integral = *((signed_integral_t*)value);
+		break;
+	case OPTYPE_RATIONAL:
+		operand->rational = *((rational_t*)value);
+		break;
+	case OPTYPE_MEMORY_POINTER:
+		operand->memory_pointer = value;
+		break;
+	case OPTYPE_BOOLEAN:
+		operand->boolean = *((boolean_t*)value);
+		break;
+	default:
+		break;
+  }
+
   return operand;
 }
 
