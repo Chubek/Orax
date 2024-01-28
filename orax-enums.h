@@ -1,4 +1,4 @@
-i #ifndef ORAX_ENUMS_H
+#ifndef ORAX_ENUMS_H
 #define ORAX_ENUMS_H
 
     enum OperandType {
