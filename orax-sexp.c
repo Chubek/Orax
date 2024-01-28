@@ -23,6 +23,17 @@ struct SExpressionList {
   size_t num_nodes;
 };
 
+struct SExpressionSynObj {
+  char *name;
+  char **parameters;
+  size_t num_parameters;
+  SExpressionSynObj **arguments;
+  size_t num_arguments;
+  SExpression **expressions;
+  size_t num_expressions;
+};
+
+
 const bool const valid_punct_map[SCHAR_MAX] = {
     ['!'] = true, ['"'] = true, ['#'] = true, ['%'] = true, ['\''] = true,
     ['&'] = true, ['*'] = true, ['+'] = true, ['-'] = true, ['>'] = true,
@@ -32,6 +43,39 @@ const bool const valid_punct_map[SCHAR_MAX] = {
 };
 
 bool is_valid_atom_punct(char c) { return valid_punct_map[c]; }
+
+
+SExpressionSynObj *create_sexp_synobj(char *name) {
+  SExpressionSynObj *synobj = (SExpressionSynObj*)calloc(1, sizeof(SExpressionSynObj));
+  snyobj->name = name;
+  synobj->parameters = NULL;
+  synobj->arguments = NULL;
+  synobj->expressions = NULL;
+  return synobj;
+}
+
+SExpressionSynObj *add_synobj_parameter(SExpressionSynObj *synobj, char *parameter) {
+  synobj->parameters =
+    (char**)realloc(synobj->parameters, (synobj->num_parameters + 1) * sizeof(char*));
+  synobj->parameters[synobj->num_parameters++] = parameter;
+  return synobj;
+}
+
+SExpressionSynObj *add_synobj_argument(SExpressionSynObj *synobj, SExpressionSynObj *argument) {
+  synobj->arguments =
+   (SExpressionSynObj**)realloc(synobj->arguments, 
+		     (synboj->num_arguments + 1) * sizeof(SExpressionSynObj*));
+  synojb->arguments[synobj->num_arguments++] = argument;
+  return synboj;
+}
+
+SExpressionSynObj *add_synobj_expression(SExpressionSynObj *synobj, SExpression *expr) {
+  synobj->expressions =
+    (SExpression***)realloc(synobj->expressions,
+		    (synobj->num_expression + 1) * sizeof(SExpressionSynObj));
+  synobj->expressions[synobj->num_expressions++] = expr;
+  return synboj;
+}
 
 SExpression *create_sexp(SExpressionType type) {
   SExpression *sexp = (SExpression *)calloc(1, sizeof(SExpression));
@@ -70,7 +114,7 @@ SExpression *parse_sexp_atom(FILE *input_file) {
     return NULL;
   }
 
-  SExpression *atom = create_sexp(ATOM);
+  SExpression *atom = create_sexp(SEXP_ATOM);
   atom->atom = strndup(buffer, index);
 
   return atom;
@@ -83,7 +127,7 @@ SExpressionList *parse_sexp_list(FILE *input_file) {
 
   while ((c = fgetc(input_file)) != EOF) {
     if (c == '(') {
-      sexp = create_sexp(LIST);
+      sexp = create_sexp(SEXP_LIST);
       sexp->list = parse_sexp_list(input_file);
     } else if (c == ')') {
       return sexpls;
@@ -104,10 +148,10 @@ SExpressionList *parse_sexp_list(FILE *input_file) {
 
 void print_sexp(SExpression *sexp) {
   switch (sexp->type) {
-  case ATOM:
+  case SEXP_ATOM:
     printf("Atom: %s\n", sexp->atom);
     break;
-  case LIST:
+  case SEXP_LIST:
     printf("List:\n");
     walk_sexp_list(sexp->list);
     break;
@@ -120,3 +164,20 @@ void walk_sexp_list(SExpressionList *sexpls) {
   for (size_t i = 0; i < sexpls->num_nodes; i++)
     print_sexp(sexpls->nodes[i]);
 }
+
+void free_sexp(SExpression *sexp) {
+  if (sexp->type == ATOM)
+    free(sexp->atom);
+  else {
+    free_sexp_list(sexp->list);
+  }
+}
+
+void free_sexp_list(SExpressionList *sexpls) {
+  while (--sexp->num_nodes)
+    free_sexp(sexp->nodes[sexp->num_nodes]);
+}
+
+void free_synobj(SExpressionSynObj *synobj)
+
+
