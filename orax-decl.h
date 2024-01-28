@@ -59,6 +59,7 @@ void free_dag_graph(DAGGraph *graph);
  * `orax-inst.c` for definitions */
 
 typedef enum InstructionType InstructionType; // Defined in `orax-enums.h`
+typedef enum InstructionName InstructionName; // Defined in `orax-enums.h`
 typedef enum OperandType OperandType;         // Defined in `orax-enums.h`
 typedef enum OperandType ResultType;          // Defined in `orax-enums.h`
 typedef struct Instruction Instruction;
@@ -67,7 +68,7 @@ typedef struct operand Result;
 typedef int instid_t;
 typedef int opid_t;
 
-Instruction *create_instruction(InstructionType type, instid_t instruction_id);
+Instruction *create_instruction(InstructionName type, instid_t instruction_id);
 Instruction *add_inst_operand(Instruction *inst, Operand *operand);
 Instruction *add_inst_result(Instruction *inst, Result *result);
 Operand *create_operand(opid_t id, OperandType type, void *value);
@@ -187,5 +188,25 @@ MaxMunchState *add_munch_state_inst(MaxMunchState *state,
 void free_instruction_tile(InstructionTile *tile);
 void free_machine_register(MachineRegister *reg);
 void free_maximal_munch_state(MaxMunchState *state);
+
+
+// + J: S-Expression Parser +
+
+
+typedef enum SExpressionType SExpressionType;	// Defined in `orax-enums.h`
+typedef struct SExpression SExpression;
+typedef struct SExpressionList SExpressionList;
+
+bool is_valid_atom_punct(char c);
+SExpression *create_sexp(SExpressionType type);
+SExpressionList *create_sexp_list(void);
+SExpressionList *add_sexpls_node(SExpressionList *sexpls, SExpression *sexp);
+SExpression *parse_sexp_atom(FILE *input_file);
+SExpressionList *parse_sexp_list(FILE *input_file);
+void walk_sexp_list(SExpressionList *sexpls);
+void print_sexp(SExpression *sexp);
+
+
+
 
 #endif
