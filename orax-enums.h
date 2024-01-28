@@ -1,4 +1,4 @@
-#ifndef ORAX_ENUMS_H
+i#ifndef ORAX_ENUMS_H
 #define ORAX_ENUMS_H
 
 enum OperandType {
@@ -117,6 +117,13 @@ enum SExpressionType
 {
   SEXP_ATOM,
   SEXP_LIST,
+  SEXP_SYNOBJ,
+};
+
+enum SemanticItemType
+{
+  SEMITEM_TERMINAL,
+  SEMITEM_NONTERMINAL,
 };
 
 #endif

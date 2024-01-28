@@ -63,6 +63,11 @@ Operand *create_operand(opid_t id, OperandType type, void *value) {
   return operand;
 }
 
+Operand *copy_operand(Operand *op) {
+  Operand *operand_copy = (Operand*)calloc(1, sizeof(Operand));
+  return memmove(operand_copy, op, sizeof(Operand));
+}
+
 Result *create_result(ResultType type, void *value) {
   return (Result *)create_operand(type, value);
 }

@@ -7,6 +7,7 @@
 #include "orax-decl.h"
 
 struct LifeObject {
+  OperandType type;
   void *object;
   size_t size;
 };
@@ -16,8 +17,9 @@ struct LifeSet {
   size_t num_objects;
 };
 
-LifeObject *create_life_object(void *obj, size_t size) {
+LifeObject *create_life_object(OperandType type, void *obj, size_t size) {
   LifeObject *object = (LifeObject *)calloc(1, sizeof(LifeObject));
+  obj->type = type;
   obj->object = obj;
   obj->size = size;
   return object;
