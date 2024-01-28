@@ -273,12 +273,15 @@ LR0State *lr0_state_add_item(LR0State *state, LR0Item *item);
 typedef struct NFAState NFAState;
 typedef struct DFAState DFAState;
 typedef struct StackAutomaton StackAutomaton;
+typedef struct LexicalRule LexicalRule;
 typedef int nfaid_t;
 typedef int dfaid_t;
 typedef int precedence_t;
 
 NFAState *create_nfa_state(nfaid_t id, bool is_accepting);
 DFAState *create_dfa_state(dfaid_t id, bool is_accepting);
+StackAutomaton *create_stack_automaton(void);
+LexicalRule *create_lexical_rule(char *semantic_action);
 NFAState *add_nfa_epstrans(NFAState *state, NFAState *eps);
 void add_nfa_trans(NFAState *state, uint32_t from, uint32_t to);
 void add_dfa_trans(DFAState *state, uint32_t from, uint16_t to);
@@ -288,6 +291,11 @@ precedence_t precedence(char c);
 bool is_operator(char c);
 void infix_to_postfix(const char *regex, char *postfix);
 StackAutomaton *parse_regular_expression(const char *regex);
+void free_nfa_state(NFAState *nfa);
+void free_dfa_state(DFAState *dfa);
+void free_stack_automaton(StackAutomaton *stack);
+void free_lexical_rule(LexicalRule *lrule);
+
 
 #define MAX_TRANSITIONS 65536
 #define EPSILON 65537
@@ -319,6 +327,8 @@ SingletonType *add_singleton_enumeration_field(SingletonType *singleton,        
 SingletonType *add_singleton_vtable_method(SingletonType *singleton, TypeMethod *meth);
 
 
+
+#define FREE_AND_NULLIFY(MEM) do { free(MEM); *MEM = NULL; } while (0)
 
 
 #endif
