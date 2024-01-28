@@ -185,6 +185,7 @@ void free_maximal_munch_state(MaxMunchState *state);
 typedef enum SExpressionType SExpressionType; // Defined in `orax-enums.h`
 typedef struct SExpression SExpression;
 typedef struct SExpressionList SExpressionList;
+typedef struct SExpressionSynObj SExpressionSynObj;
 
 bool is_valid_atom_punct(char c);
 SExpression *create_sexp(SExpressionType type);
@@ -192,8 +193,14 @@ SExpressionList *create_sexp_list(void);
 SExpressionList *add_sexpls_node(SExpressionList *sexpls, SExpression *sexp);
 SExpression *parse_sexp_atom(FILE *input_file);
 SExpressionList *parse_sexp_list(FILE *input_file);
+SExpressionSynObj *create_sexp_synobj(char *name);
+SExpressionSynObj *add_synobj_parameter(SExpressionSynObj *synobj, char *parameter);
+SExpressionSynObj *add_synobj_argument(SExpressionSynObj *synobj, SExpressionSynObj *argument);
+SExpressionSynObj *add_synobj_expression(SExpressionSynObj *synobj, SExpression *expr);
 void walk_sexp_list(SExpressionList *sexpls);
 void print_sexp(SExpression *sexp);
+void free_sexp_list(SExpressionList *sexpls);
+void free_sexp(SExpression *sexp);
 
 // + K: IEEE-745 Interface +
 
