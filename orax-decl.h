@@ -207,7 +207,7 @@ void free_sexp_list(SExpressionList *sexpls);
 void free_sexp(SExpression *sexp);
 void free_sexp_synobj(SExpressionSynObj *synobj);
 
-#define SEXP_BUFF_MAX	2048
+#define SEXP_BUFF_MAX 2048
 
 // + K: IEEE-745 Interface +
 
@@ -238,23 +238,24 @@ Float64 f64Exponentiation(Float64 a, Float64 b);
 typedef struct SSAVariable SSAVariable;
 typedef int version_t;
 
-
 // + M: Yacc Implementation +
 
+typedef enum SemanticItemType SemanticItemType; // Defined in `orax-enums.h`
+typedef struct SemanicItem SemanticItem;
+typedef struct Production Production;
 typedef struct YaccRule YaccRule;
 typedef struct SymbtabNode YaccSymtab;
 typedef struct LR0Item LR0Item;
 typedef struct LR0State LR0State;
 
-
+SemanticItem *create_semantic_item(SemanticItemType type, char *value);
+Production *create_production(void);
+Production *add_production_semitem(Production *prod, SemanticItem *semitem);
 YaccRule *create_yacc_rule(char *name, char *production, char *semantic_action);
 LR0Item *create_lr0_item(YaccRule *rule);
 LR0State *create_lr0_state(void);
 LR0State *lr0_state_add_item(LR0State *state, LR0Item *item);
 
 #define DOT_INDEX_INIT -1
-
-
-
 
 #endif
