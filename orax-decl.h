@@ -299,6 +299,31 @@ typedef union PEGMetaExpression PEGMetaExpression;
 #define PEG_SUBEXP_INDEX_CHOICE 1
 #define PEG_SUBEXP_INDEX_GROUP 2
 
+// + O: The Typing System +
+
+typedef enum TypeKind TypeKind;
+typedef enum TypeStaticity TypeStaticity;
+typedef enum TypeStrength TypeStrength;
+typedef enum BaseWordType BaseWordType;
+typedef struct SingletonType SingletonType;
+typedef struct TypeField TypeField;
+typedef struct TypeEnumeration TypeEnumeration;
+typedef struct TypeVirtualTable TypeVirtualTable;
+typedef size_t typesize_t;
+typedef int typeid_t;
+
+SingletonType *create_singleton_type(TypeKind kind, TypeStaticity staticity,
+                                     TypeStrength strength);
+SingletonType *add_singleton_type_fields(SingletonType *singleton);
+SingletonType *add_singleton_type_enumeration_fields(SingletonType *singleton);
+SingletonType *add_singleton_type_vtable(SingletonType *singleton);
+TypeFields *create_type_fields(void);
+TypeEnumerationFields *create_type_enumeration_fields(void);
+TypeVirtualTable *create_type_vtable(void);
+SingletonType *add_singleton_field(SingletonType *singleton,
+                                   SingletonType *field);
+SingletonType *add_singleton_enumeration_field(SingletonType *singleton,                                               TypeEnumeration *enumeration);
+SingletonType *add_singleton_vtable_method(SingletonType *singleton, TypeMethod *meth);
 
 
 
