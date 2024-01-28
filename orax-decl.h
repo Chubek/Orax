@@ -63,12 +63,17 @@ typedef struct operand Result;
 typedef int instid_t;
 typedef int ophash_t;
 typedef int ssaversion_t;
+typedef unsigned long long unsigned_integral_t;
+typedef signed long long signed_integral_t;
+typedef long double rational_t;
+typedef void* memory_pointer_t;
+typedef bool boolean_t;
 
 Instruction *create_instruction(InstructionName name,
 		InstructionClass class, instid_t instruction_id);
 Instruction *add_inst_operand(Instruction *inst, Operand *operand);
 Instruction *add_inst_result(Instruction *inst, Result *result);
-Operand *create_operand(opid_t id, OperandType type, void *value);
+Operand *create_operand(opid_t id, OperandType type, void *value, size_t size);
 Result *create_result(ResultType type, void *value);
 Operand *duplicate_operand(Operand *op);
 void free_operand(Operand *op);
@@ -331,7 +336,8 @@ SingletonType *add_singleton_vtable_method(SingletonType *singleton,
 
 // + M: General Optimizations +
 
-typedef struct InstructionPair InstructionPair;
+void attempt_constant_folding(Instruction *inst);
+
 
 // === Some Systems Macros ====
 
