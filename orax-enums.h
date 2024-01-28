@@ -110,7 +110,7 @@ enum InstructionName {
   // Cast and Copy
   INST_CAST_DATA,
   INST_COPY_DATA,
-
+  INST_LITERAL_DATA,
 };
 
 enum SExpressionType {
