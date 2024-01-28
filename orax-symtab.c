@@ -6,23 +6,12 @@
 
 #include "orax-decl.h"
 
-/* In this DSL, we use a singly-linked list to represent the Symbols Table. The
- * symtable is not only used for symbols, but oft, to represent the state of the
- * program as well. To reduce the need for constant calls to strcmp, we hash the
- * key, when inserting, and also, when searching. If the hash is equal, we check
- * for equality of the key with strcmp and then if equal, return the value.
- */
-
-/* The symbols table that stores info on terminals */
-
-struct SymbolsTable {
+struct SymtabNode {
   char *key;
   void *value;
   uint32_t hash;
-  SymbolsTable *next;
+  SymtabNode *next;
 };
-
-/* The following functions define symbol table routines */
 
 uint32_t djb2_hash(char *message) {
   uint32_t hash = 0;
@@ -34,8 +23,8 @@ uint32_t djb2_hash(char *message) {
   return hash;
 }
 
-void symtable_insert(SymbolsTable **tab, char *key, void *value) {
-  SymbolsTable *node = (SymbolsTable *)calloc(1, sizeof(SymbolsTable));
+void symtable_insert(SymtabNode **tab, char *key, void *value) {
+  SymtabNode *node = (SymtabNode *)calloc(1, sizeof(SymtabNode));
   node->key = key;
   node->value = value;
   node->hash = djb2(key);
@@ -43,21 +32,22 @@ void symtable_insert(SymbolsTable **tab, char *key, void *value) {
   *tab = node;
 }
 
-void symtable_get(SymbolsTable *tab, char *key) {
+void *symtable_get(SymtabNode *tab, char *key) {
   uint32_t hash = djb2_hash(key);
 
   while (tab->hash != hash && tab != NULL)
     tab = tab->next;
 
-  if (tab == NULL || strcmp(tab->key, key) != 0) {
-    fprintf(stderr, "Error: symbol %s not defined", key);
-    exit(EXIT_FAILURE);
-  }
+  if (tab == NULL)
+    return NULL;
+
+  if (strncmp(tab->key, key) != 0)
+    return NULL;
 
   return tab->value;
 }
 
-void symtable_dump(SymbolsTable *tab) {
+void free_symtable(SymtabNode *tab) {
   while (tab != NULL) {
     tab = tab->next;
     free(tab);
