@@ -46,11 +46,11 @@ void free_dag_node(DAGNode *root) {
   if (root == NULL)
     return;
   free_dag_node(root->next);
-  free(root);
+  FREE_AND_NULLIFY(free(root);
 }
 
 void free_dag_graph(DAGGraph *graph) {
   while (--graph->vertices)
      free_dag_node(graph->adj_list[graph->vertices];
-   free(graph);
+   FREE_AND_NULLIFY(free(graph);
 }

@@ -83,11 +83,11 @@ void free_operand(Operand *op) {
     return;
 
   if (op->type == OPTYPE_PTR && op->ptr != NULL)
-    free(op->ptr);
+    FREE_AND_NULLIFY(free(op->ptr);
   else if (op->type == OPTYPE_STR && op->str != NULL)
-    free(op->str);
+    FREE_AND_NULLIFY(free(op->str);
 
-  free(op);
+  FREE_AND_NULLIFY(free(op);
 }
 
 void free_instruction(Instruction *inst) {
@@ -96,5 +96,5 @@ void free_instruction(Instruction *inst) {
 
   free_operand(inst->result);
 
-  free(inst);
+  FREE_AND_NULLIFY(free(inst);
 }

@@ -332,25 +332,25 @@ void free_nfa_state(NFAState *nfa) {
 
    while (--nfa->num_epsilon_transitions)
 	free_nfa_state(nfa->epsilon_transitions[nfa->num_epsilon_transitions]);
-   free(nfa);
+   FREE_AND_NULLIFY(free(nfa);
 }
 
 void free_dfa_state(DFAState *dfa) {
    if (dfa == NULL)
      return;
 
-   free(dfa);
+   FREE_AND_NULLIFY(free(dfa);
 }
 
 void free_stack_automaton(StackAutomaton *stack) {
    while (--stack->num_states)
 	free_nfa_state(stack->states[stack->num_states]);
 
-   free(stack);
+   FREE_AND_NULLIFY(free(stack);
 }
 
 void free_lexical_rule(LexicalRule *lrule) {
     free_stack_automaton(lrule->automaton);
-    free(lrule->semantic_action);
-    free(lrule);
+    FREE_AND_NULLIFY(free(lrule->semantic_action);
+    FREE_AND_NULLIFY(free(lrule);
 }

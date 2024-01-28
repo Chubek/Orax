@@ -50,6 +50,6 @@ void *symtable_get(SymtabNode *tab, char *key) {
 void free_symtable(SymtabNode *tab) {
   while (tab != NULL) {
     tab = tab->next;
-    free(tab);
+    FREE_AND_NULLIFY(free(tab);
   }
 }

@@ -103,5 +103,5 @@ void free_life_object(LifeObject *object) { free_operand(object); }
 void free_life_set(LifeSet *set) {
   while (--set->num_objects)
     free_life_object(set->objects[set->num_objects]);
-  free(set);
+  FREE_AND_NULLIFY(free(set);
 }

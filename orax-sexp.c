@@ -184,7 +184,7 @@ void walk_sexp_list(SExpressionList *sexpls) {
 
 void free_sexp(SExpression *sexp) {
   if (sexp->type == SEXP_ATOM)
-    free(sexp->atom);
+    FREE_AND_NULLIFY(free(sexp->atom);
   else if (sexp->type = SEXP_LIST) {
     free_sexp_list(sexp->list);
   } else {
@@ -197,7 +197,7 @@ void free_sexp_synobj(SExpressionSynObj *synobj) {
     return;
 
   while (--synobj->num_parameters)
-    free(synobj->parameters[sexp->num_parameters]);
+    FREE_AND_NULLIFY(free(synobj->parameters[sexp->num_parameters]);
 
   while (--synobj->num_arguments)
     free_sexp_synobj(synobj->arguments[sexp->num_arguments]);

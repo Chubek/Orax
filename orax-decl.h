@@ -328,7 +328,7 @@ SingletonType *add_singleton_vtable_method(SingletonType *singleton, TypeMethod 
 
 
 
-#define FREE_AND_NULLIFY(MEM) do { free(MEM); *MEM = NULL; } while (0)
+#define FREE_AND_NULLIFY(MEM) do { FREE_AND_NULLIFY(free(MEM); *MEM = NULL; } while (0)
 
 
 #endif

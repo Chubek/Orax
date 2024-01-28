@@ -87,10 +87,10 @@ void free_instruction_tile(InstructionTile *tile) {
     return;
   free_instruction_tile(tile->left);
   free_instruction_tile(tile->right);
-  free(tile);
+  FREE_AND_NULLIFY(free(tile);
 }
 
-void free_machine_register(MachineRegister *reg) { free(reg->label); }
+void free_machine_register(MachineRegister *reg) { FREE_AND_NULLIFY(free(reg->label); }
 
 void free_maximal_munch_state(MaxMunchState *state) {
   if (state == NULL)
