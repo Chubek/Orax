@@ -8,7 +8,8 @@
 
 struct Instruction {
   instid_t id;
-  InstructionType type;
+  InstructionClass class;
+  InstructionName type;
   Operand **operands;
   size_t num_operands;
   Result *result;
@@ -37,9 +38,10 @@ struct Operand {
   };
 };
 
-Instruction *create_instruction(InstructionType type, instid_t id) {
+Instruction *create_instruction(InstructionName type, InstructionClass class, instid_t id) {
   Instruction *inst = (Instruction *)calloc(1, sizeof(Instruction));
   inst->id = id;
+  inst->class = class;
   inst->type = type;
   inst->operands = NULL;
   inst->num_operands = 0;

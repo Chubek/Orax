@@ -64,7 +64,8 @@ typedef int instid_t;
 typedef int ophash_t;
 typedef int ssaversion_t;
 
-Instruction *create_instruction(InstructionName type, instid_t instruction_id);
+Instruction *create_instruction(InstructionName name,
+		InstructionClass class, instid_t instruction_id);
 Instruction *add_inst_operand(Instruction *inst, Operand *operand);
 Instruction *add_inst_result(Instruction *inst, Result *result);
 Operand *create_operand(opid_t id, OperandType type, void *value);
@@ -326,6 +327,13 @@ SingletonType *add_singleton_enumeration_field(SingletonType *singleton,
                                                TypeEnumeration *enumeration);
 SingletonType *add_singleton_vtable_method(SingletonType *singleton,
                                            TypeMethod *meth);
+
+
+// + M: General Optimizations +
+
+typedef struct InstructionPair InstructionPair;
+
+// === Some Systems Macros ====
 
 #define FREE_AND_NULLIFY(MEM)                                                  \
   do {                                                                         \
