@@ -29,6 +29,10 @@ struct StackAutomaton {
    size_t num_states;
 };
 
+struct LexicalRule { 
+   StackAutomaton *automaton;
+   char *semantic_action;
+};
 
 NFAState *create_nfa_state(nfaid_t id, bool is_accepting) {
   NFAState *state = (NFAState *)calloc(1, sizeof(NFAState));
@@ -47,6 +51,13 @@ StackAutomaton *create_stack_automaton(void) {
   StackAutomaton *automaton = (StackAutomaton*)calloc(1, sizeof(StackAutomaton));
   automaton->states = NULL;
   return automaton;
+}
+
+LexicalRule *create_lexical_rule(char *semantic_action) {
+   LexicalRule *lrule = (LexicalRule*)calloc(1, sizeof(LexicalRule));
+   lrule->automaton = NULL;
+   lrule->semantic_action = strdup(semantic_action);
+   return lrule;
 }
 
 
@@ -312,4 +323,34 @@ StackAutomaton *parse_regular_expression(const char *regex) {
 
     stack->top_of_stack->is_accepting = true;
     return stack;
+}
+
+
+void free_nfa_state(NFAState *nfa) {
+   if (nfa == NULL)
+	   return;
+
+   while (--nfa->num_epsilon_transitions)
+	free_nfa_state(nfa->epsilon_transitions[nfa->num_epsilon_transitions]);
+   free(nfa);
+}
+
+void free_dfa_state(DFAState *dfa) {
+   if (dfa == NULL)
+     return;
+
+   free(dfa);
+}
+
+void free_stack_automaton(StackAutomaton *stack) {
+   while (--stack->num_states)
+	free_nfa_state(stack->states[stack->num_states]);
+
+   free(stack);
+}
+
+void free_lexical_rule(LexicalRule *lrule) {
+    free_stack_automaton(lrule->automaton);
+    free(lrule->semantic_action);
+    free(lrule);
 }
