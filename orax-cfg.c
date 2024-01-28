@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "orax-decl.h"
+#include "orax-enums.h"
 
 struct TraceBlock {
   blockid_t id;
@@ -85,6 +86,20 @@ TraceBlcok *add_trace_dominance_frontier(TraceBlock *block,
       block->dominance_frontiers,
       (block->num_dominance_frontiers + 1) * sizeof(TraceBlock *));
   block->dominance_frontiers[block->num_dominance_frontiers++] = frontier;
+  return block;
+}
+
+void insert_trace_instruction_at_head(TraceBlock *block, Instruction *inst) {
+  block->instructions = (Instruction **)realloc(block->instructions,
+                                                (block->num_instructions + 1) *
+                                                    sizeof(Instruction *));
+
+  memmove(&block->instructions[1], &block->instructions[0],
+          block->num_instructions * sizeof(Instruction *));
+
+  block->instructions[0] = inst;
+  block->num_instructions++;
+
   return block;
 }
 
@@ -205,6 +220,50 @@ void calculate_dominance_frontiers(ControlFlowGraph *cfg) {
 
         if (succ->immediate_dominator != block) {
           succ = add_trace_dominance_frontier(succ, frontier_block);
+        }
+      }
+    }
+  }
+}
+
+void insert_phi_instructions(ControlFlowGraph *cfg) {
+  for (size_t i = 0; i < cfg->num_blocks; i++) {
+    TraceBlock *block = cfg->blocks[i];
+
+    for (size_t var_index = 0; var_index < block->def_set->num_objects;
+         var_index++) {
+      LifeObject *variable = block->def_set->objects[var_index];
+
+      if (variable->size > 1) {
+
+        Operand *phi_result = create_operand(GEN_UNIQUE_ID(), OPTYPE_PHI, NULL);
+        Instruction *phi_instruction =
+            create_instruction(INST_PHI, GEN_UNIQUE_ID());
+        phi_instruction = add_inst_result(
+            phi_instruction, create_result(variable->type, phi_result));
+
+        block = insert_trace_instruction_at_head(block, phi_instruction);
+
+        block->use_set = add_life_set_object(
+            block->use_set,
+            create_life_object(variable->type, phi_result, variable->size));
+
+        for (size_t df_index = 0; df_index < block->num_dominance_frontiers;
+             df_index++) {
+          TraceBlock *frontier_block = block->dominance_frontiers[df_index];
+
+          if (frontier_block->def_set != NULL) {
+            for (size_t def_index = 0;
+                 def_index < frontier_block->def_set->num_objects;
+                 def_index++) {
+              if (objects_are_equal(frontier_block->def_set->objects[def_index],
+                                    variable)) {
+                frontier_block =
+                    add_trace_dominance_frontir(frontier_block, block);
+                break;
+              }
+            }
+          }
         }
       }
     }
