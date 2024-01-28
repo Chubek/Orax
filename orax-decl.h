@@ -194,13 +194,17 @@ SExpressionList *add_sexpls_node(SExpressionList *sexpls, SExpression *sexp);
 SExpression *parse_sexp_atom(FILE *input_file);
 SExpressionList *parse_sexp_list(FILE *input_file);
 SExpressionSynObj *create_sexp_synobj(char *name);
-SExpressionSynObj *add_synobj_parameter(SExpressionSynObj *synobj, char *parameter);
-SExpressionSynObj *add_synobj_argument(SExpressionSynObj *synobj, SExpressionSynObj *argument);
-SExpressionSynObj *add_synobj_expression(SExpressionSynObj *synobj, SExpression *expr);
+SExpressionSynObj *add_synobj_parameter(SExpressionSynObj *synobj,
+                                        char *parameter);
+SExpressionSynObj *add_synobj_argument(SExpressionSynObj *synobj,
+                                       SExpressionSynObj *argument);
+SExpressionSynObj *add_synobj_expression(SExpressionSynObj *synobj,
+                                         SExpression *expr);
 void walk_sexp_list(SExpressionList *sexpls);
 void print_sexp(SExpression *sexp);
 void free_sexp_list(SExpressionList *sexpls);
 void free_sexp(SExpression *sexp);
+void free_sexp_synobj(SExpressionSynObj *synobj);
 
 // + K: IEEE-745 Interface +
 
