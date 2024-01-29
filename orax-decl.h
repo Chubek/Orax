@@ -301,9 +301,9 @@ bool is_operator(char c);
 void infix_to_postfix(const char *regex, char *postfix);
 StackAutomaton *parse_regular_expression(const char *regex);
 void lexer_generator_output_dfa_state(DFAState *dfa, FILE *output_file);
-void lexer_generator_output_dfa_accepting_status(DFAState **states, 
-                size_t num_states,   
-                FILE *output_file);
+void lexer_generator_output_dfa_accepting_status(DFAState **states,
+                                                 size_t num_states,
+                                                 FILE *output_file);
 void free_nfa_state(NFAState *nfa);
 void free_dfa_state(DFAState *dfa);
 void free_stack_automaton(StackAutomaton *stack);
@@ -352,7 +352,6 @@ void attempt_constant_folding(Instruction *inst);
     free(*MEM);                                                                \
     *MEM = NULL;                                                               \
   } while (0)
-
 
 #ifdef __unix__
 #define SYSTEM_NEWLINE "\n"
