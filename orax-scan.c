@@ -34,14 +34,14 @@ struct LexicalRule {
   char *semantic_action;
 };
 
-struct LexicalStartCondition { 
-   condid_t id;
-   char *name;
-   bool exclusive;
+struct LexicalStartCondition {
+  condid_t id;
+  char *name;
+  bool exclusive;
 };
 
 struct LexicalScannerSpecs {
-   char **
+  char **
 };
 
 NFAState *create_nfa_state(nfaid_t id, bool is_accepting) {
@@ -71,9 +71,10 @@ LexicalRule *create_lexical_rule(char *semantic_action) {
   return lrule;
 }
 
-LexicalStartCondition *create_lexical_start_condition(condid_t id, char *name, bool exclusive) {
-  LexicalStartCondition *stcond = 
-	  (LexicalStartConditio*)calloc(1, sizeof(LexicalStartCondition));
+LexicalStartCondition *create_lexical_start_condition(condid_t id, char *name,
+                                                      bool exclusive) {
+  LexicalStartCondition *stcond =
+      (LexicalStartConditio *)calloc(1, sizeof(LexicalStartCondition));
   stcond->id = id;
   stcond->name = name;
   stcond->exclusive = exclusive;
@@ -321,18 +322,18 @@ StackAutomaton *parse_regular_expression(const char *regex) {
       char range_start = 0, range_end = 0;
 
       while ((range_start = postfix[j]) != ']') {
-	if (postfix[j + 1] == '-') {
-	   if (postfix[j + 2] != ']') {
-		range_end = postfix[j + 2];
-	   }
-	}
+        if (postfix[j + 1] == '-') {
+          if (postfix[j + 2] != ']') {
+            range_end = postfix[j + 2];
+          }
+        }
 
-	if (range_start != 0 && range_end != 0 && range_start < range_end) {
-	   for (char r = range_start; r <= range_end; r++)
-		   add_nfa_trans(state, r, i + 1);
-	   range_start = range_end = 0;
-	} else
-	   add_nfa_trans(state, range_start, i + 1);
+        if (range_start != 0 && range_end != 0 && range_start < range_end) {
+          for (char r = range_start; r <= range_end; r++)
+            add_nfa_trans(state, r, i + 1);
+          range_start = range_end = 0;
+        } else
+          add_nfa_trans(state, range_start, i + 1);
         j++;
       }
 

@@ -292,9 +292,8 @@ NFAState *create_nfa_state(nfaid_t id, bool is_accepting);
 DFAState *create_dfa_state(dfaid_t id, bool is_accepting);
 StackAutomaton *create_stack_automaton(void);
 LexicalRule *create_lexical_rule(char *semantic_action);
-LexicalStartCondition *create_lexical_start_condition(condid_t id, 
-		char *name, 
-		bool exclusive);
+LexicalStartCondition *create_lexical_start_condition(condid_t id, char *name,
+                                                      bool exclusive);
 NFAState *add_nfa_epstrans(NFAState *state, NFAState *eps);
 StackAutomaton *push_stack_state(StackAutomaton *stack, NFAState *state);
 static inline NFAState *stack_tos_proceed(StackAutomaton *stack);
