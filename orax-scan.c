@@ -34,6 +34,16 @@ struct LexicalRule {
   char *semantic_action;
 };
 
+struct LexicalStartCondition { 
+   condid_t id;
+   char *name;
+   bool exclusive;
+};
+
+struct LexicalScannerSpecs {
+   char **
+};
+
 NFAState *create_nfa_state(nfaid_t id, bool is_accepting) {
   NFAState *state = (NFAState *)calloc(1, sizeof(NFAState));
   state->id = id;
@@ -61,6 +71,15 @@ LexicalRule *create_lexical_rule(char *semantic_action) {
   return lrule;
 }
 
+LexicalStartCondition *create_lexical_start_condition(condid_t id, char *name, bool exclusive) {
+  LexicalStartCondition *stcond = 
+	  (LexicalStartConditio*)calloc(1, sizeof(LexicalStartCondition));
+  stcond->id = id;
+  stcond->name = name;
+  stcond->exclusive = exclusive;
+  return stcond;
+}
+
 NFAState *add_nfa_epstrans(NFAState *state, NFAState *eps) {
   state->epsilon_transitions = (NFAState **)realloc(
       state->epsilon_transitions,
@@ -80,7 +99,7 @@ NFAState *stack_tos_proceed(StackAutomaton *stack) {
   return ++stack->top_of_stack;
 }
 NFAState *stack_tos_recede(StackAutomaton *stack) {
-  return --stack->top_of_stack;
+  return --staci->top_of_stack;
 }
 
 void add_nfa_trans(NFAState *state, uint32_t from, uint32_t to) {
@@ -275,14 +294,14 @@ StackAutomaton *parse_regular_expression(const char *regex) {
       add_nfa_epstrans(state, top);
       add_nfa_epstrans(top, state);
 
-      push_stack_state(stack, state);
+      stack = push_stack_state(stack, state);
     } else if (current == '?') {
       NFAState *top = stack_tos_recede(stack);
 
       NFAState *state = create_nfa_state(i, false);
       add_nfa_epstrans(state, top);
 
-      push_stack_state(stack, state);
+      stack = push_stack_state(stack, state);
     } else if (current == '+') {
       NFAState *top = stack_tos_recede(stack);
 
@@ -290,7 +309,7 @@ StackAutomaton *parse_regular_expression(const char *regex) {
       add_nfa_epstrans(state, top);
       add_nfa_epstrans(top, state);
 
-      push_stack_state(stack, state);
+      stack = push_stack_state(stack, state);
     } else if (current == '.') {
       NFAState *state = create_nfa_state(i, false);
       add_nfa_trans(state, ANY_CHAR, i + 1);
@@ -299,13 +318,25 @@ StackAutomaton *parse_regular_expression(const char *regex) {
     } else if (current == '[') {
       NFAState *state = create_nfa_state(i, false);
       int j = i + 1;
+      char range_start = 0, range_end = 0;
 
-      while (postfix[j] != ']') {
-        add_nfa_trans(state, postfix[j], i + 1);
+      while ((range_start = postfix[j]) != ']') {
+	if (postfix[j + 1] == '-') {
+	   if (postfix[j + 2] != ']') {
+		range_end = postfix[j + 2];
+	   }
+	}
+
+	if (range_start != 0 && range_end != 0 && range_start < range_end) {
+	   for (char r = range_start; r <= range_end; r++)
+		   add_nfa_trans(state, r, i + 1);
+	   range_start = range_end = 0;
+	} else
+	   add_nfa_trans(state, range_start, i + 1);
         j++;
       }
 
-      push_stack_state(stack, state);
+      stack = push_stack_state(stack, state);
       i = j;
     } else if (current == ']') {
       fprintf(
@@ -317,7 +348,7 @@ StackAutomaton *parse_regular_expression(const char *regex) {
       char next_char = postfix[++i];
       NFAState *state = create_nfa_state(i, false);
       add_nfa_trans(state, escape_map[next_char], i + 1);
-      push_stack_state(stack, state);
+      stack = push_stack_state(stack, state);
     }
 
     i++;
