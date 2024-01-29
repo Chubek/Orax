@@ -74,7 +74,8 @@ Instruction *create_instruction(InstructionName name, InstructionClass class,
                                 instid_t instruction_id);
 Instruction *add_inst_operand(Instruction *inst, Operand *operand);
 Instruction *add_inst_result(Instruction *inst, Result *result);
-Operand *create_operand(opid_t id, OperandType type, void *value, size_t size);
+Operand *create_operand(ophash_t hash, OperandType type, void *value,
+                        size_t size);
 Result *create_result(ResultType type, void *value);
 Operand *duplicate_operand(Operand *op);
 void add_to_operand_size(Operand *op, typesize_t addition);

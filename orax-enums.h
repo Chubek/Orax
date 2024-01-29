@@ -52,6 +52,8 @@ enum InstructionName {
   INST_BITWISE_AND,
   INST_BITWISE_OR,
   INST_BITWISE_XOR,
+  INST_BITWISE_SHR,
+  INST_BITWISE_SHL,
 
   // Jumps
   INST_JUMP,
