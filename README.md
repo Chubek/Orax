@@ -1,4 +1,4 @@
-# Orax(Aurocks) : The Optimizing C Compiler
+# Orax (Aurocks) : The Optimizing C Compiler
 
 
 Orax is an optimizing compiler. It has its own lexer and parser. It relies on S-Expressions for its various passes. Besides S-Expressions for the IR, it relines on ASTs, DAGs, the SSA form, Maximal Munch, Control Flow analysis, and so on.
