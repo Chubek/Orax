@@ -283,6 +283,7 @@ typedef struct NFAState NFAState;
 typedef struct DFAState DFAState;
 typedef struct StackAutomaton StackAutomaton;
 typedef struct LexicalRule LexicalRule;
+typedef struct LexicalStartCondition LexicalStartCondition;
 typedef int nfaid_t;
 typedef int dfaid_t;
 typedef int precedence_t;
@@ -291,7 +292,13 @@ NFAState *create_nfa_state(nfaid_t id, bool is_accepting);
 DFAState *create_dfa_state(dfaid_t id, bool is_accepting);
 StackAutomaton *create_stack_automaton(void);
 LexicalRule *create_lexical_rule(char *semantic_action);
+LexicalStartCondition *create_lexical_start_condition(condid_t id, 
+		char *name, 
+		bool exclusive);
 NFAState *add_nfa_epstrans(NFAState *state, NFAState *eps);
+StackAutomaton *push_stack_state(StackAutomaton *stack, NFAState *state);
+static inline NFAState *stack_tos_proceed(StackAutomaton *stack);
+static inline NFAState *stack_tos_recede(StackAutomaton *stack);
 void add_nfa_trans(NFAState *state, uint32_t from, uint32_t to);
 void add_dfa_trans(DFAState *state, uint32_t from, uint16_t to);
 bool state_in_set(NFAState **set, size_t size, NFAState *state);
@@ -304,6 +311,7 @@ void lexer_generator_output_dfa_state(DFAState *dfa, FILE *output_file);
 void lexer_generator_output_dfa_accepting_status(DFAState **states,
                                                  size_t num_states,
                                                  FILE *output_file);
+static inline bool state_in_set(NFAState **set, size_t size, NFAState *state);
 void free_nfa_state(NFAState *nfa);
 void free_dfa_state(DFAState *dfa);
 void free_stack_automaton(StackAutomaton *stack);
