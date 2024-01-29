@@ -353,9 +353,48 @@ SingletonType *add_singleton_enumeration_field(SingletonType *singleton,
 SingletonType *add_singleton_vtable_method(SingletonType *singleton,
                                            TypeMethod *meth);
 
-// + M: General Optimizations +
+// + M: Constant Folding +
 
+Operand *symm_add_operands(Operand *op1, Operand *op2);
+Operand *symm_subtract_operands(Operand *op1, Operand *op2);
+Operand *symm_multiply_operands(Operand *op1, Operand *op2);
+Operand *symm_divide_operands(Operand *op1, Operand *op2);
+Operand *symm_modulo_operands(Operand *op1, Operand *op2);
+Operand *symm_exponentiate_operands(Operand *op1, Operand *op2);
+Operand *symm_bitwise_and_operands(Operand *op1, Operand *op2);
+Operand *symm_bitwise_or_operands(Operand *op1, Operand *op2);
+Operand *symm_bitwise_xor_operands(Operand *op1, Operand *op2);
+Operand *symm_bitwise_shr_operands(Operand *op1, Operand *op2);
+Operand *symm_bitwise_shl_operands(Operand *op1, Operand *op2);
 void attempt_constant_folding(Instruction *inst);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // === Some Systems Macros ====
 
