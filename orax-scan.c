@@ -339,6 +339,7 @@ void lexer_generator_output_dfa_state(DFAState *dfa, FILE *output_file) {
     if ((i + 1) % NUM_GENERATED_ARRAY_ROWS == 0)
       fprintf(output_file, SYSTEM_NEWLINE);
   }
+  fprintf(output_file, "\n};\n");
 }
 
 void lexer_generator_output_dfa_accepting_status(DFAState **states,
@@ -353,6 +354,7 @@ void lexer_generator_output_dfa_accepting_status(DFAState **states,
     if ((num_states) % NUM_GENERATED_ARRAY_ROWS == 0)
       fprintf(output_file, SYSTEM_NEWLINE);
   }
+  fprintf(output_file, "\n};\n");
 }
 
 void free_nfa_state(NFAState *nfa) {
