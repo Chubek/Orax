@@ -41,7 +41,10 @@ struct LexicalStartCondition {
 };
 
 struct LexicalScannerSpecs {
-  char **
+  LexicalStartCondition **start_conditions;
+  size_t num_start_conditions;
+  LexicalRule **lexical_rules;
+  size_t num_lexical_rules;
 };
 
 NFAState *create_nfa_state(nfaid_t id, bool is_accepting) {
@@ -81,6 +84,14 @@ LexicalStartCondition *create_lexical_start_condition(condid_t id, char *name,
   return stcond;
 }
 
+LexicalScannerSpecs *create_lexical_scanner_specs(void) {
+  LexicalScannerSpecs *lspecs =
+      (LexicalScannerSpecs *)calloc(1, sizeof(LexicalScannerSpecs));
+  lspecs->start_conditions = NULL;
+  lspecs->lexical_rules = NULL;
+  return lspecs;
+}
+
 NFAState *add_nfa_epstrans(NFAState *state, NFAState *eps) {
   state->epsilon_transitions = (NFAState **)realloc(
       state->epsilon_transitions,
@@ -94,6 +105,24 @@ StackAutomaton *push_stack_state(StackAutomaton *stack, NFAState *state) {
                                                           sizeof(NFAState *));
   stack->states[stack->num_states++] = state;
   return stack;
+}
+
+LexicalScannerSpecs *add_lspecs_start_condition(LexicalScannerSpecs *lspecs,
+                                                LexicalStartCondition *stcond) {
+  lspecs->start_conditions = (LexicalStartCondition **)realloc(
+      lspecs->start_conditions,
+      (lspecs->num_start_conditions + 1) * sizeof(LexicalStartCondition *));
+  lspecs->start_conditions[lspecs->num_start_conditions++] = stcond;
+  return lspecs;
+}
+
+LexicalScannerSpecs *add_lspecs_lexical_rule(LexicalScannerSpecs *lspecs,
+                                             LexicalRule *lrule) {
+  lspecs->lexical_rules = (LexicalRule **)realloc(
+      lspecs->lexical_rules,
+      (lspecs->num_lexical_rules + 1) * sizeof(LexicalRule *));
+  lspecs->lexical_rules[lspecs->num_lexical_rules++] = lrule;
+  return lspecs;
 }
 
 NFAState *stack_tos_proceed(StackAutomaton *stack) {
