@@ -4,19 +4,19 @@
 
 #include "orax-decl.h"
 
-struct Float32 {
+struct IEEE745_Float32 {
   uint32_t fraction : 23;
   uint32_t exponent : 8;
   uint32_t sign : 1;
 };
 
-typedef struct Float64 {
+struct IEEE745_Float64 {
   uint64_t fraction : 52;
   uint64_t exponent : 11;
   uint64_t sign : 1;
 };
 
-Float32 newFloat32(uint32_t fraction, uint8_t exponent, uint8_t sign) {
+Float32 new_float32(uint32_t fraction, uint8_t exponent, sign_t sign) {
   Float32 f32 = {0};
   f32.fraction = fraction;
   f32.exponent = exponent;
@@ -24,7 +24,7 @@ Float32 newFloat32(uint32_t fraction, uint8_t exponent, uint8_t sign) {
   return f32;
 }
 
-Float64 newFloat64(uint64_t fraction, uint16_t exponent, uint8_t sign) {
+Float64 new_float64(uint64_t fraction, uint16_t exponent, sign_t sign) {
   Float64 f64 = {0};
   f64.fraction = fraction;
   f64.exponent = exponent;
@@ -32,7 +32,7 @@ Float64 newFloat64(uint64_t fraction, uint16_t exponent, uint8_t sign) {
   return f64;
 }
 
-Float32 f32Addition(Float32 a, Float32 b) {
+Float32 f32_addition(Float32 a, Float32 b) {
   Float32 result = {0};
 
   uint32_t mantissa_a = (a.fraction | FLOAT32_FRACTION_MASK) << 7;
@@ -69,12 +69,12 @@ Float32 f32Addition(Float32 a, Float32 b) {
   return result;
 }
 
-Float32 f32Subtraction(Float32 a, Float32 b) {
+Float32 f32_subtraction(Float32 a, Float32 b) {
   b.sign = !b.sign;
-  return f32Addition(a, b);
+  return f32_addition(a, b);
 }
 
-Float32 f32Multiplication(Float32 a, Float32 b) {
+Float32 f32_multiplication(Float32 a, Float32 b) {
   Float32 result = {0};
 
   uint32_t mantissa_a = a.fraction | FLOAT32_FRACTION_MASK;
@@ -89,7 +89,7 @@ Float32 f32Multiplication(Float32 a, Float32 b) {
   return result;
 }
 
-Float32 f32Division(Float32 a, Float32 b) {
+Float32 f32_division(Float32 a, Float32 b) {
   Float32 result = {0};
 
   uint32_t mantissa_a = a.fraction | FLOAT32_FRACTION_MASK;
@@ -104,7 +104,7 @@ Float32 f32Division(Float32 a, Float32 b) {
   return result;
 }
 
-Float32 f32Exponentiation(Float32 a, Float32 b) {
+Float32 f32_exponentiation(Float32 a, Float32 b) {
   Float32 result = {0};
   result.fraction = (uint32_t)powf((float)a.fraction, (float)b.fraction);
   result.exponent = FLOAT32_BIAS;
@@ -112,7 +112,7 @@ Float32 f32Exponentiation(Float32 a, Float32 b) {
   return result;
 }
 
-Float64 f64Addition(Float64 a, Float64 b) {
+Float64 f64_addition(Float64 a, Float64 b) {
   Float64 result = {0};
 
   uint64_t mantissa_a = (a.fraction | FLOAT64_FRACTION_MASK);
@@ -149,12 +149,12 @@ Float64 f64Addition(Float64 a, Float64 b) {
   return result;
 }
 
-Float64 f64Subtraction(Float64 a, Float64 b) {
+Float64 f64_subtraction(Float64 a, Float64 b) {
   b.sign = !b.sign;
-  return f64Addition(a, b);
+  return f64_addition(a, b);
 }
 
-Float64 f64Multiplication(Float64 a, Float64 b) {
+Float64 f64_multiplication(Float64 a, Float64 b) {
   Float64 result = {0};
 
   uint64_t mantissa_a = a.fraction | FLOAT64_FRACTION_MASK;
@@ -169,7 +169,7 @@ Float64 f64Multiplication(Float64 a, Float64 b) {
   V return result;
 }
 
-Float64 f64Division(Float64 a, Float64 b) {
+Float64 f64_division(Float64 a, Float64 b) {
   Float64 result = {0};
 
   uint64_t mantissa_a = a.fraction | FLOAT64_FRACTION_MASK;
@@ -184,7 +184,7 @@ Float64 f64Division(Float64 a, Float64 b) {
   return result;
 }
 
-Float64 f64Exponentiation(Float64 a, Float64 b) {
+Float64 f64_exponentiation(Float64 a, Float64 b) {
   Float64 result = {0};
   result.fraction = (uint64_t)pow((double)a.fraction, (double)b.fraction);
   result.exponent = FLOAT64_BIAS;
