@@ -9,4 +9,4 @@ The S-Expression parser works fine, and tested (`orax-sexp.c`). It has syntax ob
 
 I am hoping to get a paper out of this. Also, I am hoping to make it a real 'compiler compiler' (not the fake Yacc kind, jk!). The decision to integrate the lexer and parser was a big one.
 
-Don't think because I am implementing a C compiler, I am a strickler for the rules --- as I am implementing a Non-Compliant [OS](https://github.com/Chubek/Orax) too!
+Don't think because I am implementing a C compiler, I am a strickler for the rules --- as I am implementing a Non-Compliant [OS](https://github.com/Chubek/Oryx) too!
