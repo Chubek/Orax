@@ -235,21 +235,25 @@ void free_sexp_synobj(SExpressionSynObj *synobj);
 
 // + K: IEEE-745 Interface +
 
-typedef struct Float32 Float32;
-typedef struct Float64 Float64;
+typedef struct IEEE745_Float32 Float32;
+typedef struct IEEE745_Float64 Float64;
+typedef bool sign_t;
 
-Float32 newFloat32(uint32_t fraction, uint8_t exponent, uint8_t sign);
-Float64 newFloat64(uint64_t fraction, uint16_t exponent, uint8_t sign);
-Float32 f32Addition(Float32 a, Float32 b);
-Float32 f32Subtraction(Float32 a, Float32 b);
-Float32 f32Multiplication(Float32 a, Float32 b);
-Float32 f32Division(Float32 a, Float32 b);
-Float32 f32Exponentiation(Float32 a, Float32 b);
-Float64 f64Addition(Float64 a, Float64 b);
-Float64 f64Subtraction(Float64 a, Float64 b);
-Float64 f64Multiplication(Float64 a, Float64 b);
-Float64 f64Division(Float64 a, Float64 b);
-Float64 f64Exponentiation(Float64 a, Float64 b);
+Float32 create_float32(uint32_t fraction, uint8_t exponent, sign_t sign);
+Float64 create_float64(uint64_t fraction, uint16_t exponent, sign_t sign);
+Float32 f32_addition(Float32 a, Float32 b);
+Float32 f32_subtraction(Float32 a, Float32 b);
+Float32 f32_multiplication(Float32 a, Float32 b);
+Float32 f32_division(Float32 a, Float32 b);
+Float32 f32_exponentiation(Float32 a, Float32 b);
+Float64 f64_addition(Float64 a, Float64 b);
+Float64 f64_subtraction(Float64 a, Float64 b);
+Float64 f64_multiplication(Float64 a, Float64 b);
+Float64 f64_division(Float64 a, Float64 b);
+Float64 f64_exponentiation(Float64 a, Float64 b);
+
+#define IEEE745_SIGN_NEGATIVE 0
+#define IEEE745_SIGN_POSITIVE 1
 
 #define FLOAT32_FRACTION_MASK 0x800000
 #define FLOAT32_BIAS 127
