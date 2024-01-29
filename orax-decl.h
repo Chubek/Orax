@@ -289,6 +289,7 @@ typedef struct DFAState DFAState;
 typedef struct StackAutomaton StackAutomaton;
 typedef struct LexicalRule LexicalRule;
 typedef struct LexicalStartCondition LexicalStartCondition;
+typedef struct LexicalScannerSpecs LexicalScannerSpecs;
 typedef int nfaid_t;
 typedef int dfaid_t;
 typedef int precedence_t;
@@ -299,8 +300,13 @@ StackAutomaton *create_stack_automaton(void);
 LexicalRule *create_lexical_rule(char *semantic_action);
 LexicalStartCondition *create_lexical_start_condition(condid_t id, char *name,
                                                       bool exclusive);
+LexicalScannerSpecs *create_lexical_scanner_specs(void);
 NFAState *add_nfa_epstrans(NFAState *state, NFAState *eps);
 StackAutomaton *push_stack_state(StackAutomaton *stack, NFAState *state);
+LexicalScannerSpecs *add_lspecs_start_condition(LexicalScannerSpecs *lspecs,
+                                                LexicalStartCondition *stcond);
+LexicalScannerSpecs *add_lspecs_lexical_rule(LexicalScannerSpecs *lspecs,
+                                             LexicalRule *lrule);
 static inline NFAState *stack_tos_proceed(StackAutomaton *stack);
 static inline NFAState *stack_tos_recede(StackAutomaton *stack);
 void add_nfa_trans(NFAState *state, uint32_t from, uint32_t to);
@@ -367,34 +373,6 @@ Operand *symm_bitwise_xor_operands(Operand *op1, Operand *op2);
 Operand *symm_bitwise_shr_operands(Operand *op1, Operand *op2);
 Operand *symm_bitwise_shl_operands(Operand *op1, Operand *op2);
 void attempt_constant_folding(Instruction *inst);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // === Some Systems Macros ====
 
