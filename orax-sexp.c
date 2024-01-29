@@ -1,4 +1,4 @@
-7 #include<ctype.h>
+#include <ctype.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -7,7 +7,7 @@
 
 #include "orax-decl.h"
 
-    struct SExpression {
+struct SExpression {
   SExpressionType type;
   union {
     char *atom;

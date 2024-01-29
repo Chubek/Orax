@@ -320,7 +320,8 @@ bool is_phi_present_for_operand(TraceBlock *block, Operand *operand) {
 }
 
 Instruction *create_phi_instruction(TraceBlock *block, Operand *operand) {
-  Instruction *phi_inst = create_instruction(INST_PHI, INSTCLASS_SSA, GEN_UNIQUE_ID());
+  Instruction *phi_inst =
+      create_instruction(INST_PHI, INSTCLASS_SSA, GEN_UNIQUE_ID());
   Operand *phi_result = duplicate_operand(operand);
   phi_result->ssa_version = GEN_UNIQUE_ID();
   phi_inst = add_inst_result(phi_inst, phi_result);

@@ -1,37 +1,17 @@
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-
 
 #include "orax-decl.h"
 #include "orax-enums.h"
 
+void attempt_constant_folding(Instruction *inst) {
+  if (inst->class != INSTCLASS_ARITHMETIC)
+    return;
+  if (inst->num_operands < 2)
+    return;
 
-struct InstructionPair {
-   Instruction *inst1;
-   Instruction *inst2;
-   Instruction *result;
-};
-
-
-
-InstructionPair *create_inst_pair(Instruction *inst1, Instruction *inst2) {
-  InstructionPair *instpair = (InstructionPair*)calloc(1, sizeof(Instruction));
-  instpair->inst1 = inst1;
-  instpair->inst2 = inst2;
-  instpair->result = NULL;
-  return instpair;
+   Operand *result = create_operand(
 }
-
-
-
-
-void fold_instpair_constants(InstructionPair *instpair) {
-  
-}
-
-
-
-
