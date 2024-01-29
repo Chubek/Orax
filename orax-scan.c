@@ -327,6 +327,34 @@ StackAutomaton *parse_regular_expression(const char *regex) {
   return stack;
 }
 
+
+void lexer_generator_output_dfa_state(DFAState *dfa, FILE *output_file) {
+  fprintf(output_file, "const char const STATE_TRANSITIONS_%d[MAX_TRANSITIONS] = {\n", dfa->id);
+  for (uint32_t i = 0; i < MAX_TRANSITIONS; i++) {
+  	if (dfa->transitions[i])
+		fprintf(output_file, "[%lc] = %lc, ", 
+				(uint16_t)i,  
+				(uint16_t)dfa->transitions[i]);
+
+	if ((i + 1) % NUM_GENERATED_ARRAY_ROWS == 0)
+		fprintf(output_file, SYSTEM_NEWLINE);
+  }
+}
+
+void lexer_generator_output_dfa_accepting_status(DFAState **states, 
+		size_t num_states,
+		FILE *output_file) {
+   fprintf(output_file, "const bool const STATE_ACCEPTANCE_MAP[%lu] = {", num_states);
+   while (--num_states) {
+	if (dfa[num_states]->is_accepting)
+		fprintf(output_file, "[%d] = %s, ", dfa->id, "true");
+
+	if ((num_states) % NUM_GENERATED_ARRAY_ROWS == 0)
+		fprintf(output_file, SYSTEM_NEWLINE);
+   }
+}
+
+
 void free_nfa_state(NFAState *nfa) {
   if (nfa == NULL)
     return;
