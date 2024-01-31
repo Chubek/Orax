@@ -205,35 +205,6 @@ void free_instruction_tile(InstructionTile *tile);
 void free_machine_register(MachineRegister *reg);
 void free_maximal_munch_state(MaxMunchState *state);
 
-// + J: S-Expression Parser +
-
-typedef enum SExpressionType SExpressionType; // Defined in `orax-enums.h`
-typedef struct SExpression SExpression;
-typedef struct SExpressionList SExpressionList;
-typedef struct SExpressionSynObj SExpressionSynObj;
-typedef struct SExpressionMacro SExpressionMacro;
-
-bool is_valid_atom_punct(char c);
-SExpression *create_sexp(SExpressionType type);
-SExpressionList *create_sexp_list(void);
-SExpressionList *add_sexpls_node(SExpressionList *sexpls, SExpression *sexp);
-SExpression *parse_sexp_atom(FILE *input_file);
-SExpressionList *parse_sexp_list(FILE *input_file);
-SExpressionSynObj *create_sexp_synobj(char *name);
-SExpressionSynObj *add_synobj_parameter(SExpressionSynObj *synobj,
-                                        char *parameter);
-SExpressionSynObj *add_synobj_argument(SExpressionSynObj *synobj,
-                                       SExpressionSynObj *argument);
-SExpressionSynObj *add_synobj_expression(SExpressionSynObj *synobj,
-                                         SExpression *expr);
-void walk_sexp_list(SExpressionList *sexpls);
-void print_sexp(SExpression *sexp);
-void free_sexp_list(SExpressionList *sexpls);
-void free_sexp(SExpression *sexp);
-void free_sexp_synobj(SExpressionSynObj *synobj);
-
-#define SEXP_BUFF_MAX 2048
-
 // + K: IEEE-745 Interface +
 
 typedef struct IEEE745_Float32 Float32;
@@ -261,75 +232,6 @@ Float64 f64_exponentiation(Float64 a, Float64 b);
 
 #define FLOAT64_FRACTION_MASK 0x10000000000000
 #define FLOAT64_BIAS 1023
-
-// + L: LALR Parser Generator +
-
-typedef enum SemanticItemType SemanticItemType; // Defined in `orax-enums.h`
-typedef struct SemanicItem SemanticItem;
-typedef struct Production Production;
-typedef struct LALRRule LALRRule;
-typedef struct SymbtabNode LALRSymtab;
-typedef struct LR0Item LR0Item;
-typedef struct LR0State LR0State;
-
-SemanticItem *create_semantic_item(SemanticItemType type, char *value);
-Production *create_production(void);
-Production *add_production_semitem(Production *prod, SemanticItem *semitem);
-LALRRule *create_lalr_rule(char *name, char *production, char *semantic_action);
-LR0Item *create_lr0_item(LALRRule *rule);
-LR0State *create_lr0_state(void);
-LR0State *lr0_state_add_item(LR0State *state, LR0Item *item);
-
-#define DOT_INDEX_INIT -1
-
-// + M: The Lexican Scanner Generator +
-
-typedef struct NFAState NFAState;
-typedef struct DFAState DFAState;
-typedef struct StackAutomaton StackAutomaton;
-typedef struct LexicalRule LexicalRule;
-typedef struct LexicalStartCondition LexicalStartCondition;
-typedef struct LexicalScannerSpecs LexicalScannerSpecs;
-typedef int nfaid_t;
-typedef int dfaid_t;
-typedef int precedence_t;
-
-NFAState *create_nfa_state(nfaid_t id, bool is_accepting);
-DFAState *create_dfa_state(dfaid_t id, bool is_accepting);
-StackAutomaton *create_stack_automaton(void);
-LexicalRule *create_lexical_rule(char *semantic_action);
-LexicalStartCondition *create_lexical_start_condition(condid_t id, char *name,
-                                                      bool exclusive);
-LexicalScannerSpecs *create_lexical_scanner_specs(void);
-NFAState *add_nfa_epstrans(NFAState *state, NFAState *eps);
-StackAutomaton *push_stack_state(StackAutomaton *stack, NFAState *state);
-LexicalScannerSpecs *add_lspecs_start_condition(LexicalScannerSpecs *lspecs,
-                                                LexicalStartCondition *stcond);
-LexicalScannerSpecs *add_lspecs_lexical_rule(LexicalScannerSpecs *lspecs,
-                                             LexicalRule *lrule);
-static inline NFAState *stack_tos_proceed(StackAutomaton *stack);
-static inline NFAState *stack_tos_recede(StackAutomaton *stack);
-void add_nfa_trans(NFAState *state, uint32_t from, uint32_t to);
-void add_dfa_trans(DFAState *state, uint32_t from, uint16_t to);
-bool state_in_set(NFAState **set, size_t size, NFAState *state);
-DFAState *convert_nfa_to_dfa(NFAState *nfa);
-precedence_t precedence(char c);
-bool is_operator(char c);
-void infix_to_postfix(const char *regex, char *postfix);
-StackAutomaton *parse_regular_expression(const char *regex);
-void lexer_generator_output_dfa_state(DFAState *dfa, FILE *output_file);
-void lexer_generator_output_dfa_accepting_status(DFAState **states,
-                                                 size_t num_states,
-                                                 FILE *output_file);
-static inline bool state_in_set(NFAState **set, size_t size, NFAState *state);
-void free_nfa_state(NFAState *nfa);
-void free_dfa_state(DFAState *dfa);
-void free_stack_automaton(StackAutomaton *stack);
-void free_lexical_rule(LexicalRule *lrule);
-
-#define MAX_TRANSITIONS 65536
-#define EPSILON 65537
-#define NUM_GENERATED_ARRAY_ROWS 16
 
 // + L: The Typing System +
 
