@@ -361,18 +361,18 @@ SingletonType *add_singleton_vtable_method(SingletonType *singleton,
 
 // + M: Constant Folding +
 
-Operand *symm_add_operands(Operand *op1, Operand *op2);
-Operand *symm_subtract_operands(Operand *op1, Operand *op2);
-Operand *symm_multiply_operands(Operand *op1, Operand *op2);
-Operand *symm_divide_operands(Operand *op1, Operand *op2);
-Operand *symm_modulo_operands(Operand *op1, Operand *op2);
-Operand *symm_exponentiate_operands(Operand *op1, Operand *op2);
-Operand *symm_bitwise_and_operands(Operand *op1, Operand *op2);
-Operand *symm_bitwise_or_operands(Operand *op1, Operand *op2);
-Operand *symm_bitwise_xor_operands(Operand *op1, Operand *op2);
-Operand *symm_bitwise_shr_operands(Operand *op1, Operand *op2);
-Operand *symm_bitwise_shl_operands(Operand *op1, Operand *op2);
-void attempt_constant_folding(Instruction *inst);
+Operand *add_operands(Operand *op1, Operand *op2);
+Operand *subtract_operands(Operand *op1, Operand *op2);
+Operand *multiply_operands(Operand *op1, Operand *op2);
+Operand *divide_operands(Operand *op1, Operand *op2);
+Operand *modulo_operands(Operand *op1, Operand *op2);
+Operand *exponentiate_operands(Operand *op1, Operand *op2);
+Operand *bitwise_and_operands(Operand *op1, Operand *op2);
+Operand *bitwise_or_operands(Operand *op1, Operand *op2);
+Operand *bitwise_xor_operands(Operand *op1, Operand *op2);
+Operand *bitwise_shr_operands(Operand *op1, Operand *op2);
+Operand *bitwise_shl_operands(Operand *op1, Operand *op2);
+bool attempt_constant_folding(Instruction *inst);
 
 // === Some Systems Macros ====
 
