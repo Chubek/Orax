@@ -1,14 +1,29 @@
+# Ignore object files
+
 *.a
 *.out
 *.a
 *.so
+
+# Ignore temporary files
+
 *.tmp
 *.temp
 _*
+
+# Ignore build directories
+
 build/
 bin/
 test/
+
+# Ignore temporary directories
+
 temp/
 tmp/
-orax-munch.c
-orax-munch.h
+
+# Ignore Lex & Yacc files
+*.yy.c
+*.yy.h
+*.tab.c
+*.tab.h
