@@ -7,10 +7,10 @@
 #include "orax-decl.h"
 
 struct MachineInstruction {
-  MachineOpcode opcode;          // enum MachineOpcode
-  MachineRegister dest_register; // enum MachineRegister;
-  char *label;                   // Assembler label
-  size_t line_number;            // Line number in Assembly code
+  MachineOpcode opcode;         
+  MachineRegister dest_register; 
+  char *label;                   
+  size_t line_number;            
 };
 
 struct InstructionTile {
@@ -21,7 +21,7 @@ struct InstructionTile {
 struct MaxMunchState {
   InstructionTile **tiles;
   size_t num_tiles;
-  MachineInstruction **gen_inst; // Generated instructions
+  MachineInstruction **gen_inst; 
   size_t num_gen_inst;
 };
 
@@ -103,5 +103,4 @@ void free_maximal_munch_state(MaxMunchState *state) {
 
   while (--state->num_gen_inst)
     free_machine_instruction(state->gen_inst[state->num_gen_inst]);
-  q
 }
