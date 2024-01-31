@@ -275,7 +275,7 @@ typedef struct LR0State LR0State;
 SemanticItem *create_semantic_item(SemanticItemType type, char *value);
 Production *create_production(void);
 Production *add_production_semitem(Production *prod, SemanticItem *semitem);
-LALRRule *create_yacc_rule(char *name, char *production, char *semantic_action);
+LALRRule *create_lalr_rule(char *name, char *production, char *semantic_action);
 LR0Item *create_lr0_item(LALRRule *rule);
 LR0State *create_lr0_state(void);
 LR0State *lr0_state_add_item(LR0State *state, LR0Item *item);
