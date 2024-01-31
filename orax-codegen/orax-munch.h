@@ -170,10 +170,10 @@ MUNCHFN create_munch_state(term_t header, term_t footer, MunchList decls,
 FREEFN free_munch(MunchNode *node) {
   if (node == NULL)
     return;
-  free_tree(node->left);
-  free_tree(node->right);
+  free_munch(node->left);
+  free_munch(node->right);
   if (node->is_leaf)
-    free(node->value);
+    FREE_AND_NULLIFY(node->value);
   FREE_AND_NULLFY(&node);
 }
 
@@ -210,15 +210,13 @@ INSTALLFN munch_install_open_func(
       term_t type;
       term_t ident;
     } * *params) {
+
   fprintf(state->yyout, "%s %s(", return_type, identifier);
   struct FunctionParameter *current_param = NULL;
 
-  while ((current_param = *params++) != NULL) {
+  while ((current_param = *params++) != NULL)
     fprintf(state->yyout, "%s %s%c", current_param->type, current_param->ident,
             current_param == NULL ? ')' : ',');
-
-    FREE_AND_NULLIFY(&current_param);
-  }
 
   fprintf(state->yyout, "{\n");
 }
@@ -228,11 +226,11 @@ INSTALLFN munch_install_close_func(OraxMunch *state) {
 }
 
 INSTALLFN munch_install_return(OraxMunch *state, term_t return_value) {
-  fprintf(state->yyout, "return %s;" return_value == NULL ? "" : return_value);
+  fprintf(state->yyout, "return %s;", return_value == NULL ? "" : return_value);
 }
 
-INSTALLFN munch_install_kw_sttm(OraxMunch *state, term_t keyword) {
-  fprintf(state->yyout, "%s;" keyword);
+INSTALLFN munch_install_kw_stmt(OraxMunch *state, term_t keyword) {
+  fprintf(state->yyout, "%s;", keyword);
 }
 
 INSTALLFN munch_install_array_literal(OraxMunch *state, term_t *elements,
@@ -260,11 +258,9 @@ INSTALLFN munch_install_bitfield(
   fprintf(state->yyout, "struct %s {\n", identifier);
   struct BitFieldItem current_bitfield = NULL;
 
-  while ((current_bitfield = *fields++) != NULL) {
+  while ((current_bitfield = *fields++) != NULL)
     fprintf("%s %s : %d;\n", current_bitfield->type, current_bitfield->name,
             currnet_bitfield->bits);
-    FREE_AND_NULLIFY(&current_bitfield);
-  }
 
   fprintf(state->yyout, "};\n");
 }
@@ -278,10 +274,8 @@ INSTALLFN munch_install_datatype(
   fprintf(state->yyout, "%s %s {\n", lexical_terminal, identifier);
   struct StructItem *current_item = NULL;
 
-  while ((current_item = *items++) != NULL) {
-    fprintf("%s %s;\n", current_item->type, current_item->name);
-    FREE_AND_NULLIFY(&current_item);
-  }
+  while ((current_item = *items++) != NULL)
+    fprintf(stdout->yyout, "%s %s;\n", current_item->type, current_item->name);
 
   fprintf(state->yyout, "};\n");
 }
