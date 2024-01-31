@@ -101,6 +101,26 @@ Operand *duplicate_operand(Operand *op) {
   return operand_copy;
 }
 
+bool operand_pair_is_signed_integral(Operand *op1, Operand *op2) {
+  return op1->type == OPTYPE_SIGNED_INTEGERAL
+	  	&& op2->type == OPTYPE_SIGNED_INTEGERAL;
+}
+
+bool operand_pair_is_unsigned_integral(Operand *op1, Operand *op2) {
+  return op1->type == OPTYPE_UNSIGNED_INTEGERAL
+	  	&& op2->type == OPTYPE_UNSIGNED_INTEGERAL;
+}
+
+bool operand_pair_is_rational(Operand *op1, Operand *op2) {
+  return op1->type == OPTYPE_RATIONAL
+	  	&& op2->type == OPTYPE_RATIONAL;
+}
+
+bool operand_pair_is_memory_pointer(Operand *op1, Operand *op2) {
+  return op1->type == OPTYPE_MEMORY_POINTER
+	  	&& op2->type == OPTYPE_MEMORY_POINTER;
+}
+
 Result *create_result(ResultType type, void *value) {
   return (Result *)create_operand(type, value);
 }
