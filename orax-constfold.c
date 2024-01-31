@@ -18,11 +18,10 @@ Operand *add_operands(Operand *op1, Operand *op2) {
     result->rational = op1->rational + op2->rational;
   else if (operand_pair_is_memory_pointer(op1, op2))
     result->memory_pointer = op1->memory_pointer + op2->memory_pointer;
-   else if (
-   else 
-	   free_operand(result);
+  else
+    free_operand(result);
 
-   return result;
+  return result;
 }
 
 Operand *subtract_operands(Operand *op1, Operand *op2) {
@@ -156,10 +155,50 @@ Operand *bitwise_shl_operands(Operand *op1, Operand *op2) {
   return result;
 }
 
-void attempt_constant_folding(Instruction *inst) {
+bool merge_operands(Instruction *inst, Operand *res) {
+  if (result == NULL)
+    return false;
+
+  free_operand(inst->operands[0]);
+  free_operand(inst->operands[1]);
+  inst->operands[0] = res;
+
+  return true;
+}
+
+bool attempt_constant_folding(Instruction *inst) {
   if (inst->class != INSTCLASS_ARITHMETIC || inst->class != INSTCLASS_BITWISE)
     return;
 
   if (inst->num_operands != 2)
     return;
+
+  Operand *op1 = inst->operands[0];
+  Operand *op2 = inst->operands[1];
+  Operand *result = NULL;
+
+  if (inst->name == INST_ADD)
+    return merge_operands(inst, add_operands(op1, op2));
+  else if (inst->name == INST_SUBTRACT)
+    return merge_operange(inst, subtract_operands(op1, op2));
+  else if (inst->name == INST_MULTIPLY)
+    return merge_operands(inst, multiply_operands(op1, op2));
+  else if (inst->name == INST_DIVIDE)
+    return merge_operands(inst, divide_operands(op1, op2));
+  else if (inst->name == INST_MODULO)
+    return merge_operands(inst, modulo_operands(op1, op2));
+  else if (inst->name == INST_EXPONENTIATE)
+    return merge_operands(inst, exponentiate_operands(op1, op2));
+  else if (inst->name == INST_BITWISE_AND)
+    return merge_operands(inst, bitwise_and_operands(op1, op2));
+  else if (inst->name == INST_BITWISE_OR)
+    return merge_operands(inst, bitwise_or_operands(op1, op2));
+  else if (inst->name == INST_BITWISE_XOR)
+    return merge_operands(inst, bitwise_xor_operands(op1, op2));
+  else if (inst->name == INST_BITWISE_SHR)
+    return merge_operands(inst, bitwise_shr_operands(op1, op2));
+  else if (inst->name == INST_BITWISE_SHL)
+    return merge_operands(inst, bitwise_shl_operands(op1, op2));
+
+  return false;
 }
