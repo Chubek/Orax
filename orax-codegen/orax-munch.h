@@ -1,14 +1,22 @@
 #ifndef ORAX_MUNCH_H
 #define ORAX_MUNCH_H
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "orax-decl.h"
+
 #define NODEFN static inline MunchNode*
 #define LISTFN static inline MunchList
+#define MUNCHFN static inline OraxMunch*
+#define FREEFN static inline void
+#define INSTALLFN static inline void
+#define WALKFN static inline void
 
 typedef enum MunchNodeType MunchNodeType;
 typedef struct MunchNode MunchNode;
+typedef struct OraxMunch OraxMunch;
 typedef MunchNode** MunchList;
 
 struct MunchNode {
@@ -17,6 +25,14 @@ struct MunchNode {
    MunchNode *right;
    const char *value;
    bool is_leaf;
+};
+
+struct OraxMunch {
+  MunchList decls;
+  MunchList rules;
+  const char *header;
+  const char *footer;
+  FILE *yyout;
 };
 
 enum MunchNodeType {
@@ -33,6 +49,7 @@ enum MunchNodeType {
   MUNCH_RULE,
   MUNCH_RULE_LIST,
 };
+
 
 // General factories
 
@@ -83,6 +100,25 @@ NODEFN munch_ast_munch_tree(MunchNode *node1, MunchNode *node2) {
     return new_munch_node(MUNCH_TREE, node1, node2);
 }
 
+NODEFN munch_ast_munch_tree_list(MunchList trees) {
+    size_t size = 0;
+    while (trees[size] != NULL) {
+        size++;
+    }
+
+    if (size == 1) {
+        return trees[0];
+    }
+
+    MunchNode *combined_tree = new_munch_node(MUNCH_TREE_LIST, trees[0], trees[1]);
+
+    for (size_t i = 2; i < size; i++) {
+        combined_tree = new_munch_node(MUNCH_TREE_LIST, combined_tree, trees[i]);
+    }
+
+    return combined_tree;
+}
+
 NODEFN munch_ast_tree_action(MunchNode *node, const char *semantic_action) {
     MunchNode *semActionNode = munch_ast_new_semantic_action(semantic_action);
     return new_munch_node(MUNCH_TREE_LIST, node, semActionNode);
@@ -114,7 +150,24 @@ LISTFN munch_list_append(MunchList list, MunchNode *item) {
     return list;
 }
 
-static inline void free_munch(MunchNode *node) {
+// Orax munch factory
+
+MUNCHFN create_munch_state(const char *header, 
+		const char *footer,
+		MunchList decls,
+		MunchList rules) {
+    OraxMunch *munch_state = (OraxMunch*)calloc(1, sizeof(OraxMunch));
+    munch_state->header = header;
+    munch_state->footer = footer;
+    munch_state->decls = decls;
+    munch_state->rules = rules;
+    munch_state->yyout = NULL;
+    return munch_state;
+}
+
+// Free functions
+
+FREEFN free_munch(MunchNode *node) {
     if (node == NULL)
 	    return;
     free_tree(node->left);
@@ -124,13 +177,82 @@ static inline void free_munch(MunchNode *node) {
     FREE_AND_NULLFY(&node);
 }
 
-static inline void free_munch_list(MunchList list) {
+FREEFN free_munch_list(MunchList list) {
     MunchNode *node = NULL;
     while ((node = *list++) != NULL)
 	    free_munch(node);
     FREE_AND_NULLIFY(&list);
 }
 
+// C code installers
 
+INSTALLFN munch_install_macro(OraxMunch *state, 
+		const char *name, 
+		const char *definition) {
+    fprintf(state->yyout, "\n#define %s %s\n", name, definition);
+}
+
+INSTALLFN munch_install_word(OraxMunch *state, const char *word) {
+    fprintf(state->yyout, " %s ", word);
+}
+
+INSTALLFN munch_install_char(OraxMunch *state, const char character) {
+    fprintf(state->yyout, " %c ", character);
+}
+
+INSTALLFN munch_install_array_literal(OraxMunch *state, 
+		const char **elements,
+		const char *term) {
+    char *element = NULL;
+    fprintf(state->yyout, "{");
+    while ((element = *elements++) != NULL)
+	    fprintf(state->yyout, "%s, ", element);
+    fprintf(state->yyout, "%s };", term);
+}
+
+INSTALLFN munch_install_array_identifier(OraxMunch *state,
+		const char *identifier,
+		const int size) {
+    fprintf(state->yyout, "%s[%d]", identifier, size);
+}
+
+INSTALLFN munch_install_bitfield(OraxMunch *state,
+		const char *identifier,
+		const struct BitFieldItem { 
+			const char *name;
+			int bits;
+		} **fields) {
+     fprintf(state->yyout, "struct %s {", identifier);
+     struct BitFieldItem *current_bitfield = NULL;
+     
+     while ((current_bitfield = *fields++) != NULL) {
+	fprintf("%s : %d;", 
+			current_bitfield->name, 
+			currnet_bitfield->bits);
+	FREE_AND_NULLIFY(&current_bitfield);
+     }
+
+     fprintf(state->yyout, "};");
+}
+
+// Walker functions
+
+WALKFN walk_munch_node(MunchNode *node) {
+    if (node == NULL) {
+        return;
+    }
+
+    if (node->is_leaf) { }
+
+    walk_munch_node(node->left);
+    walk_munch_node(node->right);
+}
+
+WALKFN walk_munch_list(MunchList list) {
+    MunchNode *node = NULL;
+    while ((node = *list++) != NULL) {
+        walk_munch_node(node);
+    }
+}
 
 #endif
