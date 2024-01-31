@@ -23,6 +23,8 @@ temp/
 tmp/
 
 # Ignore Lex & Yacc files
+*.y.c
+*.y.h
 *.yy.c
 *.yy.h
 *.tab.c
