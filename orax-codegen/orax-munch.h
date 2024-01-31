@@ -19,7 +19,7 @@
 
 typedef enum MunchNodeType MunchNodeType;
 typedef enum MunchNodeLeafType MunchNodeLeafType;
-typedef enum MaxMunchStateState MaxMunchStateState;
+typedef enum MaxMunchStateType MaxMunchStateType;
 typedef struct MunchNode MunchNode;
 typedef struct MaxMunchState MaxMunchState;
 typedef MunchNode *MunchList;
@@ -37,7 +37,7 @@ struct MunchNode {
 };
 
 struct MaxMunchState {
-  MaxMunchStateState state;
+  MaxMunchStateType state;
   MunchNode *decls;
   MunchNode *rules;
   term_t header;
