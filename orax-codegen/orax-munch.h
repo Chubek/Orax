@@ -114,9 +114,22 @@ LISTFN munch_list_append(MunchList list, MunchNode *item) {
     return list;
 }
 
+static inline void free_munch(MunchNode *node) {
+    if (node == NULL)
+	    return;
+    free_tree(node->left);
+    free_tree(node->right);
+    if (node->is_leaf)
+	    free(node->value);
+    FREE_AND_NULLFY(&node);
+}
 
-
-
+static inline void free_munch_list(MunchList list) {
+    MunchNode *node = NULL;
+    while ((node = *list++) != NULL)
+	    free_munch(node);
+    FREE_AND_NULLIFY(&list);
+}
 
 
 
