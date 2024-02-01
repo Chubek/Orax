@@ -42,11 +42,11 @@ typedef struct Instruction
     Instruction; // This will be re-declared in the next section
 typedef struct DAGNode DAGNode;
 typedef struct DAGGraph DAGGraph;
-typedef int vert_t;
+typedef int vertnum_t;
 
-DAGNode *create_dag_node(Instruction *inst, vert_t dest);
-DAGGraph *create_dag_graph(vert_t vertices);
-void add_dag_edge(DAGGraph **graph, vert_t src, vert_t dst, Instruction *inst);
+DAGNode *create_dag_node(Instruction *inst, vertnum_t dest);
+DAGGraph *create_dag_graph(vertnum_t vertices);
+void add_dag_edge(DAGGraph *graph, vertnum_t src, vertnum_t dst, Instruction *inst);
 
 void free_dag_node(DAGNode *root);
 void free_dag_graph(DAGGraph *graph);
@@ -54,15 +54,15 @@ void free_dag_graph(DAGGraph *graph);
 // + D: The Instructions +
 
 typedef enum InstructionName InstructionName; // Defined in `orax-enums.h`
-typedef enum VariableType VariableType;         // Defined in `orax-enums.h`
-typedef enum VariableType ResultType;          // Defined in `orax-enums.h`
 typedef enum OperandType OperandType;		// Defined in `orax-enums.h`
+typedef enum VariableType VariableType;         // Defined in `orax-enums.h`
+typedef enum OperandType ResultType;          // Defined in `orax-enums.h`
 typedef enum ConstantType ConstantType;		// Defined in `orax-enums.h`
 typedef struct SSAInfo SSAInfo;
 typedef struct Instruction Instruction;
-typedef struct Variable Variable;
-typedef struct Variable Result;
 typedef struct Operand Operand;
+typedef struct Variable Variable;
+typedef struct Operand Result;
 typedef int instid_t;
 typedef int varhash_t;
 typedef int ssaversion_t;
