@@ -117,27 +117,30 @@ Constant *create_constant(ConstantType type, void *value) {
 Operand *create_operand(OperandType type, void *value) {
   Opernad *op = (Opernad*)calloc(1, sizeof(Operand));
 
-  if (type == CONTYPE_CONSTANT)
+  if (type == OPTYPE_CONSTANT)
 	  op->constant = (Constant*)value;
   else
 	  op->variable = (Variable*)value;
 }
 
-
-void add_to_variable_size(Variable *op, typesize_t addition) {
-  op->size += addition;
+Result *create_result(ResultType type, void *value) {
+  return (Result *)create_operand(type, value);
 }
 
-void subtract_from_variable_size(Variable *op, typesize_t subtraction) {
-  if (op->size - subtraction = < 0)
+void add_to_variable_size(Variable *var, typesize_t addition) {
+  var->size += addition;
+}
+
+void subtract_from_variable_size(Variable *var, typesize_t subtraction) {
+  if (var->size - subtraction = < 0)
     return;
-  op->size -= subtraction;
+  var->size -= subtraction;
 }
 
-Instruction *add_inst_variable(Instrution *inst, Variable *variable) {
-  inst->variables = (Variable **)realloc(inst->variables, (inst->num_variable + 1) *
-                                                           sizeof(Variable *));
-  inst->variables[inst->num_variables++] = variable;
+Instruction *add_inst_operand(Instrution *inst, Operand *operand) {
+  inst->operands = (Operand **)realloc(inst->operands, (inst->num_operands + 1) *
+                                                           sizeof(Operand *));
+  inst->operands[inst->num_operands++] = operand;
   return inst;
 }
 
@@ -177,10 +180,6 @@ bool constant_pair_is_rational(Constant *cons1, Constant *cons2) {
 bool constant_pair_is_boolean(Constant *cons1, Constant *cons2) {
   return cons1->type == CONTYPE_BOOLEAN
 	  	&& cons2->type == CONTYPE_BOOLEAN;
-}
-
-Result *create_result(ResultType type, void *value) {
-  return (Result *)create_variable(type, value);
 }
 
 void free_variable(Variable *op) {
