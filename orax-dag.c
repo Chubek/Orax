@@ -7,16 +7,16 @@
 
 struct DAGNode {
   Instruction *instruction;
-  vert_t dest;
+  vertnum_t dest;
   DAGNode *next;
 };
 
 struct DAGGraph {
-  vert_t vertices;
+  vertnum_t vertices;
   DAGNode **adj_list;
 };
 
-DAGNode *create_dag_node(Instruction *instruction, vert_t dest) {
+DAGNode *create_dag_node(Instruction *instruction, vertnum_t dest) {
   DAGNode *node = (DAGNode *)calloc(1, sizeof(DAGNode));
   node->instruction = instruction;
   node->dest = dest;
@@ -24,7 +24,7 @@ DAGNode *create_dag_node(Instruction *instruction, vert_t dest) {
   return node;
 }
 
-DAGGraph *create_dag_graph(vert_t vertices) {
+DAGGraph *create_dag_graph(vertnum_t vertices) {
   DAGGraph *graph = (DAGGraph *)calloc(1, sizeof(DAGGraph));
   graph->vertices = vertices;
 
@@ -36,10 +36,10 @@ DAGGraph *create_dag_graph(vert_t vertices) {
   return graph;
 }
 
-void add_dag_edge(DAGGraph **graph, vert_t src, vert_t dst, Instruction *inst) {
+void add_dag_edge(DAGGraph *graph, vertnum_t src, vertnum_t dst, Instruction *inst) {
   DAGNode *new_node = create_dag_node(instruction, dst);
-  new_node->next = (*graph)->adj_list[src];
-  (*graph)->adj_list[src] = new_node;
+  new_node->next = graph->adj_list[src];
+    graph->adj_list[src] = new_node;
 }
 
 void free_dag_node(DAGNode *root) {
