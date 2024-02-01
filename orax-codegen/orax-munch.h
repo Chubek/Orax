@@ -16,10 +16,10 @@
 #define GENFN void
 
 #define MAX_TERM 64
+#define MAX_BUFF 65536
 
 typedef enum MunchNodeType MunchNodeType;
 typedef enum MunchNodeLeafType MunchNodeLeafType;
-typedef enum MaxMunchStateType MaxMunchStateType;
 typedef struct MunchNode MunchNode;
 typedef struct MaxMunchState MaxMunchState;
 typedef MunchNode *MunchList;
@@ -31,19 +31,21 @@ struct MunchNode {
   MunchNode *left;
   MunchNode *right;
   union {
-	  term_t leaf_value;
+	  term_t leaf_string;
 	  MunchNode leaf_list;
    };
 };
 
 struct MaxMunchState {
-  MaxMunchStateType state;
   MunchNode *decls;
   MunchNode *rules;
   term_t header;
   term_t footer;
+  char tree_decls_buff[MAX_BUFF];
+  char match_functions_buff[MAX_BUFF];
+  FILE *tree_decls_stream;
+  FILE *match_functions_stream;
   FILE *yyout;
-  void *ctx;
 };
 
 enum MunchNodeType {
@@ -170,19 +172,30 @@ LISTFN munch_list_append(MunchList *list, MunchNode *item) {
   return list;
 }
 
-// Orax munch factory
+// Munch state methods
+
+MUNCHFN set_munch_state_buffers_to_zero(MaxMunchState *state) {
+   memset(&state->tree_decls_buff[0], 0, MAX_BUFF);
+   memset(&state->match_functions_buff[0], 0, MAX_BUFF);
+}
 
 MUNCHFN create_munch_state(term_t header, 
 			   term_t footer, 
 			   MunchNode *decls,
                            MunchNode *rules) {
   MaxMunchState *munch_state = (MaxMunchState *)calloc(1, sizeof(MaxMunchState));
+  set_munch_state_buffers_to_zero(munch_state);
+
   munch_state->header = header;
   munch_state->footer = footer;
   munch_state->decls = decls;
   munch_state->rules = rules;
-  munch_state->yyout = NULL;
-  munch_state->ctx = NULL;
+  
+  munch_state->tree_decls_stream = 
+	  fmemopen(&munch_state->tree_decls_buff[0], MAX_BUFF, "w");
+  munch_state->match_functions_stream = 
+	  fmemopen(&munch_state->tree_decls_buff[0], MAX_BUFF, "w");
+  
   return munch_state;
 }
 
@@ -216,112 +229,13 @@ FREEFN free_munch_list(MunchList *list) {
 FREEFN free_munch_state(MaxMunchState *state) {
   if (state == NULL)
 	  return;
+  fclose(state->tree_decls_stream);
+  fclose(state->match_functions_stream);
   free_munch_node(state->decls);
   free_munch_node(state->rules);
   FREE_AND_NULLIFY(&state->header);
   FREE_AND_NULLIFY(&state->footer);
   FREE_AND_NULLIFY(&state);
-}
-
-// C code installers
-
-INSTALLFN munch_install_macro(MaxMunchState *state, term_t name,
-                              term_t definition) {
-  fprintf(state->yyout, "#define %s %s\n", name, definition);
-}
-
-INSTALLFN munch_install_include(MaxMunchState *state, term_t file,
-                                term_t delim_left, term_t delim_right) {
-  fprintf(state->yyout, "#include %c%s%c\n", delim_left, file, delim_right);
-}
-
-INSTALLFN munch_install_word(MaxMunchState *state, term_t word) {
-  fprintf(state->yyout, " %s ", word);
-}
-
-INSTALLFN munch_install_char(MaxMunchState *state, term_t character) {
-  fprintf(state->yyout, " %c ", character);
-}
-
-INSTALLFN munch_install_open_func(
-    MaxMunchState *state, term_t return_type, term_t identifier,
-    struct FunctionParameter {
-      term_t type;
-      term_t ident;
-    } * *params) {
-
-  fprintf(state->yyout, "%s %s(", return_type, identifier);
-  struct FunctionParameter *current_param = NULL;
-
-  while ((current_param = *params++) != NULL)
-    fprintf(state->yyout, "%s %s%c", current_param->type, current_param->ident,
-            current_param == NULL ? ')' : ',');
-
-  fprintf(state->yyout, "{\n");
-}
-
-INSTALLFN munch_install_close_func(MaxMunchState *state) {
-  fprintf(state->yyout, "}");
-}
-
-INSTALLFN munch_install_return(MaxMunchState *state, term_t return_value) {
-  fprintf(state->yyout, "return %s;", return_value == NULL ? "" : return_value);
-}
-
-INSTALLFN munch_install_kw_stmt(MaxMunchState *state, term_t keyword) {
-  fprintf(state->yyout, "%s;", keyword);
-}
-
-INSTALLFN munch_install_array_literal(MaxMunchState *state, term_t *elements,
-                                      term_t term) {
-  char *element = NULL;
-  fprintf(state->yyout, "{");
-  while ((element = *elements++) != NULL) {
-    fprintf(state->yyout, "%s, ", element);
-    FREE_AND_NULLIFY(&element);
-  }
-  fprintf(state->yyout, "%s, };", term);
-}
-
-INSTALLFN munch_install_array_identifier(MaxMunchState *state, term_t identifier,
-                                         const int size) {
-  fprintf(state->yyout, "%s[%d]", identifier, size);
-}
-
-INSTALLFN munch_install_bitfield(
-    MaxMunchState *state, term_t identifier, const struct BitFieldItem {
-      term_t type;
-      term_t name;
-      int bits;
-    } * *fields) {
-  fprintf(state->yyout, "struct %s {\n", identifier);
-  struct BitFieldItem current_bitfield = NULL;
-
-  while ((current_bitfield = *fields++) != NULL)
-    fprintf("%s %s : %d;\n", current_bitfield->type, current_bitfield->name,
-            currnet_bitfield->bits);
-
-  fprintf(state->yyout, "};\n");
-}
-
-INSTALLFN munch_install_datatype(
-    MaxMunchState *state, term_t identifier, term_t lexical_terminal,
-    const struct StructItem {
-      term_t type;
-      term_t name;
-    } * *items) {
-  fprintf(state->yyout, "%s %s {\n", lexical_terminal, identifier);
-  struct StructItem *current_item = NULL;
-
-  while ((current_item = *items++) != NULL)
-    fprintf(stdout->yyout, "%s %s;\n", current_item->type, current_item->name);
-
-  fprintf(state->yyout, "};\n");
-}
-
-INSTALLFN munch_install_typedef(MaxMunchState *state, term_t main_type,
-                                term_t alias) {
-  fprintf(state->yyout, "typedef %s %s;", main_type, alias);
 }
 
 // Forward declarations for functions which will be implemented in `orax-munch.c`
