@@ -54,6 +54,8 @@ enum MunchNodeType {
   MUNCH_SEMANTIC_ACTION,
   MUNCH_TREE_ACTION,
   MUNCH_INSTRUCTION,
+  MUNCH_CONST_TYPE,
+  MUNCH_VARIABLE_TYPE,
   MUNCH_HEADER,
   MUNCH_FOOTER,
   MUNCH_TREE,
@@ -119,6 +121,14 @@ TERMFN munch_ast_new_semantic_action(term_t semaction) {
 
 TERMFN munch_ast_new_inst(term_t instruction) {
   return new_munch_string_leaf(MUNCH_INSTRUCTION, instruction);
+}
+
+TERMFN munch_ast_new_const_type(term_t contype) {
+  return new_munch_string_leaf(MUNCH_CONST_TYPE, contype);
+}
+
+TERMFN munch_ast_new_var_type(term_t vartype) {
+  return new_munch_string_leaf(MUNCH_VAR_TYPE, vartype);
 }
 
 TERMFN munch_ast_new_tree_list(MunchList *list) {
