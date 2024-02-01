@@ -1,7 +1,5 @@
 %{
 
-// The following grammar parses a Tree and a list of instructions. The Trees make up a 'tile' (as in instruction selection tile) and the generated functions use Maximal Munch to arrive at the optimal (not optimum!) code
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -22,7 +20,7 @@ extern void yyerror(const char*);
 }
 
 
-%token <string_term> TERMINAL NON_TERMINAL SEMANTIC_ACTION INSTRUCTION HEADER FOOTER
+%token <string_term> TERMINAL NON_TERMINAL SEMANTIC_ACTION IR HEADER FOOTER
 
 %type <ast> MaxMunch Rule SemAction Decl TreeAct Tree
 %type <list> TreeAlt Decls Rules
@@ -55,7 +53,7 @@ Decls	  : Decl			{ $$ = new_munch_list($1); }
 	  | Decls ',' Decl		{ $$ = munch_list_append($1, $3); }
 	  ;
 
-Decl	  : '%' INSTRUCTION		{ $$ = munch_ast_new_inst($2); }
+OpOpCodes : PCNT_INST INSTRUCTION	{ $$ = munch_ast_new_inst($2); }
        	  ;
 
 TreeAlt   : TreeAct			{ $$ = new_munch_list($1); }

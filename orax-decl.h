@@ -54,14 +54,17 @@ void free_dag_graph(DAGGraph *graph);
 // + D: The Instructions +
 
 typedef enum InstructionName InstructionName; // Defined in `orax-enums.h`
-typedef enum OperandType OperandType;         // Defined in `orax-enums.h`
-typedef enum OperandType ResultType;          // Defined in `orax-enums.h`
+typedef enum VariableType VariableType;         // Defined in `orax-enums.h`
+typedef enum VariableType ResultType;          // Defined in `orax-enums.h`
+typedef enum OperandType OperandType;		// Defined in `orax-enums.h`
+typedef enum ConstantType ConstantType;		// Defined in `orax-enums.h`
 typedef struct SSAInfo SSAInfo;
 typedef struct Instruction Instruction;
+typedef struct Variable Variable;
+typedef struct Variable Result;
 typedef struct Operand Operand;
-typedef struct operand Result;
 typedef int instid_t;
-typedef int ophash_t;
+typedef int varhash_t;
 typedef int ssaversion_t;
 typedef size_t typesize_t;
 typedef unsigned long long unsigned_integral_t;
@@ -72,15 +75,15 @@ typedef bool boolean_t;
 
 Instruction *create_instruction(InstructionName name, InstructionClass class,
                                 instid_t instruction_id);
-Instruction *add_inst_operand(Instruction *inst, Operand *operand);
+Instruction *add_inst_variable(Instruction *inst, Variable *variable);
 Instruction *add_inst_result(Instruction *inst, Result *result);
-Operand *create_operand(ophash_t hash, OperandType type, void *value,
+Variable *create_variable(varhash_t hash, VariableType type, void *value,
                         size_t size);
 Result *create_result(ResultType type, void *value);
-Operand *duplicate_operand(Operand *op);
-void add_to_operand_size(Operand *op, typesize_t addition);
-void subtract_from_operand_size(Operand *op, typesize_t subtraction);
-void free_operand(Operand *op);
+Variable *duplicate_variable(Variable *op);
+void add_to_variable_size(Variable *op, typesize_t addition);
+void subtract_from_variable_size(Variable *op, typesize_t subtraction);
+void free_variable(Variable *op);
 void free_instruction(Instruction *inst);
 
 #define SSA_VERSION_UNASSIGNED -1
@@ -110,13 +113,13 @@ void ssa_calculate_immediate_dominator(ControlFlowGraph *cfg,
                                        size_t entry_index);
 void ssa_calculate_dominance_frontiers(ControlFlowGraph *cfg);
 void ssa_insert_phi_instructions(ControlFlowGraph *cfg);
-void ssa_reversion_operands(ControlFlowGraph *cfg);
+void ssa_reversion_variables(ControlFlowGraph *cfg);
 void analyze_liveness(ControlFlowGraph *graph);
 bool dominates(TraceBlock *dominator, TraceBlock *block);
-bool operand_defined_in_block(Operand *operand, TraceBlock *block);
-bool is_phi_present_for_operand(TraceBlock *block, Operand *operand);
-Instruction *create_instruction(TraceBlock *block, Operand *operand);
-Operand *get_operand_from_block(Operand *operand, TraceBlock *block);
+bool variable_defined_in_block(Variable *variable, TraceBlock *block);
+bool is_phi_present_for_variable(TraceBlock *block, Variable *variable);
+Instruction *create_instruction(TraceBlock *block, Variable *variable);
+Variable *get_variable_from_block(Variable *variable, TraceBlock *block);
 void insert_phi_instruction_at_head(TraceBlock *block, Instruction *inst);
 void ssa_insert_phi_instructions(ControlFlowGraph *cfg);
 void free_trace_block(TraceBlock *block);
@@ -166,7 +169,7 @@ void remove_node_from_graph(RegisterNode *nodes[], size_t num_nodes,
 /* These are declarations for the lifeset, see `orax-lifeset.c` for definitions
  */
 
-typedef struct Operand LifeObject;
+typedef struct Variable LifeObject;
 typedef struct LifeSet LifeSet;
 
 LifeSet *create_life_set(void);
@@ -263,17 +266,17 @@ SingletonType *add_singleton_vtable_method(SingletonType *singleton,
 
 // + M: Constant Folding +
 
-Operand *add_operands(Operand *op1, Operand *op2);
-Operand *subtract_operands(Operand *op1, Operand *op2);
-Operand *multiply_operands(Operand *op1, Operand *op2);
-Operand *divide_operands(Operand *op1, Operand *op2);
-Operand *modulo_operands(Operand *op1, Operand *op2);
-Operand *exponentiate_operands(Operand *op1, Operand *op2);
-Operand *bitwise_and_operands(Operand *op1, Operand *op2);
-Operand *bitwise_or_operands(Operand *op1, Operand *op2);
-Operand *bitwise_xor_operands(Operand *op1, Operand *op2);
-Operand *bitwise_shr_operands(Operand *op1, Operand *op2);
-Operand *bitwise_shl_operands(Operand *op1, Operand *op2);
+Variable *add_variables(Variable *op1, Variable *op2);
+Variable *subtract_variables(Variable *op1, Variable *op2);
+Variable *multiply_variables(Variable *op1, Variable *op2);
+Variable *divide_variables(Variable *op1, Variable *op2);
+Variable *modulo_variables(Variable *op1, Variable *op2);
+Variable *exponentiate_variables(Variable *op1, Variable *op2);
+Variable *bitwise_and_variables(Variable *op1, Variable *op2);
+Variable *bitwise_or_variables(Variable *op1, Variable *op2);
+Variable *bitwise_xor_variables(Variable *op1, Variable *op2);
+Variable *bitwise_shr_variables(Variable *op1, Variable *op2);
+Variable *bitwise_shl_variables(Variable *op1, Variable *op2);
 bool attempt_constant_folding(Instruction *inst);
 
 // === Some Systems Macros ====

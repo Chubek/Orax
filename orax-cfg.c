@@ -227,8 +227,8 @@ void ssa_calculate_dominance_frontiers(ControlFlowGraph *cfg) {
   }
 }
 
-void ssa_reversion_operands(ControlFlowGraph *cfg) {
-  ophash_t hash_lut[MAX_OP_HASH] = {0};
+void ssa_reversion_variables(ControlFlowGraph *cfg) {
+  varhash_t hash_lut[MAX_OP_HASH] = {0};
 
   for (size_t i = 0; i < cfg->num_blocks; i++) {
     TraceBlock *block = cfg->blocks[i];
@@ -236,14 +236,14 @@ void ssa_reversion_operands(ControlFlowGraph *cfg) {
     for (size_t j = 0; j < block->num_instructions; j++) {
       Instruction *inst = block->instructions[j];
 
-      for (size_t k = 0; k < inst->num_operands; k++) {
-        Operand *operand = inst->operands[k];
+      for (size_t k = 0; k < inst->num_variables; k++) {
+        Variable *variable = inst->variables[k];
 
-        if (operand->ssa_version == SSA_VERSION_UNASSIGNED) {
-          hash_lut[operand->hash] = hash_lut[operand->hash] == 0
+        if (variable->ssa_version == SSA_VERSION_UNASSIGNED) {
+          hash_lut[variable->hash] = hash_lut[variable->hash] == 0
                                         ? GEN_UNIQUE_ID()
-                                        : hash_lut[operand->hash]++;
-          new_operand->ssa_version = hash_lut[operand->hash];
+                                        : hash_lut[variable->hash]++;
+          new_variable->ssa_version = hash_lut[variable->hash];
         }
       }
     }
@@ -261,19 +261,19 @@ void ssa_insert_phi_instructions(ControlFlowGraph *cfg) {
       for (size_t k = 0; k < dominance_frontier->num_instructions; k++) {
         Instruction *inst = dominance_frontier->instructions[k];
 
-        for (size_t m = 0; m < inst->num_operands; m++) {
-          Operand *operand = inst->operands[m];
+        for (size_t m = 0; m < inst->num_variables; m++) {
+          Variable *variable = inst->variables[m];
 
           for (size_t x = 0; x < dominance_frontier->num_predecessors; x++) {
             TraceBlock *pred = dominance_frontier->predecessors[x];
 
             if (dominates(pred, block)) {
 
-              if (operand_defined_in_block(operand, pred)) {
+              if (variable_defined_in_block(variable, pred)) {
 
-                if (!is_phi_present_for_operand(block, operand)) {
+                if (!is_phi_present_for_variable(block, variable)) {
                   Instruction *phi_inst =
-                      create_phi_instruction(block, operand);
+                      create_phi_instruction(block, variable);
                   insert_instruction_at_head(block, phi_inst);
                 }
               }
@@ -293,11 +293,11 @@ bool dominates(TraceBlock *dominator, TraceBlock *block) {
   return (block == dominator);
 }
 
-bool operand_defined_in_block(Operand *operand, TraceBlock *block) {
+bool variable_defined_in_block(Variable *variable, TraceBlock *block) {
   for (size_t i = 0; i < block->num_instructions; i++) {
     Instruction *inst = block->instructions[i];
-    for (size_t j = 0; j < inst->num_operands; j++) {
-      if (inst->operands[j]->hash == operand->hash) {
+    for (size_t j = 0; j < inst->num_variables; j++) {
+      if (inst->variables[j]->hash == variable->hash) {
         return true;
       }
     }
@@ -305,12 +305,12 @@ bool operand_defined_in_block(Operand *operand, TraceBlock *block) {
   return false;
 }
 
-bool is_phi_present_for_operand(TraceBlock *block, Operand *operand) {
+bool is_phi_present_for_variable(TraceBlock *block, Variable *variable) {
   for (size_t i = 0; i < block->num_instructions; i++) {
     Instruction *inst = block->instructions[i];
     if (inst->type == INST_PHI) {
-      for (size_t j = 0; j < inst->num_operands; j++) {
-        if (inst->operands[j]->hash == operand->hash) {
+      for (size_t j = 0; j < inst->num_variables; j++) {
+        if (inst->variables[j]->hash == variable->hash) {
           return true;
         }
       }
@@ -319,28 +319,28 @@ bool is_phi_present_for_operand(TraceBlock *block, Operand *operand) {
   return false;
 }
 
-Instruction *create_phi_instruction(TraceBlock *block, Operand *operand) {
+Instruction *create_phi_instruction(TraceBlock *block, Variable *variable) {
   Instruction *phi_inst =
       create_instruction(INST_PHI, INSTCLASS_SSA, GEN_UNIQUE_ID());
-  Operand *phi_result = duplicate_operand(operand);
+  Variable *phi_result = duplicate_variable(variable);
   phi_result->ssa_version = GEN_UNIQUE_ID();
   phi_inst = add_inst_result(phi_inst, phi_result);
 
   for (size_t i = 0; i < block->num_predecessors; i++) {
     TraceBlock *pred = block->predecessors[i];
-    Operand *pred_operand = get_operand_from_block(operand, pred);
-    phi_inst = add_inst_operand(phi_inst, pred_operand);
+    Variable *pred_variable = get_variable_from_block(variable, pred);
+    phi_inst = add_inst_variable(phi_inst, pred_variable);
   }
 
   return phi_inst;
 }
 
-Operand *get_operand_from_block(Operand *operand, TraceBlock *block) {
+Variable *get_variable_from_block(Variable *variable, TraceBlock *block) {
   for (size_t i = 0; i < block->num_instructions; i++) {
     Instruction *inst = block->instructions[i];
-    for (size_t j = 0; j < inst->num_operands; j++) {
-      if (inst->operands[j] == operand) {
-        return inst->operands[j];
+    for (size_t j = 0; j < inst->num_variables; j++) {
+      if (inst->variables[j] == variable) {
+        return inst->variables[j];
       }
     }
   }

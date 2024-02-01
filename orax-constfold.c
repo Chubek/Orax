@@ -7,161 +7,161 @@
 #include "orax-decl.h"
 #include "orax-enums.h"
 
-Operand *add_operands(Operand *op1, Operand *op2) {
-  Operand *result = duplicate_operand(op1);
+Variable *add_variables(Variable *op1, Variable *op2) {
+  Variable *result = duplicate_variable(op1);
 
-  if (operand_is_integeral(op1) && operand_is_integral(op2))
+  if (variable_is_integeral(op1) && variable_is_integral(op2))
     result->signed_integral = op1->signed_integral + op2->signed_integral;
-  else if (operand_pair_is_unsigned_integral(op1, op2))
+  else if (variable_pair_is_unsigned_integral(op1, op2))
     result->unsigned_integral = op1->unsigned_integral + op2->unsigned_integral;
-  else if (operand_pair_is_rational(op1, op2))
+  else if (variable_pair_is_rational(op1, op2))
     result->rational = op1->rational + op2->rational;
-  else if (operand_pair_is_memory_pointer(op1, op2))
+  else if (variable_pair_is_memory_pointer(op1, op2))
     result->memory_pointer = op1->memory_pointer + op2->memory_pointer;
   else
-    free_operand(result);
+    free_variable(result);
 
   return result;
 }
 
-Operand *subtract_operands(Operand *op1, Operand *op2) {
-  Operand *result = duplicate_operand(op1);
+Variable *subtract_variables(Variable *op1, Variable *op2) {
+  Variable *result = duplicate_variable(op1);
 
-  if (operand_pair_is_integral(op1, op2))
+  if (variable_pair_is_integral(op1, op2))
     result->signed_integral = op1->signed_integral - op2->signed_integral;
-  else if (operand_pair_is_unsigned_integral(op1, op2))
+  else if (variable_pair_is_unsigned_integral(op1, op2))
     result->unsigned_integral = op1->unsigned_integral - op2->unsigned_integral;
-  else if (operand_pair_is_rational(op1, op2))
+  else if (variable_pair_is_rational(op1, op2))
     result->rational = op1->rational - op2->rational;
-  else if (operand_pair_is_memory_pointer(op1, op2))
+  else if (variable_pair_is_memory_pointer(op1, op2))
     result->memory_pointer = op1->memory_pointer - op2->memory_pointer;
   else
-    free_operand(result);
+    free_variable(result);
 
   return result;
 }
 
-Operand *multiply_operands(Operand *op1, Operand *op2) {
-  Operand *result = duplicate_operand(op1);
+Variable *multiply_variables(Variable *op1, Variable *op2) {
+  Variable *result = duplicate_variable(op1);
 
-  if (operand_pair_is_integral(op1, op2))
+  if (variable_pair_is_integral(op1, op2))
     result->signed_integral = op1->signed_integral * op2->signed_integral;
-  else if (operand_pair_is_unsigned_integral(op1, op2))
+  else if (variable_pair_is_unsigned_integral(op1, op2))
     result->unsigned_integral = op1->unsigned_integral * op2->unsigned_integral;
-  else if (operand_pair_is_rational(op1, op2))
+  else if (variable_pair_is_rational(op1, op2))
     result->rational = op1->rational * op2->rational;
-  else if (operand_pair_is_memory_pointer(op1, op2))
+  else if (variable_pair_is_memory_pointer(op1, op2))
     result->memory_pointer = op1->memory_pointer * op2->memory_pointer;
   else
-    free_operand(result);
+    free_variable(result);
 
   return result;
 }
 
-Operand *divide_operands(Operand *op1, Operand *op2) {
-  Operand *result = duplicate_operand(op1);
+Variable *divide_variables(Variable *op1, Variable *op2) {
+  Variable *result = duplicate_variable(op1);
 
-  if (operand_pair_is_integral(op1, op2))
+  if (variable_pair_is_integral(op1, op2))
     result->signed_integral = op1->signed_integral / op2->signed_integral;
-  else if (operand_pair_is_unsigned_integral(op1, op2))
+  else if (variable_pair_is_unsigned_integral(op1, op2))
     result->unsigned_integral = op1->unsigned_integral / op2->unsigned_integral;
-  else if (operand_pair_is_rational(op1, op2))
+  else if (variable_pair_is_rational(op1, op2))
     result->rational = op1->rational / op2->rational;
-  else if (operand_pair_is_memory_pointer(op1, op2))
+  else if (variable_pair_is_memory_pointer(op1, op2))
     result->memory_pointer = op1->memeory_pointer / op2->memory_pointer;
   else
-    free_operand(result);
+    free_variable(result);
 
   return result;
 }
 
-Operand *modulo_operands(Operand *op1, Operand *op2) {
-  Operand *result = duplicate_operand(op1);
+Variable *modulo_variables(Variable *op1, Variable *op2) {
+  Variable *result = duplicate_variable(op1);
 
-  if (operand_pair_is_unsigned_integral(op1, op2))
+  if (variable_pair_is_unsigned_integral(op1, op2))
     result->unsigned_integral = op1->unsigned_integral % op2->unsigned_integral;
   else
-    free_operand(result);
+    free_variable(result);
 
   return result;
 }
 
-Operand *exponentiate_operands(Operand *op1, Operand *op2) {
-  Operand *result = duplicate_operand(op1);
+Variable *exponentiate_variables(Variable *op1, Variable *op2) {
+  Variable *result = duplicate_variable(op1);
 
-  if (operand_pair_is_integral(op1, op2))
+  if (variable_pair_is_integral(op1, op2))
     result->unsigned_integral =
         pow(op1->unsigned_integral, op2->unsigned_integral);
   else
-    free_operand(result);
+    free_variable(result);
 
   return result;
 }
 
-Operand *bitwise_and_operands(Operand *op1, Operand *op2) {
-  Operand *result = duplicate_operand(op1);
+Variable *bitwise_and_variables(Variable *op1, Variable *op2) {
+  Variable *result = duplicate_variable(op1);
 
-  if (operand_pair_is_unsigned_integral(op1, op2))
+  if (variable_pair_is_unsigned_integral(op1, op2))
     result->unsigned_integral = op1->unsigned_integral & op2->unsigned_integral;
   else
-    free_operand(result);
+    free_variable(result);
 
   return result;
 }
 
-Operand *bitwise_or_operands(Operand *op1, Operand *op2) {
-  Operand *result = duplicate_operand(op1);
+Variable *bitwise_or_variables(Variable *op1, Variable *op2) {
+  Variable *result = duplicate_variable(op1);
 
-  if (operand_pair_is_unsigned_integral(op1, op2))
+  if (variable_pair_is_unsigned_integral(op1, op2))
     result->unsigned_integral = op1->unsigned_integral | op2->unsigned_integral;
   else
-    free_operand(result);
+    free_variable(result);
 
   return result;
 }
 
-Operand *bitwise_xor_operands(Operand *op1, Operand *op2) {
-  Operand *result = duplicate_operand(op1);
+Variable *bitwise_xor_variables(Variable *op1, Variable *op2) {
+  Variable *result = duplicate_variable(op1);
 
-  if (operand_pair_is_unsigned_integral(op1, op2))
+  if (variable_pair_is_unsigned_integral(op1, op2))
     result->unsigned_integral = op1->unsigned_integral ^ op2->unsigned_integral;
   else
-    free_operand(result);
+    free_variable(result);
 
   return result;
 }
 
-Operand *bitwise_shr_operands(Operand *op1, Operand *op2) {
-  Operand *result = duplicate_operand(op1);
+Variable *bitwise_shr_variables(Variable *op1, Variable *op2) {
+  Variable *result = duplicate_variable(op1);
 
-  if (operand_pair_is_unsigned_integral(op1, op2))
+  if (variable_pair_is_unsigned_integral(op1, op2))
     result->unsigned_integral =
         op1->unsigned_integral >> op2->unsigned_integral;
   else
-    free_operand(result);
+    free_variable(result);
 
   return result;
 }
 
-Operand *bitwise_shl_operands(Operand *op1, Operand *op2) {
-  Operand *result = duplicate_operand(op1);
+Variable *bitwise_shl_variables(Variable *op1, Variable *op2) {
+  Variable *result = duplicate_variable(op1);
 
-  if (operand_pair_is_unsigned_integral(op1, op2))
+  if (variable_pair_is_unsigned_integral(op1, op2))
     result->unsigned_integral = op1->unsigned_integral
                                 << op2->unsigned_integral;
   else
-    free_operand(result);
+    free_variable(result);
 
   return result;
 }
 
-bool merge_operands(Instruction *inst, Operand *res) {
+bool merge_variables(Instruction *inst, Variable *res) {
   if (result == NULL)
     return false;
 
-  free_operand(inst->operands[0]);
-  free_operand(inst->operands[1]);
-  inst->operands[0] = res;
+  free_variable(inst->variables[0]);
+  free_variable(inst->variables[1]);
+  inst->variables[0] = res;
 
   return true;
 }
@@ -170,35 +170,35 @@ bool attempt_constant_folding(Instruction *inst) {
   if (inst->class != INSTCLASS_ARITHMETIC || inst->class != INSTCLASS_BITWISE)
     return;
 
-  if (inst->num_operands != 2)
+  if (inst->num_variables != 2)
     return;
 
-  Operand *op1 = inst->operands[0];
-  Operand *op2 = inst->operands[1];
-  Operand *result = NULL;
+  Variable *op1 = inst->variables[0];
+  Variable *op2 = inst->variables[1];
+  Variable *result = NULL;
 
   if (inst->name == INST_ADD)
-    return merge_operands(inst, add_operands(op1, op2));
+    return merge_variables(inst, add_variables(op1, op2));
   else if (inst->name == INST_SUBTRACT)
-    return merge_operange(inst, subtract_operands(op1, op2));
+    return merge_operange(inst, subtract_variables(op1, op2));
   else if (inst->name == INST_MULTIPLY)
-    return merge_operands(inst, multiply_operands(op1, op2));
+    return merge_variables(inst, multiply_variables(op1, op2));
   else if (inst->name == INST_DIVIDE)
-    return merge_operands(inst, divide_operands(op1, op2));
+    return merge_variables(inst, divide_variables(op1, op2));
   else if (inst->name == INST_MODULO)
-    return merge_operands(inst, modulo_operands(op1, op2));
+    return merge_variables(inst, modulo_variables(op1, op2));
   else if (inst->name == INST_EXPONENTIATE)
-    return merge_operands(inst, exponentiate_operands(op1, op2));
+    return merge_variables(inst, exponentiate_variables(op1, op2));
   else if (inst->name == INST_BITWISE_AND)
-    return merge_operands(inst, bitwise_and_operands(op1, op2));
+    return merge_variables(inst, bitwise_and_variables(op1, op2));
   else if (inst->name == INST_BITWISE_OR)
-    return merge_operands(inst, bitwise_or_operands(op1, op2));
+    return merge_variables(inst, bitwise_or_variables(op1, op2));
   else if (inst->name == INST_BITWISE_XOR)
-    return merge_operands(inst, bitwise_xor_operands(op1, op2));
+    return merge_variables(inst, bitwise_xor_variables(op1, op2));
   else if (inst->name == INST_BITWISE_SHR)
-    return merge_operands(inst, bitwise_shr_operands(op1, op2));
+    return merge_variables(inst, bitwise_shr_variables(op1, op2));
   else if (inst->name == INST_BITWISE_SHL)
-    return merge_operands(inst, bitwise_shl_operands(op1, op2));
+    return merge_variables(inst, bitwise_shl_variables(op1, op2));
 
   return false;
 }

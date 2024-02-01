@@ -1,7 +1,7 @@
 #ifndef ORAX_ENUMS_H
 #define ORAX_ENUMS_H
 
-enum OperandType {
+enum VariableType {
   OPTYPE_SIGNED_INTEGRAL,
   OPTYPE_UNSIGNED_INTEGRAL,
   OPTYPE_RATIONAL,
@@ -120,12 +120,6 @@ enum InstructionName {
   INST_CAST_DATA,
   INST_COPY_DATA,
   INST_LITERAL_DATA,
-};
-
-enum SExpressionType {
-  SEXP_ATOM,
-  SEXP_LIST,
-  SEXP_SYNOBJ,
 };
 
 enum SemanticItemType {
