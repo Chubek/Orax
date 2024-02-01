@@ -31,9 +31,9 @@ struct MunchNode {
   MunchNode *left;
   MunchNode *right;
   union {
-	  term_t leaf_string;
-	  MunchNode leaf_list;
-   };
+    term_t leaf_string;
+    MunchNode leaf_list;
+  };
 };
 
 struct MaxMunchState {
@@ -69,7 +69,6 @@ enum MunchNodeLeafType {
   LEAF_LIST,
   LEAF_STRING,
 };
-
 
 // General factories
 
@@ -150,11 +149,10 @@ NONTERMFN munch_ast_rule(MunchNode *rule, term_t nonterm) {
   return new_munch_node(MUNCH_RULE, non_term_node, rule);
 }
 
-
 // List factories
 
 LISTFN munch_new_list(MunchNode *init_item) {
-  MunchList *list = (MunchList*)calloc(2, sizeof(MunchNode *));
+  MunchList *list = (MunchList *)calloc(2, sizeof(MunchNode *));
   list[0] = init_item;
   list[1] = NULL;
   return list;
@@ -166,7 +164,7 @@ LISTFN munch_list_append(MunchList *list, MunchNode *item) {
     size++;
   }
 
-  list = (MunchList*)realloc(list, (size + 2) * sizeof(MunchNode *));
+  list = (MunchList *)realloc(list, (size + 2) * sizeof(MunchNode *));
   list[size] = item;
   list[size + 1] = NULL;
   return list;
@@ -175,27 +173,26 @@ LISTFN munch_list_append(MunchList *list, MunchNode *item) {
 // Munch state methods
 
 MUNCHFN set_munch_state_buffers_to_zero(MaxMunchState *state) {
-   memset(&state->tree_decls_buff[0], 0, MAX_BUFF);
-   memset(&state->match_functions_buff[0], 0, MAX_BUFF);
+  memset(&state->tree_decls_buff[0], 0, MAX_BUFF);
+  memset(&state->match_functions_buff[0], 0, MAX_BUFF);
 }
 
-MUNCHFN create_munch_state(term_t header, 
-			   term_t footer, 
-			   MunchNode *decls,
+MUNCHFN create_munch_state(term_t header, term_t footer, MunchNode *decls,
                            MunchNode *rules) {
-  MaxMunchState *munch_state = (MaxMunchState *)calloc(1, sizeof(MaxMunchState));
+  MaxMunchState *munch_state =
+      (MaxMunchState *)calloc(1, sizeof(MaxMunchState));
   set_munch_state_buffers_to_zero(munch_state);
 
   munch_state->header = header;
   munch_state->footer = footer;
   munch_state->decls = decls;
   munch_state->rules = rules;
-  
-  munch_state->tree_decls_stream = 
-	  fmemopen(&munch_state->tree_decls_buff[0], MAX_BUFF, "w");
-  munch_state->match_functions_stream = 
-	  fmemopen(&munch_state->tree_decls_buff[0], MAX_BUFF, "w");
-  
+
+  munch_state->tree_decls_stream =
+      fmemopen(&munch_state->tree_decls_buff[0], MAX_BUFF, "w");
+  munch_state->match_functions_stream =
+      fmemopen(&munch_state->tree_decls_buff[0], MAX_BUFF, "w");
+
   return munch_state;
 }
 
@@ -213,13 +210,13 @@ FREEFN free_munch_node(MunchNode *node) {
   if (node->leaf_type == LEAF_STRING)
     FREE_AND_NULLIFY(node->leaf_string);
   else if (node->leaf_type == LEAF_LIST)
-     free_munch_list(node->leaf_list);
+    free_munch_list(node->leaf_list);
   FREE_AND_NULLFY(&node);
 }
 
 FREEFN free_munch_list(MunchList *list) {
   if (list == NULL)
-	  return;
+    return;
   MunchNode *node = NULL;
   while ((node = *list++) != NULL)
     free_munch_node(node);
@@ -228,7 +225,7 @@ FREEFN free_munch_list(MunchList *list) {
 
 FREEFN free_munch_state(MaxMunchState *state) {
   if (state == NULL)
-	  return;
+    return;
   fclose(state->tree_decls_stream);
   fclose(state->match_functions_stream);
   free_munch_node(state->decls);
@@ -238,7 +235,8 @@ FREEFN free_munch_state(MaxMunchState *state) {
   FREE_AND_NULLIFY(&state);
 }
 
-// Forward declarations for functions which will be implemented in `orax-munch.c`
+// Forward declarations for functions which will be implemented in
+// `orax-munch.c`
 
 GENFN walk_munch_node(MaxMunchState *state, MunchNode *node);
 GENFN walk_munch_list(MaxMunchState *state, MunchList *list);
