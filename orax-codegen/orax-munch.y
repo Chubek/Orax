@@ -20,7 +20,9 @@ extern void yyerror(const char*);
 }
 
 
-%token <string_term> TERMINAL NON_TERMINAL SEMANTIC_ACTION IR HEADER FOOTER
+%token <string_term> TERMINAL NON_TERMINAL 
+%token <string_term> SEMANTIC_ACTION HEADER FOOTER
+%token <string_term> INSTRUCTION CONST_TYPE VARIABLE_TYPE
 
 %type <ast> MaxMunch Rule SemAction Decl TreeAct Tree
 %type <list> TreeAlt Decls Rules
@@ -53,7 +55,14 @@ Decls	  : Decl			{ $$ = new_munch_list($1); }
 	  | Decls ',' Decl		{ $$ = munch_list_append($1, $3); }
 	  ;
 
-OpOpCodes : PCNT_INST INSTRUCTION	{ $$ = munch_ast_new_inst($2); }
+Decl      : ConTyDecl			{ $$ = $1; }
+	  | VarTyDecl			{ $$ = $1; }
+	  | InstDecl			{ $$ = $1; }
+	  ;
+
+ConTyDecl : PCNT_CONTY CONST_TYPE	{ $$ = munch_ast_new_const_type($2); }
+VarTyDecl : PCNT_VARTY VARIABLE_TYPE	{ $$ = munch_ast_new_var_type($2); }
+InstDecl  : PCNT_INST INSTRUCTION	{ $$ = munch_ast_new_inst($2); }
        	  ;
 
 TreeAlt   : TreeAct			{ $$ = new_munch_list($1); }
