@@ -1,6 +1,3 @@
-#ifndef ORAX_MUNCH_H
-#define ORAX_MUNCH_H
-
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,9 +6,9 @@
 
 #define TERMFN static inline MunchNode *
 #define NONTERMFN static inline MunchNode *
-#define LISTFN static inline MunchList *
+#define LISTFN static inline MunchNodeList *
 #define MUNCHFN static inline MaxMunchState *
-#define SEMCTXFN static inline SemCtx
+#define SEMCTXFN static inline SemCtx *
 #define SYMINSERTFN static inline void
 #define SYMGETFN static inline SemCtx
 #define TERMFN static inline term_t
@@ -28,7 +25,7 @@ typedef enum MunchNodeLeafType MunchNodeLeafType;
 typedef struct MunchNode MunchNode;
 typedef struct MaxMunchState MaxMunchState;
 typedef struct SemCtx SemCtx;
-typedef MunchNode *MunchList;
+typedef struct MunchNodeList MunchNodeList;
 typedef term_t term_t[static MAX_TERM];
 
 struct MunchNode {
@@ -38,8 +35,14 @@ struct MunchNode {
   MunchNode *right;
   union {
     term_t leaf_string;
-    MunchNode leaf_list;
+    SemCtx *leaf_semctx;
+    MuncNodeList *leaf_list;
   };
+};
+
+struct MunchNodeList {
+  MunchNode **items;
+  size_t num_items;
 };
 
 struct MaxMunchState {
@@ -58,6 +61,7 @@ struct SemCtx {
 
 enum MunchNodeType {
   MUNCH_TERMINAL,
+  MUNCH_SEMANTIC_CONTEXT,
   MUNCH_NON_TERMINAL,
   MUNCH_SEMANTIC_ACTION,
   MUNCH_TREE_ACTION,
@@ -78,14 +82,19 @@ enum MunchNodeLeafType {
   LEAF_IS_NOT,
   LEAF_LIST,
   LEAF_STRING,
+  LEAF_SEMCTX,
 };
 
 // Semantic syntax functions
 
 SEMCTXFN new_semctx(term_t terminal, int num) {
-  SemCtx semtx = (SemCtx){.num = num, .terminal = temrinal};
+  SemCtx *semctx = (SemCtx*)calloc(1, sizeof(SemCtx));
+  semctx->terminal = terminal;
+  semctx->num = num;
   return semctx;
 }
+
+// Munch List functions
 
 // Terminal functions
 
@@ -123,22 +132,6 @@ TERMFN term_from_num(int num) {
   return num;
 }
 
-// Symtable funtions
-
-static SymtabNode *symtable;
-
-SYMINSERTFN symtab_insert_semctx(term_t term, int num) {
-  static term_t num = term_from_num(num);
-  static term_t key = cat_terms(term, num);
-  static SemCtx semtx = new_semctx(term, num);
-  symtable = symtable_insert(&symtable, &key[0], (void *)semctx);
-}
-
-SYMGENFN symtab_get_semctx(term_t term, int num) {
-  term_t num = term_from_num(num);
-  term_t key = cat_terms(term, num);
-  return (SemCtx)symtable_get(&key[0]);
-}
 
 // General factories
 
@@ -158,7 +151,14 @@ TERMFN new_munch_string_leaf(MunchNodeType type, term_t value) {
   return node;
 }
 
-TERMFN new_munch_list_leaf(MunchNodeType type, MunchList *list) {
+TERMFN new_munch_semctx_leaf(MunchNodeType type, SemCtx *semctx) {
+  MunchNode *node = new_munch_node(type, NULL, NULL);
+  node->leaf_type = LEAF_SEMCTX;
+  node->leaf_semctx = semctx;
+  return node;
+}
+
+TERMFN new_munch_list_leaf(MunchNodeType type, MunchNodeList *list) {
   MunchNode *node = new_munch_node(type, NULL, NULL);
   node->leaf_list = list;
   node->leaf_type = LEAF_LIST;
@@ -173,6 +173,10 @@ TERMFN munch_ast_new_term(term_t term) {
 
 TERMFN munch_ast_new_non_term(term_t nonterm) {
   return new_munch_string_leaf(MUNCH_NON_TERMINAL, nonterm);
+}
+
+TERMFN munch_ast_new_semctx(SemCtx *semctx) {
+  return new_munch_semctx_leaf(MUNCH_SEMANTIC_CONTEXT, semctx);
 }
 
 TERMFN munch_ast_new_header(term_t header) {
@@ -199,15 +203,15 @@ TERMFN munch_ast_new_var_type(term_t vartype) {
   return new_munch_string_leaf(MUNCH_VAR_TYPE, vartype);
 }
 
-TERMFN munch_ast_new_tree_list(MunchList *list) {
+TERMFN munch_ast_new_tree_list(MunchNodeList *list) {
   return new_munch_list_leaf(MUNCH_TREE_LIST, list);
 }
 
-TERMFN munch_ast_new_rule_list(MunchList *list) {
+TERMFN munch_ast_new_rule_list(MunchNodeList *list) {
   return new_munch_list_leaf(MUNCH_RULE_LIST, list);
 }
 
-TERMFN munch_ast_new_decl_list(MunchList *list) {
+TERMFN munch_ast_new_decl_list(MunchNodeList *list) {
   return new_munch_list_leaf(MUNCH_DECL_LIST, list);
 }
 
@@ -230,19 +234,17 @@ NONTERMFN munch_ast_rule(MunchNode *rule, term_t nonterm) {
 // List factories
 
 LISTFN munch_new_list(MunchNode *init_item) {
-  MunchList *list = (MunchList *)calloc(2, sizeof(MunchNode *));
+  MunchNodeList *list = (MunchNodeList *)calloc(2, sizeof(MunchNode *));
   list[0] = init_item;
   list[1] = NULL;
   return list;
 }
 
-LISTFN munch_list_append(MunchList *list, MunchNode *item) {
+LISTFN munch_list_append(MunchNodeList *list, MunchNode *item) {
   size_t size = 0;
-  while (list[size] != NULL) {
-    size++;
-  }
+  while (list[size++] != NULL);
 
-  list = (MunchList *)realloc(list, (size + 2) * sizeof(MunchNode *));
+  list = (MunchNodeList *)realloc(list, (size + 2) * sizeof(MunchNode *));
   list[size] = item;
   list[size + 1] = NULL;
   return list;
@@ -271,7 +273,7 @@ MUNCHFN create_munch_state(term_t header, term_t footer, MunchNode *decls,
 
 // Free functions
 
-FREEFN free_munch_list(MunchList *list);
+FREEFN free_munch_list(MunchNodeList *list);
 FREEFN free_munch_node(MunchNode node);
 FREEFN free_munch_state(MunchState *state);
 
@@ -280,19 +282,19 @@ FREEFN free_munch_node(MunchNode *node) {
     return;
   free_munch(node->left);
   free_munch(node->right);
-  if (node->leaf_type == LEAF_STRING)
-    FREE_AND_NULLIFY(node->leaf_string);
-  else if (node->leaf_type == LEAF_LIST)
+  if (node->leaf_type == LEAF_LIST)
     free_munch_list(node->leaf_list);
   FREE_AND_NULLFY(&node);
 }
 
-FREEFN free_munch_list(MunchList *list) {
+FREEFN free_munch_list(MunchNodeList *list) {
   if (list == NULL)
     return;
+ 
   MunchNode *node = NULL;
   while ((node = *list++) != NULL)
     free_munch_node(node);
+  
   FREE_AND_NULLIFY(&list);
 }
 
@@ -307,99 +309,3 @@ FREEFN free_munch_state(MaxMunchState *state) {
   FREE_AND_NULLIFY(&state->footer);
   FREE_AND_NULLIFY(&state);
 }
-
-// Forward declarations for functions which will be implemented in
-// `orax-munch.c`
-
-GENFN walk_munch_node(MaxMunchState *state, MunchNode *node);
-GENFN walk_munch_list(MaxMunchState *state, MunchList *list);
-GENFN bind_output_stream(MaxMunchState *state);
-GENFN install_maximal_munch(MaxMunchState *state);
-
-// Renaming Lex and Yacc identifiers so they won't collide with other instances
-// of Lex and Yacc in Orax project
-
-#define yyinput munch_yylex
-#define output_streamput munch_output_stream
-#define yyunput munchyyunput
-#define yywrap munch_yywrap
-
-#define yylex munch_yylex
-#define yyerror munch_yyerror
-#define yychar munch_yychar
-#define yylval munch_yylval
-#define yydebug munch_yydebug
-#define yyec munch_yyec
-
-#define yyparse munch_yyparse
-#define yyparserr munch_yyparserr
-#define yydebug munch_yydebug
-#define yyval munch_yyval
-#define yyss munch_yyss
-#define yyssp munch_yyssp
-#define yystate munch_yystate
-#define yytmp munch_yytmp
-#define yyv munch_yyv
-#define yyvsp munch_yyvsp
-#define yylook munch_yylook
-#define yyback munch_yyback
-#define yyreduce munch_yyreduce
-#define yydefact munch_yydefact
-#define yydefgoto munch_yydefgoto
-#define yypact munch_yypact
-#define yypgoto munch_yypgoto
-#define yytable munch_yytable
-#define yycheck munch_yycheck
-#define yygbase munch_yygbase
-#define yygindex munch_yygindex
-#define yylen munch_yylen
-#define yydefred munch_yydefred
-#define yydgoto munch_yydgoto
-#define yysindex munch_yysindex
-#define yyrindex munch_yyrindex
-#define yyss munch_yyss
-#define yyssp munch_yyssp
-#define yystate munch_yystate
-#define yytmp munch_yytmp
-#define yyv munch_yyv
-#define yyvsp munch_yyvsp
-#define yylook munch_yylook
-#define yyback munch_yyback
-#define yyreduce munch_yyreduce
-#define yydefact munch_yydefact
-#define yydefgoto munch_yydefgoto
-#define yypact munch_yypact
-#define yypgoto munch_yypgoto
-#define yytable munch_yytable
-#define yycheck munch_yycheck
-#define yygbase munch_yygbase
-#define yygindex munch_yygindex
-#define yylen munch_yylen
-#define yydefred munch_yydefred
-#define yydgoto munch_yydgoto
-#define yysindex munch_yysindex
-#define yyrindex munch_yyrindex
-#define yyss munch_yyss
-#define yyssp munch_yyssp
-#define yystate munch_yystate
-#define yytmp munch_yytmp
-#define yyv munch_yyv
-#define yyvsp munch_yyvsp
-#define yylook munch_yylook
-#define yyback munch_yyback
-#define yyreduce munch_yyreduce
-#define yydefact munch_yydefact
-#define yydefgoto munch_yydefgoto
-#define yypact munch_yypact
-#define yypgoto munch_yypgoto
-#define yytable munch_yytable
-#define yycheck munch_yycheck
-#define yygbase munch_yygbase
-#define yygindex munch_yygindex
-#define yylen munch_yylen
-#define yydefred munch_yydefred
-#define yydgoto munch_yydgoto
-#define yysindex munch_yysindex
-#define yyrindex munch_yyrindex
-
-#endif
