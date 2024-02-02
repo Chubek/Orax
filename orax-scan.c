@@ -57,6 +57,7 @@ NFAState *create_nfa_state(nfaid_t id, bool is_accepting) {
 
 DFAState *create_dfa_state(dfaid_t id, bool is_accepting) {
   DFAState *state = (DFAState *)calloc(1, sizeof(DFAState));
+  state->is_accepting = is_accepting;
   return state;
 }
 
