@@ -167,4 +167,10 @@ enum BaseWordType {
   BASEWORD_U64,
 };
 
+enum SExpressionType {
+  SEXP_LIST,
+  SEXP_ATOM,
+  SEXP_SYNOBJ,
+};
+
 #endif
