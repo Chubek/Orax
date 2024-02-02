@@ -52,8 +52,8 @@ struct MaxMunchState {
 };
 
 struct SemCtx {
-  int num : 6;
-  term_t terminal : 58;
+  int num;
+  term_t terminal;
 };
 
 enum MunchNodeType {
@@ -102,9 +102,18 @@ TERMFN new_term(char *text, size_t len) {
 }
 
 TERMFN cat_terms(term_t term1, term_t term2) {
+  size_t lent1 = strlen(&term1[0]);
+  size_t lent2 = strlen(&term1[0]);
+
+  if ((lent1 + lent2) > MAX_TERM) {
+    fprintf(stderr, 
+	  "Error: length of two terminals compined is larger than allowed size(%d)", MAX_TERM);
+    exit(EXIT_FAILURE);
+  }
+
   term_t result = {0};
-  strncat(&result[0], &term1[0], strlen(&term1[0]));
-  strncat(&result[0], &term2[0], strlen(&term2[0]));
+  strncat(&result[0], &term1[0], lent1);
+  strncat(&result[lent1 - 1], &term2[0], lent2);
   return result;
 }
 
@@ -119,9 +128,9 @@ TERMFN term_from_num(int num) {
 static SymtabNode *symtable;
 
 SYMINSERTFN symtab_insert_semctx(term_t term, int num) {
-  term_t num = term_from_num(num);
-  term_t key = cat_terms(term, num);
-  SemCtx semtx = new_semctx(term, num);
+  static term_t num = term_from_num(num);
+  static term_t key = cat_terms(term, num);
+  static SemCtx semtx = new_semctx(term, num);
   symtable = symtable_insert(&symtable, &key[0], (void *)semctx);
 }
 
