@@ -8,9 +8,6 @@
 
 // + A: The Abstract Syntax Tree +
 
-/* Declaration of AST structure types and functions, see `orax-ast.c` for
- * definitions */
-
 typedef enum ASTNodeType ASTNodeType; // Defined in `orax-enums.h`
 typedef enum ASTLeafType ASTLeafType; // Defined in `orax-enums.h`
 typedef struct ASTNode ASTNode;
@@ -25,9 +22,6 @@ void free_ast_node(ASTNode *root);
 void free_ast_leaf(ASTLeaf *leaf);
 
 // + B: The Symbols Table +
-
-/* Type definitions and function declarations for the symbols table, see
- * `orax-symtable.c` for definitions */
 
 typedef struct SymtabNode SymtabNode;
 
@@ -46,7 +40,8 @@ typedef int vertnum_t;
 
 DAGNode *create_dag_node(Instruction *inst, vertnum_t dest);
 DAGGraph *create_dag_graph(vertnum_t vertices);
-void add_dag_edge(DAGGraph *graph, vertnum_t src, vertnum_t dst, Instruction *inst);
+void add_dag_edge(DAGGraph *graph, vertnum_t src, vertnum_t dst,
+                  Instruction *inst);
 
 void free_dag_node(DAGNode *root);
 void free_dag_graph(DAGGraph *graph);
@@ -54,10 +49,10 @@ void free_dag_graph(DAGGraph *graph);
 // + D: The Instructions +
 
 typedef enum InstructionName InstructionName; // Defined in `orax-enums.h`
-typedef enum OperandType OperandType;		// Defined in `orax-enums.h`
-typedef enum VariableType VariableType;         // Defined in `orax-enums.h`
+typedef enum OperandType OperandType;         // Defined in `orax-enums.h`
+typedef enum VariableType VariableType;       // Defined in `orax-enums.h`
 typedef enum OperandType ResultType;          // Defined in `orax-enums.h`
-typedef enum ConstantType ConstantType;		// Defined in `orax-enums.h`
+typedef enum ConstantType ConstantType;       // Defined in `orax-enums.h`
 typedef struct SSAInfo SSAInfo;
 typedef struct Instruction Instruction;
 typedef struct Operand Operand;
@@ -78,7 +73,7 @@ Instruction *create_instruction(InstructionName name, InstructionClass class,
 Instruction *add_inst_variable(Instruction *inst, Variable *variable);
 Instruction *add_inst_result(Instruction *inst, Result *result);
 Variable *create_variable(varhash_t hash, VariableType type, void *value,
-                        size_t size);
+                          size_t size);
 Result *create_result(ResultType type, void *value);
 Variable *duplicate_variable(Variable *op);
 void add_to_variable_size(Variable *op, typesize_t addition);
@@ -278,6 +273,29 @@ Variable *bitwise_xor_variables(Variable *op1, Variable *op2);
 Variable *bitwise_shr_variables(Variable *op1, Variable *op2);
 Variable *bitwise_shl_variables(Variable *op1, Variable *op2);
 bool attempt_constant_folding(Instruction *inst);
+
+// + O: S-Expression Parsing +
+
+typedef enum SExpressionType SExpressionType; // Defined in `orax-enums.h`
+typedef struct SExpression SExpression;
+typedef struct SExpressionSynObj SExpressionSynObj;
+
+SExpressionSynObj *create_sexp_synobj(char *name);
+SExpressionSynObj *add_synobj_parameter(SExpressionSynObj *synobj,
+                                        char *parameter);
+SExpressionSynObj *add_synobj_argument(SExpressionSynObj *synobj,
+                                       SExpressionSynObj *argument);
+SExpressionSynObj *add_synobj_expression(SExpressionSynObj *synobj,
+                                         SExpression *expr);
+SExpressionList *create_sexp_list(void);
+SExpressionList *add_sexpls_node(SExpressionList *sexpls, SExpression *sexp);
+SExpression *parse_sexp_atom(FILE *input_file);
+SExpressionList *parse_sexp_list(FILE *input_file);
+void print_sexp(SExpression *sexp);
+void walk_sexp_list(SExpressionList *sexpls);
+void free_sexp(SExpression *sexp);
+void free_sexp_synobj(SExpressionSynObj *synobj);
+void free_sexp_list(SExpressionList *sexpls);
 
 // === Some Systems Macros ====
 
