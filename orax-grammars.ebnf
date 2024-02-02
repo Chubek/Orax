@@ -1,0 +1,9 @@
+string		::= '"' .+  '"'
+string-sequence ::= string { string }
+backreference   ::= '$' [A-Z]+
+muncher		::= tree-decl <<s-expression>>
+		| emit-single <<string>>
+		| emit-sequence <<string-sequence>>
+		| target-architecture <<string>>
+		| var <<backreference>>
+		| const <<backreference>>
