@@ -146,8 +146,10 @@ void remove_node_from_graph(RegisterNode *nodes[], size_t num_nodes,
 #define MAX_SPILLABLE 8
 #endif
 
-/* These are declarations for the lifeset, see `orax-lifeset.c` for definitions
- */
+
+
+
+
 
 typedef struct Variable LifeObject;
 typedef struct LifeSet LifeSet;
@@ -320,6 +322,27 @@ void free_nfa_state(NFAState *nfa);
 void free_dfa_state(DFAState *dfa);
 void free_stack_automaton(StackAutomaton *stack);
 void free_lexical_rule(LexicalRule *lrule);
+
+
+
+
+typedef enum LALR0ActionType LALR0ActionType;
+typedef enum LALR0ProductionType LALR0ProductionType;
+typedef struct LALR0Production LALR0Production;
+typedef struct LALR0Item LALR0Item;
+typedef struct LALR0State LALR0State;
+typedef struct LALR0Action LALR0Action;
+typedef struct LALR0ParsingTable LALR0ParsingTable;
+typedef int lar0pos_t;
+typedef uint32_t lalr0hash_t;
+
+
+
+
+
+#define DOT_INDEX_INIT -1
+
+
 
 #define FREE_AND_NULLIFY(MEM)                                                  \
   do {                                                                         \
