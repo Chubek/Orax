@@ -11,17 +11,23 @@
 #define NONTERMFN static inline MunchNode *
 #define LISTFN static inline MunchList *
 #define MUNCHFN static inline MaxMunchState *
+#define SEMCTXFN static inline SemCtx
+#define SYMINSERTFN static inline void
+#define SYMGETFN static inline SemCtx
+#define TERMFN static inline term_t
 #define FREEFN static inline void
 #define INSTALLFN static inline void
 #define GENFN void
 
+#ifndef MAX_TERM
 #define MAX_TERM 64
-#define MAX_BUFF 65536
+#endif
 
 typedef enum MunchNodeType MunchNodeType;
 typedef enum MunchNodeLeafType MunchNodeLeafType;
 typedef struct MunchNode MunchNode;
 typedef struct MaxMunchState MaxMunchState;
+typedef struct SemCtx SemCtx;
 typedef MunchNode *MunchList;
 typedef term_t term_t[static MAX_TERM];
 
@@ -41,11 +47,13 @@ struct MaxMunchState {
   MunchNode *rules;
   term_t header;
   term_t footer;
-  char tree_decls_buff[MAX_BUFF];
-  char match_functions_buff[MAX_BUFF];
-  FILE *tree_decls_stream;
-  FILE *match_functions_stream;
-  FILE *yyout;
+  void *context;
+  FILE *output_stream;
+};
+
+struct SemCtx {
+  int num : 6;
+  term_t terminal : 58;
 };
 
 enum MunchNodeType {
@@ -71,6 +79,57 @@ enum MunchNodeLeafType {
   LEAF_LIST,
   LEAF_STRING,
 };
+
+// Semantic syntax functions
+
+SEMCTXFN new_semctx(term_t terminal, int num) {
+  SemCtx semtx = (SemCtx){.num = num, .terminal = temrinal};
+  return semctx;
+}
+
+// Terminal functions
+
+TERMFN new_term(char *text, size_t len) {
+  if (len >= MAX_TERM) {
+    fprintf(stderr,
+            "Error: length of terminal `%s` larger than allowed size(%d)\n",
+            text, MAX_TERM);
+    exit(EXIT_FAILURE);
+  }
+  term_t term = {0};
+  strncat(&term[0], len);
+  return term;
+}
+
+TERMFN cat_terms(term_t term1, term_t term2) {
+  term_t result = {0};
+  strncat(&result[0], &term1[0], strlen(&term1[0]));
+  strncat(&result[0], &term2[0], strlen(&term2[0]));
+  return result;
+}
+
+TERMFN term_from_num(int num) {
+  term_t num = {0};
+  sprintf(&num[0], "%d", num);
+  return num;
+}
+
+// Symtable funtions
+
+static SymtabNode *symtable;
+
+SYMINSERTFN symtab_insert_semctx(term_t term, int num) {
+  term_t num = term_from_num(num);
+  term_t key = cat_terms(term, num);
+  SemCtx semtx = new_semctx(term, num);
+  symtable = symtable_insert(&symtable, &key[0], (void *)semctx);
+}
+
+SYMGENFN symtab_get_semctx(term_t term, int num) {
+  term_t num = term_from_num(num);
+  term_t key = cat_terms(term, num);
+  return (SemCtx)symtable_get(&key[0]);
+}
 
 // General factories
 
@@ -183,7 +242,7 @@ LISTFN munch_list_append(MunchList *list, MunchNode *item) {
 // Munch state methods
 
 MUNCHFN set_munch_state_buffers_to_zero(MaxMunchState *state) {
-  memset(&state->tree_decls_buff[0], 0, MAX_BUFF);
+  memset(&state->decls_buffer[0], 0, MAX_BUFF);
   memset(&state->match_functions_buff[0], 0, MAX_BUFF);
 }
 
@@ -197,11 +256,6 @@ MUNCHFN create_munch_state(term_t header, term_t footer, MunchNode *decls,
   munch_state->footer = footer;
   munch_state->decls = decls;
   munch_state->rules = rules;
-
-  munch_state->tree_decls_stream =
-      fmemopen(&munch_state->tree_decls_buff[0], MAX_BUFF, "w");
-  munch_state->match_functions_stream =
-      fmemopen(&munch_state->tree_decls_buff[0], MAX_BUFF, "w");
 
   return munch_state;
 }
@@ -236,8 +290,8 @@ FREEFN free_munch_list(MunchList *list) {
 FREEFN free_munch_state(MaxMunchState *state) {
   if (state == NULL)
     return;
-  fclose(state->tree_decls_stream);
-  fclose(state->match_functions_stream);
+  fclose(state->decls_stream);
+  fclose(state->defs_stream);
   free_munch_node(state->decls);
   free_munch_node(state->rules);
   FREE_AND_NULLIFY(&state->header);
@@ -250,14 +304,14 @@ FREEFN free_munch_state(MaxMunchState *state) {
 
 GENFN walk_munch_node(MaxMunchState *state, MunchNode *node);
 GENFN walk_munch_list(MaxMunchState *state, MunchList *list);
-GENFN bind_yyout(MaxMunchState *state);
+GENFN bind_output_stream(MaxMunchState *state);
 GENFN install_maximal_munch(MaxMunchState *state);
 
 // Renaming Lex and Yacc identifiers so they won't collide with other instances
 // of Lex and Yacc in Orax project
 
 #define yyinput munch_yylex
-#define yyoutput munch_yyout
+#define output_streamput munch_output_stream
 #define yyunput munchyyunput
 #define yywrap munch_yywrap
 
