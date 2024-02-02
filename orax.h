@@ -274,75 +274,22 @@ void free_sexp(SExpression *sexp);
 void free_sexp_synobj(SExpressionSynObj *synobj);
 void free_sexp_list(SExpressionList *sexpls);
 
-typedef struct NFAState NFAState;
-typedef struct DFAState DFAState;
-typedef struct StackAutomaton StackAutomaton;
-typedef struct LexicalRule LexicalRule;
-typedef struct LexicalStartCondition LexicalStartCondition;
-typedef struct LexicalScannerSpecs LexicalScannerSpecs;
-typedef int nfaid_t;
-typedef int dfaid_t;
-typedef int condid_t;
-typedef int precedence_t;
 
-#define MAX_TRANSITIONS 256
-#define NUM_GENERATED_ARRAY_ROWS 16
-#define EPSILON 0
-#define ANY_CHAR 255
+
+
+
+
+
+
+
+
+
+
+
 
 #ifdef __unix__
 #define SYSTEM_NEWLINE "\n"
-
-NFAState *create_nfa_state(nfaid_t id, bool is_accepting);
-DFAState *create_dfa_state(dfaid_t id, bool is_accepting);
-StackAutomaton *create_stack_automaton(void);
-LexicalRule *create_lexical_rule(char *semantic_action);
-LexicalStartCondition *create_lexical_start_condition(condid_t id, char *name,
-                                                      bool exclusive);
-LexicalScannerSpecs *create_lexical_scanner_specs(void);
-NFAState *add_nfa_epstrans(NFAState *state, NFAState *eps);
-StackAutomaton *push_stack_state(StackAutomaton *stack, NFAState *state);
-LexicalScannerSpecs *add_lspecs_start_condition(LexicalScannerSpecs *lspecs,
-                                                LexicalStartCondition *stcond);
-LexicalScannerSpecs *add_lspecs_lexical_rule(LexicalScannerSpecs *lspecs,
-                                             LexicalRule *lrule);
-NFAState *stack_tos_proceed(StackAutomaton *stack);
-NFAState *stack_tos_recede(StackAutomaton *stack);
-void add_nfa_trans(NFAState *state, uint32_t from, uint32_t to);
-void add_dfa_trans(DFAState *state, uint32_t from, uint32_t to);
-DFAState *convert_nfa_to_dfa(NFAState *nfa);
-bool state_in_set(NFAState **set, size_t size, NFAState *state);
-void infix_to_postfix(const char *regex, char *postfix);
-StackAutomaton *parse_regular_expression(const char *regex);
-void lexer_generator_output_dfa_state(DFAState *dfa, FILE *output_file);
-void lexer_generator_output_dfa_accepting_status(DFAState **states,
-                                                 size_t num_states,
-                                                 FILE *output_file);
-void free_nfa_state(NFAState *nfa);
-void free_dfa_state(DFAState *dfa);
-void free_stack_automaton(StackAutomaton *stack);
-void free_lexical_rule(LexicalRule *lrule);
-
-
-
-
-typedef enum LALR0ActionType LALR0ActionType;
-typedef enum LALR0ProductionType LALR0ProductionType;
-typedef struct LALR0Production LALR0Production;
-typedef struct LALR0Item LALR0Item;
-typedef struct LALR0State LALR0State;
-typedef struct LALR0Action LALR0Action;
-typedef struct LALR0ParsingTable LALR0ParsingTable;
-typedef int lar0pos_t;
-typedef uint32_t lalr0hash_t;
-
-
-
-
-
-#define DOT_INDEX_INIT -1
-
-
+#endif 
 
 #define FREE_AND_NULLIFY(MEM)                                                  \
   do {                                                                         \
