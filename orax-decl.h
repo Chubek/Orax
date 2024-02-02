@@ -6,10 +6,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
-// + A: The Abstract Syntax Tree +
-
-typedef enum ASTNodeType ASTNodeType; // Defined in `orax-enums.h`
-typedef enum ASTLeafType ASTLeafType; // Defined in `orax-enums.h`
+typedef enum ASTNodeType ASTNodeType;
+typedef enum ASTLeafType ASTLeafType;
 typedef struct ASTNode ASTNode;
 typedef struct ASTLeaf ASTLeaf;
 
@@ -21,8 +19,6 @@ ASTNode *add_ast_leaf(ASTNode *node, ASTLeaf *leaf);
 void free_ast_node(ASTNode *root);
 void free_ast_leaf(ASTLeaf *leaf);
 
-// + B: The Symbols Table +
-
 typedef struct SymtabNode SymtabNode;
 
 uint32_t djb2_hash(char *message);
@@ -30,10 +26,7 @@ void symbtable_insert(SymtabNode **tab, char *key, void *value);
 void *symtable_get(SymtabNode *tab, char *key);
 void free_symtable(SymtabNode *tab);
 
-// + C: The Directed Acyclic Graph +
-
-typedef struct Instruction
-    Instruction; // This will be re-declared in the next section
+typedef struct Instruction Instruction;
 typedef struct DAGNode DAGNode;
 typedef struct DAGGraph DAGGraph;
 typedef int vertnum_t;
@@ -46,13 +39,11 @@ void add_dag_edge(DAGGraph *graph, vertnum_t src, vertnum_t dst,
 void free_dag_node(DAGNode *root);
 void free_dag_graph(DAGGraph *graph);
 
-// + D: The Instructions +
-
-typedef enum InstructionName InstructionName; // Defined in `orax-enums.h`
-typedef enum OperandType OperandType;         // Defined in `orax-enums.h`
-typedef enum VariableType VariableType;       // Defined in `orax-enums.h`
-typedef enum OperandType ResultType;          // Defined in `orax-enums.h`
-typedef enum ConstantType ConstantType;       // Defined in `orax-enums.h`
+typedef enum InstructionName InstructionName;
+typedef enum OperandType OperandType;
+typedef enum VariableType VariableType;
+typedef enum OperandType ResultType;
+typedef enum ConstantType ConstantType;
 typedef struct SSAInfo SSAInfo;
 typedef struct Instruction Instruction;
 typedef struct Operand Operand;
@@ -83,9 +74,7 @@ void free_instruction(Instruction *inst);
 
 #define SSA_VERSION_UNASSIGNED -1
 
-// + E: The Control Flow Graph +
-
-typedef enum TraceBlockType TraceBlockType; // Defined in `orax-enums.h`
+typedef enum TraceBlockType TraceBlockType;
 typedef struct TraceBlock TraceBlock;
 typedef struct ControlFlowGraph ControlFlowGraph;
 typedef int blockid_t;
@@ -119,8 +108,6 @@ void insert_phi_instruction_at_head(TraceBlock *block, Instruction *inst);
 void ssa_insert_phi_instructions(ControlFlowGraph *cfg);
 void free_trace_block(TraceBlock *block);
 void free_cfg(ControlFlowGraph *cfg);
-
-// + F: The Interferrence Graph +
 
 typedef struct RegisterNode RegisterNode;
 typedef int regid_t;
@@ -159,8 +146,6 @@ void remove_node_from_graph(RegisterNode *nodes[], size_t num_nodes,
 #define MAX_SPILLABLE 8
 #endif
 
-// + G: The Lifeset +
-
 /* These are declarations for the lifeset, see `orax-lifeset.c` for definitions
  */
 
@@ -177,10 +162,8 @@ LifeSet *copy_life_set(LifeSet *set);
 void free_life_object(LifeObject *object);
 void free_life_set(LifeSet *set);
 
-// + H: Instruction Selection +
-
-typedef enum MachineOpcode MachineOpcode;     // Generated from file
-typedef enum MachineRegister MachineRegister; // Generated from file
+typedef enum MachineOpcode MachineOpcode;
+typedef enum MachineRegister MachineRegister;
 typedef struct MachineInstruction MachineInstrction;
 typedef struct InstructionTile InstructionTile;
 typedef struct MaxMunchState MaxMunchState;
@@ -202,8 +185,6 @@ MaxMunchState *add_munch_state_inst(MaxMunchState *state,
 void free_instruction_tile(InstructionTile *tile);
 void free_machine_register(MachineRegister *reg);
 void free_maximal_munch_state(MaxMunchState *state);
-
-// + K: IEEE-745 Interface +
 
 typedef struct IEEE745_Float32 Float32;
 typedef struct IEEE745_Float64 Float64;
@@ -231,8 +212,6 @@ Float64 f64_exponentiation(Float64 a, Float64 b);
 #define FLOAT64_FRACTION_MASK 0x10000000000000
 #define FLOAT64_BIAS 1023
 
-// + L: The Typing System +
-
 typedef enum TypeKind TypeKind;
 typedef enum TypeStaticity TypeStaticity;
 typedef enum TypeStrength TypeStrength;
@@ -259,8 +238,6 @@ SingletonType *add_singleton_enumeration_field(SingletonType *singleton,
 SingletonType *add_singleton_vtable_method(SingletonType *singleton,
                                            TypeMethod *meth);
 
-// + M: Constant Folding +
-
 Variable *add_variables(Variable *op1, Variable *op2);
 Variable *subtract_variables(Variable *op1, Variable *op2);
 Variable *multiply_variables(Variable *op1, Variable *op2);
@@ -274,9 +251,7 @@ Variable *bitwise_shr_variables(Variable *op1, Variable *op2);
 Variable *bitwise_shl_variables(Variable *op1, Variable *op2);
 bool attempt_constant_folding(Instruction *inst);
 
-// + O: S-Expression Parsing +
-
-typedef enum SExpressionType SExpressionType; // Defined in `orax-enums.h`
+typedef enum SExpressionType SExpressionType;
 typedef struct SExpression SExpression;
 typedef struct SExpressionSynObj SExpressionSynObj;
 
@@ -297,7 +272,54 @@ void free_sexp(SExpression *sexp);
 void free_sexp_synobj(SExpressionSynObj *synobj);
 void free_sexp_list(SExpressionList *sexpls);
 
-// === Some Systems Macros ====
+typedef struct NFAState NFAState;
+typedef struct DFAState DFAState;
+typedef struct StackAutomaton StackAutomaton;
+typedef struct LexicalRule LexicalRule;
+typedef struct LexicalStartCondition LexicalStartCondition;
+typedef struct LexicalScannerSpecs LexicalScannerSpecs;
+typedef int nfaid_t;
+typedef int dfaid_t;
+typedef int condid_t;
+typedef int precedence_t;
+
+#define MAX_TRANSITIONS 256
+#define NUM_GENERATED_ARRAY_ROWS 16
+#define EPSILON 0
+#define ANY_CHAR 255
+
+#ifdef __unix__
+#define SYSTEM_NEWLINE "\n"
+
+NFAState *create_nfa_state(nfaid_t id, bool is_accepting);
+DFAState *create_dfa_state(dfaid_t id, bool is_accepting);
+StackAutomaton *create_stack_automaton(void);
+LexicalRule *create_lexical_rule(char *semantic_action);
+LexicalStartCondition *create_lexical_start_condition(condid_t id, char *name,
+                                                      bool exclusive);
+LexicalScannerSpecs *create_lexical_scanner_specs(void);
+NFAState *add_nfa_epstrans(NFAState *state, NFAState *eps);
+StackAutomaton *push_stack_state(StackAutomaton *stack, NFAState *state);
+LexicalScannerSpecs *add_lspecs_start_condition(LexicalScannerSpecs *lspecs,
+                                                LexicalStartCondition *stcond);
+LexicalScannerSpecs *add_lspecs_lexical_rule(LexicalScannerSpecs *lspecs,
+                                             LexicalRule *lrule);
+NFAState *stack_tos_proceed(StackAutomaton *stack);
+NFAState *stack_tos_recede(StackAutomaton *stack);
+void add_nfa_trans(NFAState *state, uint32_t from, uint32_t to);
+void add_dfa_trans(DFAState *state, uint32_t from, uint32_t to);
+DFAState *convert_nfa_to_dfa(NFAState *nfa);
+bool state_in_set(NFAState **set, size_t size, NFAState *state);
+void infix_to_postfix(const char *regex, char *postfix);
+StackAutomaton *parse_regular_expression(const char *regex);
+void lexer_generator_output_dfa_state(DFAState *dfa, FILE *output_file);
+void lexer_generator_output_dfa_accepting_status(DFAState **states,
+                                                 size_t num_states,
+                                                 FILE *output_file);
+void free_nfa_state(NFAState *nfa);
+void free_dfa_state(DFAState *dfa);
+void free_stack_automaton(StackAutomaton *stack);
+void free_lexical_rule(LexicalRule *lrule);
 
 #define FREE_AND_NULLIFY(MEM)                                                  \
   do {                                                                         \
