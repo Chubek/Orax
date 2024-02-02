@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "orax-decl.h"
+#include "orax.h"
 
 struct IEEE745_Float32 {
   uint32_t fraction : 23;

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "orax-decl.h"
+#include "orax.h"
 
 struct DAGNode {
   Instruction *instruction;

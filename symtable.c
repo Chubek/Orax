@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "orax-decl.h"
+#include "orax.h"
 
 struct SymtabNode {
   char *key;

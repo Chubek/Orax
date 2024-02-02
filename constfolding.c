@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "orax-decl.h"
-#include "orax-enums.h"
+#include "orax.h"
+#include "enumerations.h"
 
 Variable *add_variables(Variable *op1, Variable *op2) {
   Variable *result = duplicate_variable(op1);

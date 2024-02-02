@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "orax-decl.h"
-#include "orax-enums.h"
+#include "orax.h"
+#include "enumerations.h"
 
 struct Instruction {
   instid_t id;
